@@ -81,6 +81,111 @@ const EV_GUIDE = [
 // ビタミンの残り使用可能回数（第3世代ルール）
 const vitaminLeft = (ev) => ev < VITAMIN_CAP ? Math.ceil((VITAMIN_CAP - ev) / 10) : 0;
 
+// 性格データ（日本語名・上昇・下降ステータス）
+const NATURES = [
+  { name:"がんばりや", up:null,  dn:null  },
+  { name:"さみしがり", up:"atk", dn:"def" },
+  { name:"ゆうかん",   up:"atk", dn:"spe" },
+  { name:"いじっぱり", up:"atk", dn:"spa" },
+  { name:"やんちゃ",   up:"atk", dn:"spd" },
+  { name:"ずぶとい",   up:"def", dn:"atk" },
+  { name:"すなお",     up:null,  dn:null  },
+  { name:"のんき",     up:"def", dn:"spe" },
+  { name:"わんぱく",   up:"def", dn:"spa" },
+  { name:"のうてんき", up:"def", dn:"spd" },
+  { name:"おくびょう", up:"spe", dn:"atk" },
+  { name:"せっかち",   up:"spe", dn:"def" },
+  { name:"まじめ",     up:null,  dn:null  },
+  { name:"ようき",     up:"spe", dn:"spa" },
+  { name:"むじゃき",   up:"spe", dn:"spd" },
+  { name:"ひかえめ",   up:"spa", dn:"atk" },
+  { name:"おっとり",   up:"spa", dn:"def" },
+  { name:"れいせい",   up:"spa", dn:"spe" },
+  { name:"てれや",     up:null,  dn:null  },
+  { name:"うっかりや", up:"spa", dn:"spd" },
+  { name:"おだやか",   up:"spd", dn:"atk" },
+  { name:"おとなしい", up:"spd", dn:"def" },
+  { name:"なまいき",   up:"spd", dn:"spe" },
+  { name:"しんちょう", up:"spd", dn:"spa" },
+  { name:"きまぐれ",   up:null,  dn:null  },
+];
+
+// カントー151匹の種族値 [id, 日本語名, HP, こうげき, ぼうぎょ, とくこう, とくぼう, すばやさ]
+const POKEMON_DATA = [
+  [1,"フシギダネ",45,49,49,65,65,45],[2,"フシギソウ",60,62,63,80,80,60],[3,"フシギバナ",80,82,83,100,100,80],
+  [4,"ヒトカゲ",39,52,43,60,50,65],[5,"リザード",58,64,58,80,65,80],[6,"リザードン",78,84,78,109,85,100],
+  [7,"ゼニガメ",44,48,65,50,64,43],[8,"カメール",59,63,80,65,80,58],[9,"カメックス",79,83,100,85,105,78],
+  [10,"キャタピー",45,30,35,20,20,45],[11,"トランセル",50,20,55,25,25,30],[12,"バタフリー",60,45,50,90,80,70],
+  [13,"ビードル",40,35,30,20,20,50],[14,"コクーン",45,25,50,25,25,35],[15,"スピアー",65,90,40,45,80,75],
+  [16,"ポッポ",40,45,40,35,35,56],[17,"ピジョン",63,60,55,50,50,71],[18,"ピジョット",83,80,75,70,70,101],
+  [19,"コラッタ",30,56,35,25,35,72],[20,"ラッタ",55,81,60,50,70,97],
+  [21,"オニスズメ",40,60,30,31,31,70],[22,"オニドリル",65,90,65,61,61,100],
+  [23,"アーボ",35,60,44,40,54,55],[24,"アーボック",60,95,69,65,79,80],
+  [25,"ピカチュウ",35,55,40,50,50,90],[26,"ライチュウ",60,90,55,90,80,110],
+  [27,"サンド",50,75,85,20,30,40],[28,"サンドパン",75,100,110,45,55,65],
+  [29,"ニドラン♀",55,47,52,40,40,41],[30,"ニドリーナ",70,62,67,55,55,56],[31,"ニドクイン",90,92,87,75,85,76],
+  [32,"ニドラン♂",46,57,40,40,40,50],[33,"ニドリーノ",61,72,57,55,55,65],[34,"ニドキング",81,102,77,85,75,85],
+  [35,"ピッピ",70,45,48,60,65,35],[36,"ピクシー",95,70,73,95,90,60],
+  [37,"ロコン",38,41,40,50,65,65],[38,"キュウコン",73,76,75,81,100,100],
+  [39,"プリン",115,45,20,45,25,20],[40,"プクリン",140,70,45,85,50,45],
+  [41,"ズバット",40,45,35,30,40,55],[42,"ゴルバット",75,80,70,65,75,90],
+  [43,"ナゾノクサ",45,50,55,75,65,30],[44,"クサイハナ",60,65,70,85,75,40],[45,"ラフレシア",75,80,85,110,90,50],
+  [46,"パラス",35,70,55,45,55,25],[47,"パラセクト",60,95,80,60,80,30],
+  [48,"コンパン",60,55,50,40,55,45],[49,"モルフォン",70,65,60,90,75,90],
+  [50,"ディグダ",10,55,25,35,45,95],[51,"ダグトリオ",35,100,50,50,70,120],
+  [52,"ニャース",40,45,35,40,40,90],[53,"ペルシアン",65,70,60,65,65,115],
+  [54,"コダック",50,52,48,65,50,55],[55,"ゴルダック",80,82,78,95,80,85],
+  [56,"マンキー",40,80,35,35,45,70],[57,"オコリザル",65,105,60,60,70,95],
+  [58,"ガーディ",55,70,45,70,50,60],[59,"ウインディ",90,110,80,100,80,95],
+  [60,"ニョロモ",40,50,40,40,40,90],[61,"ニョロゾ",65,65,65,50,50,90],[62,"ニョロボン",90,95,95,70,90,70],
+  [63,"ケーシィ",25,20,15,105,55,90],[64,"ユンゲラー",40,35,30,120,70,105],[65,"フーディン",55,50,45,135,95,120],
+  [66,"ワンリキー",70,80,50,35,35,35],[67,"ゴーリキー",80,100,70,50,60,45],[68,"カイリキー",90,130,80,65,85,55],
+  [69,"マダツボミ",50,75,35,70,30,40],[70,"ウツドン",65,90,50,85,45,55],[71,"ウツボット",80,105,65,100,70,70],
+  [72,"メノクラゲ",40,40,35,50,100,70],[73,"ドククラゲ",80,70,65,80,120,100],
+  [74,"イシツブテ",40,80,100,30,30,20],[75,"ゴローン",55,95,115,45,45,35],[76,"ゴローニャ",80,120,130,55,65,45],
+  [77,"ポニータ",50,85,55,65,65,90],[78,"ギャロップ",65,100,70,80,80,105],
+  [79,"ヤドン",90,65,65,40,40,15],[80,"ヤドラン",95,75,110,100,80,30],
+  [81,"コイル",25,35,70,95,55,45],[82,"レアコイル",50,60,95,120,70,70],
+  [83,"カモネギ",52,90,55,58,62,60],
+  [84,"ドードー",35,85,45,35,35,75],[85,"ドードリオ",60,110,70,60,60,110],
+  [86,"パウワウ",65,45,55,45,70,45],[87,"ジュゴン",90,70,80,70,95,70],
+  [88,"ベトベター",80,80,50,40,50,25],[89,"ベトベトン",105,105,75,65,100,50],
+  [90,"シェルダー",30,65,100,45,25,40],[91,"パルシェン",50,95,180,85,45,70],
+  [92,"ゴース",30,35,30,100,35,80],[93,"ゴースト",45,50,45,115,55,95],[94,"ゲンガー",60,65,60,130,75,110],
+  [95,"イワーク",35,45,160,30,45,70],
+  [96,"スリープ",60,48,45,43,90,42],[97,"スリーパー",85,73,70,73,115,67],
+  [98,"クラブ",30,105,90,25,25,50],[99,"キングラー",55,130,115,50,50,75],
+  [100,"ビリリダマ",40,30,50,55,55,100],[101,"マルマイン",60,50,70,80,80,150],
+  [102,"タマタマ",60,40,80,60,45,40],[103,"ナッシー",95,95,85,125,75,55],
+  [104,"カラカラ",50,50,95,40,50,35],[105,"ガラガラ",60,80,110,50,80,45],
+  [106,"サワムラー",50,120,53,35,110,87],[107,"エビワラー",50,105,79,35,110,76],
+  [108,"ベロリンガ",90,55,75,60,75,30],
+  [109,"ドガース",40,65,95,60,45,35],[110,"マタドガス",65,90,120,85,70,60],
+  [111,"サイホーン",80,85,95,30,30,25],[112,"サイドン",105,130,120,45,45,40],
+  [113,"ラッキー",250,5,5,35,105,50],[114,"モンジャラ",65,55,115,100,40,60],
+  [115,"ガルーラ",105,95,80,40,80,90],
+  [116,"タッツー",30,40,70,70,25,60],[117,"シードラ",55,65,95,95,45,85],
+  [118,"トサキント",45,67,60,35,50,63],[119,"アズマオウ",80,92,65,65,80,68],
+  [120,"ヒトデマン",30,45,55,70,55,85],[121,"スターミー",60,75,85,100,85,115],
+  [122,"バリヤード",40,45,65,100,120,90],[123,"ストライク",70,110,80,55,80,105],
+  [124,"ルージュラ",65,50,35,115,95,95],
+  [125,"エレブー",65,83,57,95,85,105],[126,"ブーバー",65,95,57,100,85,93],
+  [127,"カイロス",65,125,100,55,70,85],[128,"ケンタロス",75,100,95,40,70,110],
+  [129,"コイキング",20,10,55,15,20,80],[130,"ギャラドス",95,125,79,60,100,81],
+  [131,"ラプラス",130,85,80,85,95,60],[132,"メタモン",48,48,48,48,48,48],
+  [133,"イーブイ",55,55,50,45,65,55],
+  [134,"シャワーズ",130,65,60,110,95,65],[135,"サンダース",65,65,60,110,95,130],[136,"ブースター",65,130,60,95,110,65],
+  [137,"ポリゴン",65,60,70,85,75,40],
+  [138,"オムナイト",35,40,100,90,55,35],[139,"オムスター",70,60,125,115,70,55],
+  [140,"カブト",30,80,90,55,45,55],[141,"カブトプス",60,115,105,65,70,80],
+  [142,"プテラ",80,105,65,60,75,130],[143,"カビゴン",160,110,65,65,110,30],
+  [144,"フリーザー",90,85,100,95,125,85],[145,"サンダー",90,90,85,125,90,100],[146,"ファイヤー",90,100,90,125,85,90],
+  [147,"ミニリュウ",41,64,45,50,50,50],[148,"ハクリュー",61,84,65,70,70,70],[149,"カイリュー",91,134,95,100,100,80],
+  [150,"ミュウツー",106,110,90,154,90,130],[151,"ミュウ",100,100,100,100,100,100],
+];
+// [id, name, hp, atk, def, spa, spd, spe] のインデックス
+const PD = { hp:2, atk:3, def:4, spa:5, spd:6, spe:7 };
+
 function EVTracker() {
   const [party, setParty] = useState(DEFAULT_PARTY);
   const [allEVs, setAllEVs] = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
@@ -88,6 +193,12 @@ function EVTracker() {
   const [loaded, setLoaded] = useState(false);
   const [macho, setMacho] = useState(false); // 強制ギプス（EV×2）
   const [showGuide, setShowGuide] = useState(false);
+  const [showIVC, setShowIVC] = useState(false);
+  const [ivcMon,    setIvcMon]    = useState(0);
+  const [ivcLv,     setIvcLv]     = useState(50);
+  const [ivcNat,    setIvcNat]    = useState(0);
+  const [ivcActual, setIvcActual] = useState({hp:"",atk:"",def:"",spa:"",spd:"",spe:""});
+  const [ivcEV,     setIvcEV]     = useState({hp:0,atk:0,def:0,spa:0,spd:0,spe:0});
 
   const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState("");
@@ -136,6 +247,46 @@ function EVTracker() {
   };
 
   const reset = () => setAllEVs(prev => ({ ...prev, [selected]: initEVs() }));
+
+  // 個体値計算（第3世代）
+  const ivCalc = (statKey) => {
+    const actual = parseInt(ivcActual[statKey]);
+    if (isNaN(actual) || actual <= 0) return null;
+    const mon = POKEMON_DATA[ivcMon];
+    const base = mon[PD[statKey]];
+    const ev = Math.max(0, Math.min(255, parseInt(ivcEV[statKey]) || 0));
+    const nat = NATURES[ivcNat];
+    const isHP = statKey === "hp";
+    const res = [];
+    for (let iv = 0; iv <= 31; iv++) {
+      const inner = Math.floor((2 * base + iv + Math.floor(ev / 4)) * ivcLv / 100);
+      let stat;
+      if (isHP) {
+        stat = inner + ivcLv + 10;
+      } else {
+        const s5 = inner + 5;
+        stat = nat.up === statKey ? Math.floor(s5 * 11 / 10)
+             : nat.dn === statKey ? Math.floor(s5 * 9  / 10)
+             : s5;
+      }
+      if (stat === actual) res.push(iv);
+    }
+    return res;
+  };
+  const ivDisp = (statKey) => {
+    const res = ivCalc(statKey);
+    if (res === null) return "—";
+    if (res.length === 0) return "？";
+    if (res.length === 1) return `${res[0]}`;
+    return `${res[0]}〜${res[res.length - 1]}`;
+  };
+  const ivColor = (statKey) => {
+    const res = ivCalc(statKey);
+    if (!res || res.length === 0) return "#555";
+    if (res[0] >= 28) return "#7fff7f";
+    if (res[res.length - 1] <= 10) return "#ff6b6b";
+    return "#f5d020";
+  };
 
   const updateMemo = (text) => {
     setParty(prev => prev.map(p => p.name === selected ? { ...p, memo: text } : p));
@@ -323,6 +474,94 @@ function EVTracker() {
           rows={2}
           style={{ width: "100%", background: "#0d0d1a", border: "1px solid #2a2a4a", borderRadius: "6px", color: "#e8e8e8", fontSize: "11px", padding: "7px 10px", fontFamily: "inherit", lineHeight: "1.5" }}
         />
+      </div>
+
+      {/* 個体値チェッカー */}
+      <div style={{ marginBottom: "10px" }}>
+        <button
+          onClick={() => setShowIVC(v => !v)}
+          style={{ width:"100%", background: showIVC ? "#0d1a2e" : "#16213e", border:`1px solid ${showIVC ? mon.color+"88" : "#2a2a4a"}`, borderRadius: showIVC ? "8px 8px 0 0" : "8px", color: showIVC ? mon.color : "#555", fontSize:"11px", padding:"8px", cursor:"pointer", fontFamily:"inherit", letterSpacing:"1px" }}
+        >
+          🔬 個体値チェッカー（Gen III）{showIVC ? "　▲" : "　▼"}
+        </button>
+        {showIVC && (() => {
+          const nat = NATURES[ivcNat];
+          const statLabel = { hp:"ＨＰ", atk:"こうげき", def:"ぼうぎょ", spa:"とくこう", spd:"とくぼう", spe:"すばやさ" };
+          const natLabel = (n) => n.up ? `${n.name}（↑${statLabel[n.up]} / ↓${statLabel[n.dn]}）` : `${n.name}（補正なし）`;
+          return (
+            <div style={{ background:"#0d1a2e", border:`1px solid ${mon.color}44`, borderTop:"none", borderRadius:"0 0 8px 8px", padding:"12px" }}>
+              {/* ポケモン選択 */}
+              <select
+                value={ivcMon}
+                onChange={e => setIvcMon(Number(e.target.value))}
+                style={{ width:"100%", background:"#16213e", border:"1px solid #3a3a5a", borderRadius:"6px", color:"#e8e8e8", fontSize:"12px", padding:"6px 8px", marginBottom:"8px", fontFamily:"inherit" }}
+              >
+                {POKEMON_DATA.map((p, i) => (
+                  <option key={p[0]} value={i}>{String(p[0]).padStart(3,"0")} {p[1]}</option>
+                ))}
+              </select>
+
+              {/* レベル・性格 */}
+              <div style={{ display:"flex", gap:"6px", marginBottom:"10px" }}>
+                <div style={{ display:"flex", flexDirection:"column", gap:"3px" }}>
+                  <div style={{ fontSize:"9px", color:"#555" }}>レベル</div>
+                  <input
+                    type="number" min="1" max="100"
+                    value={ivcLv}
+                    onChange={e => setIvcLv(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+                    style={{ width:"54px", background:"#16213e", border:"1px solid #3a3a5a", borderRadius:"6px", color:"#e8e8e8", fontSize:"13px", padding:"5px 6px", fontFamily:"inherit", textAlign:"center" }}
+                  />
+                </div>
+                <div style={{ flex:1, display:"flex", flexDirection:"column", gap:"3px" }}>
+                  <div style={{ fontSize:"9px", color:"#555" }}>性格</div>
+                  <select
+                    value={ivcNat}
+                    onChange={e => setIvcNat(Number(e.target.value))}
+                    style={{ width:"100%", background:"#16213e", border:"1px solid #3a3a5a", borderRadius:"6px", color:"#e8e8e8", fontSize:"11px", padding:"5px 6px", fontFamily:"inherit" }}
+                  >
+                    {NATURES.map((n, i) => <option key={i} value={i}>{natLabel(n)}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* ステータス入力テーブル */}
+              <div style={{ display:"grid", gridTemplateColumns:"62px 52px 1fr 44px", gap:"3px 6px", alignItems:"center", marginBottom:"4px" }}>
+                <div style={{ fontSize:"9px", color:"#444" }}>ステータス</div>
+                <div style={{ fontSize:"9px", color:"#444", textAlign:"center" }}>努力値</div>
+                <div style={{ fontSize:"9px", color:"#444", textAlign:"center" }}>実数値</div>
+                <div style={{ fontSize:"9px", color:"#444", textAlign:"center" }}>個体値</div>
+              </div>
+              {STATS.map(stat => {
+                const isUp = nat.up === stat.key;
+                const isDn = nat.dn === stat.key;
+                const disp = ivDisp(stat.key);
+                const col  = ivColor(stat.key);
+                return (
+                  <div key={stat.key} style={{ display:"grid", gridTemplateColumns:"62px 52px 1fr 44px", gap:"3px 6px", alignItems:"center", marginBottom:"4px" }}>
+                    <div style={{ fontSize:"11px", color: isUp ? "#f5d020" : isDn ? "#ff6b6b" : "#888" }}>
+                      {stat.jp}{isUp ? "↑" : isDn ? "↓" : ""}
+                    </div>
+                    <input
+                      type="number" min="0" max="255"
+                      value={ivcEV[stat.key]}
+                      onChange={e => setIvcEV(prev => ({ ...prev, [stat.key]: Math.max(0, Math.min(255, parseInt(e.target.value) || 0)) }))}
+                      style={{ background:"#16213e", border:"1px solid #2a2a4a", borderRadius:"4px", color:"#aaa", fontSize:"11px", padding:"4px 5px", fontFamily:"inherit", textAlign:"center", width:"100%" }}
+                    />
+                    <input
+                      type="number" min="1"
+                      value={ivcActual[stat.key]}
+                      onChange={e => setIvcActual(prev => ({ ...prev, [stat.key]: e.target.value }))}
+                      placeholder="実数値"
+                      style={{ background:"#16213e", border:"1px solid #3a3a5a", borderRadius:"4px", color:"#e8e8e8", fontSize:"11px", padding:"4px 5px", fontFamily:"inherit", textAlign:"center", width:"100%" }}
+                    />
+                    <div style={{ fontSize:"13px", fontWeight:"bold", color:col, textAlign:"center" }}>{disp}</div>
+                  </div>
+                );
+              })}
+              <div style={{ fontSize:"8px", color:"#333", marginTop:"6px" }}>「？」は実数値・努力値・レベルを確認してください</div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* EV稼ぎガイド */}
