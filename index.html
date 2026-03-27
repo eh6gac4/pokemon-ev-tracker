@@ -43,6 +43,34 @@ const VITAMIN_CAP = 100; // 第3世代: EVが100未満のときのみビタミ�
 
 const initEVs = () => Object.fromEntries(STATS.map(s => [s.key, 0]));
 
+// EV稼ぎガイド（FR/LG）
+const EV_GUIDE = [
+  { stat: "hp",  jp: "ＨＰ",     spots: [
+    { name: "ラッキー",   ev: 3, note: "13〜15番道路 / サファリゾーン" },
+    { name: "カビゴン",   ev: 2, note: "12・16番道路" },
+  ]},
+  { stat: "atk", jp: "こうげき", spots: [
+    { name: "マンキー",   ev: 1, note: "22・23番道路（FR）" },
+    { name: "オコリザル", ev: 2, note: "23番道路（FR）" },
+  ]},
+  { stat: "def", jp: "ぼうぎょ", spots: [
+    { name: "イシツブテ", ev: 1, note: "マウントムーン / 岩山の洞窟" },
+    { name: "ゴローン",   ev: 2, note: "岩山の洞窟 / 勝利への道路" },
+  ]},
+  { stat: "spa", jp: "とくこう", spots: [
+    { name: "ゴース",     ev: 1, note: "ポケモンタワー" },
+    { name: "ゴースト",   ev: 2, note: "ポケモンタワー（高層階）" },
+  ]},
+  { stat: "spd", jp: "とくぼう", spots: [
+    { name: "メノクラゲ", ev: 1, note: "サーフ中（全海上）" },
+    { name: "ドククラゲ", ev: 2, note: "サーフ中（全海上）" },
+  ]},
+  { stat: "spe", jp: "すばやさ", spots: [
+    { name: "コラッタ",   ev: 1, note: "1・2番道路ほか全域" },
+    { name: "ピジョン",   ev: 1, note: "1・2番道路ほか全域" },
+  ]},
+];
+
 // ビタミンの残り使用可能回数（第3世代ルール）
 const vitaminLeft = (ev) => ev < VITAMIN_CAP ? Math.ceil((VITAMIN_CAP - ev) / 10) : 0;
 
@@ -52,6 +80,7 @@ function EVTracker() {
   const [selected, setSelected] = useState(DEFAULT_PARTY[0].name);
   const [loaded, setLoaded] = useState(false);
   const [macho, setMacho] = useState(false); // 強制ギプス（EV×2）
+  const [showGuide, setShowGuide] = useState(false);
 
   const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState("");
@@ -287,6 +316,36 @@ function EVTracker() {
           rows={2}
           style={{ width: "100%", background: "#0d0d1a", border: "1px solid #2a2a4a", borderRadius: "6px", color: "#e8e8e8", fontSize: "11px", padding: "7px 10px", fontFamily: "inherit", lineHeight: "1.5" }}
         />
+      </div>
+
+      {/* EV稼ぎガイド */}
+      <div style={{ marginBottom: "10px" }}>
+        <button
+          onClick={() => setShowGuide(v => !v)}
+          style={{ width: "100%", background: showGuide ? "#0d1a2e" : "#16213e", border: `1px solid ${showGuide ? mon.color + "88" : "#2a2a4a"}`, borderRadius: showGuide ? "8px 8px 0 0" : "8px", color: showGuide ? mon.color : "#555", fontSize: "11px", padding: "8px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px" }}
+        >
+          📖 EV稼ぎガイド（FR/LG）{showGuide ? "　▲" : "　▼"}
+        </button>
+        {showGuide && (
+          <div style={{ background: "#0d1a2e", border: `1px solid ${mon.color}44`, borderTop: "none", borderRadius: "0 0 8px 8px", padding: "10px 12px" }}>
+            {EV_GUIDE.map(({ stat, jp, spots }) => {
+              const accent = STATS.find(s => s.key === stat);
+              return (
+                <div key={stat} style={{ marginBottom: "10px" }}>
+                  <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px", letterSpacing: "1px" }}>{jp}</div>
+                  {spots.map(s => (
+                    <div key={s.name} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "10px", marginBottom: "3px", paddingLeft: "4px" }}>
+                      <span style={{ color: "#ccc", minWidth: "72px" }}>{s.name}</span>
+                      <span style={{ color: "#7fff7f", minWidth: "24px", textAlign: "right" }}>+{s.ev}</span>
+                      <span style={{ color: "#444" }}>{s.note}</span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+            <div style={{ fontSize: "8px", color: "#333", marginTop: "4px" }}>強制ギプス装備で獲得EV×2</div>
+          </div>
+        )}
       </div>
 
       <button onClick={reset} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
