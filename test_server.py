@@ -301,5 +301,142 @@ class TestEVRules(unittest.TestCase):
         self.assertEqual(sum(result.values()), self.MAX_TOTAL)
 
 
+# ---------------------------------------------------------------------------
+# 強制ギプス（倍率×2）ロジックテスト
+# ---------------------------------------------------------------------------
+
+class TestMachoBrace(unittest.TestCase):
+    """強制ギプス装備時: 加算方向のみ2倍、減算はそのまま"""
+
+    MAX_STAT = 252
+    MAX_TOTAL = 510
+
+    def _change(self, evs: dict, key: str, delta: int, macho: bool = False) -> dict:
+        actual_delta = delta * 2 if (delta > 0 and macho) else delta
+        cur = evs.get(key, 0)
+        cur_total = sum(evs.values())
+        next_val = max(0, min(self.MAX_STAT, cur + actual_delta))
+        if cur_total - cur + next_val > self.MAX_TOTAL:
+            next_val = cur + (self.MAX_TOTAL - cur_total)
+        next_val = max(0, next_val)
+        return {**evs, key: next_val}
+
+    def _zero_evs(self):
+        return {"hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}
+
+    def test_plus1_becomes_plus2_with_macho(self):
+        evs = self._change(self._zero_evs(), "hp", 1, macho=True)
+        self.assertEqual(evs["hp"], 2)
+
+    def test_plus4_becomes_plus8_with_macho(self):
+        evs = self._change(self._zero_evs(), "hp", 4, macho=True)
+        self.assertEqual(evs["hp"], 8)
+
+    def test_minus1_unchanged_with_macho(self):
+        evs = {**self._zero_evs(), "hp": 10}
+        result = self._change(evs, "hp", -1, macho=True)
+        self.assertEqual(result["hp"], 9)
+
+    def test_minus4_unchanged_with_macho(self):
+        evs = {**self._zero_evs(), "hp": 10}
+        result = self._change(evs, "hp", -4, macho=True)
+        self.assertEqual(result["hp"], 6)
+
+    def test_macho_still_caps_at_252(self):
+        evs = {**self._zero_evs(), "hp": 248}
+        result = self._change(evs, "hp", 4, macho=True)  # +8 → capped at 252
+        self.assertEqual(result["hp"], 252)
+
+    def test_macho_still_caps_at_510_total(self):
+        evs = {**self._zero_evs(), "hp": 252, "atk": 252, "def": 4}
+        result = self._change(evs, "spa", 4, macho=True)  # total=508, +8 → capped
+        self.assertLessEqual(sum(result.values()), self.MAX_TOTAL)
+
+    def test_without_macho_plus4_is_4(self):
+        evs = self._change(self._zero_evs(), "hp", 4, macho=False)
+        self.assertEqual(evs["hp"], 4)
+
+
+# ---------------------------------------------------------------------------
+# ビタミン管理ロジックテスト（第3世代: EV<100のみ使用可、1本10EV）
+# ---------------------------------------------------------------------------
+
+class TestVitamins(unittest.TestCase):
+
+    def setUp(self):
+        # シンプルな実装で再定義
+        import math
+        self._vl = lambda ev: math.ceil((100 - ev) / 10) if ev < 100 else 0
+
+    def test_zero_ev_can_use_10_vitamins(self):
+        self.assertEqual(self._vl(0), 10)
+
+    def test_4ev_can_use_10_vitamins(self):
+        # 4→14→24→…→94→104, 94<100なので10本使える
+        self.assertEqual(self._vl(4), 10)
+
+    def test_95ev_can_use_1_vitamin(self):
+        self.assertEqual(self._vl(95), 1)
+
+    def test_100ev_cannot_use_vitamins(self):
+        self.assertEqual(self._vl(100), 0)
+
+    def test_252ev_cannot_use_vitamins(self):
+        self.assertEqual(self._vl(252), 0)
+
+    def test_90ev_can_use_1_vitamin(self):
+        self.assertEqual(self._vl(90), 1)
+
+    def test_89ev_can_use_2_vitamins(self):
+        self.assertEqual(self._vl(89), 2)
+
+
+# ---------------------------------------------------------------------------
+# メモ欄: DB保存テスト（party に memo フィールドが保存・復元される）
+# ---------------------------------------------------------------------------
+
+class TestMemo(unittest.TestCase):
+
+    def setUp(self):
+        fd, path = tempfile.mkstemp(suffix=".db")
+        os.close(fd)
+        self.db_path = Path(path)
+
+    def tearDown(self):
+        self.db_path.unlink(missing_ok=True)
+
+    def test_memo_saved_and_loaded(self):
+        data = {
+            "party": [{"name": "ゲンガー", "icon": "👻", "color": "#C97AE0", "memo": "おくびょう　めがねゲンガー"}],
+            "allEVs": {"ゲンガー": {"hp": 0, "atk": 0, "def": 0, "spa": 252, "spd": 4, "spe": 252}},
+            "selected": "ゲンガー",
+        }
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data(data)
+            result = server.load_data()
+        self.assertEqual(result["party"][0]["memo"], "おくびょう　めがねゲンガー")
+
+    def test_empty_memo_preserved(self):
+        data = {
+            "party": [{"name": "リザードン", "icon": "🔥", "color": "#FF6B35", "memo": ""}],
+            "allEVs": {"リザードン": {"hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}},
+            "selected": "リザードン",
+        }
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data(data)
+            result = server.load_data()
+        self.assertEqual(result["party"][0]["memo"], "")
+
+    def test_memo_updated(self):
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data({"party": [{"name": "A", "memo": "before"}], "allEVs": {}, "selected": "A"})
+            server.save_data({"party": [{"name": "A", "memo": "after"}],  "allEVs": {}, "selected": "A"})
+            result = server.load_data()
+        self.assertEqual(result["party"][0]["memo"], "after")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
