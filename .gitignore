@@ -1,0 +1,9 @@
+# SQLite databases
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Node modules (if ever used)
+node_modules/

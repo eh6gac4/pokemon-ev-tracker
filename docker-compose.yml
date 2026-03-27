@@ -1,0 +1,10 @@
+services:
+  ev-tracker:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DB_PATH=/app/data/ev_data.db
