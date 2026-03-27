@@ -325,10 +325,12 @@ class TestMachoBrace(unittest.TestCase):
         return {"hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}
 
     def test_plus1_becomes_plus2_with_macho(self):
+        # ＋ボタン(d=1) → ×2 → +2
         evs = self._change(self._zero_evs(), "hp", 1, macho=True)
         self.assertEqual(evs["hp"], 2)
 
     def test_plus4_becomes_plus8_with_macho(self):
+        # ＋4ボタン(d=4) → ×2 → +8
         evs = self._change(self._zero_evs(), "hp", 4, macho=True)
         self.assertEqual(evs["hp"], 8)
 

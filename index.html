@@ -253,7 +253,7 @@ function EVTracker() {
           const val = evs[stat.key] || 0;
           const isMaxed = val >= MAX_STAT;
           const vLeft = vitaminLeft(val);
-          const plusLabels = macho ? ["＋2", "＋8"] : ["＋4", "＋"];
+          const plusLabels = macho ? ["＋8", "＋2"] : ["＋4", "＋"];
           return (
             <div key={stat.key} style={{ background: "#16213e", borderRadius: "8px", padding: "9px 12px", border: `1px solid ${isMaxed ? "#7fff7f44" : "#2a2a4a"}` }}>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
