@@ -4,14 +4,123 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>努力値トラッカー</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+      * { box-sizing: border-box; }
+      body { margin: 0; }
+
+      /* Layout */
+      .app-wrap {
+        min-height: 100vh;
+        background: #1a1a2e;
+        font-family: 'DotGothic16', 'Courier New', monospace;
+        color: #e8e8e8;
+        padding: 16px;
+        padding-bottom: 72px;
+      }
+      .app-layout { /* mobile: single column */ }
+      .col-hidden { display: none; }
+
+      /* Navigation */
+      .bottom-nav {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        display: flex; background: #0d0d1a;
+        border-top: 1px solid #2a2a4a; z-index: 100;
+      }
+      .bottom-nav button {
+        flex: 1; padding: 13px 8px;
+        background: transparent; border: none; border-top: 2px solid transparent;
+        color: #555; font-size: 13px; cursor: pointer;
+        font-family: inherit; letter-spacing: 1px;
+        transition: color 0.15s;
+      }
+
+      /* Party cards */
+      .mon-btn { transition: all 0.15s; }
+      .mon-btn:hover { transform: translateY(-2px); filter: brightness(1.15); }
+      .mon-btn.active { box-shadow: 0 0 12px rgba(255,255,255,0.3); }
+      .mon-wrap .del-btn { opacity: 0; transition: opacity 0.15s; }
+      .mon-wrap:hover .del-btn { opacity: 1; }
+
+      /* EV step buttons */
+      .step-btn {
+        border-radius: 4px; font-size: 10px;
+        padding: 3px 6px; cursor: pointer;
+        min-width: 28px; font-family: inherit;
+        transition: all 0.1s;
+      }
+      .step-btn:hover { filter: brightness(1.3); transform: scale(1.08); }
+      .step-btn:active { transform: scale(0.95); }
+
+      /* Progress bar */
+      .bar-bg { background: #0d0d1a; border-radius: 3px; overflow: hidden; }
+      .bar-fill { transition: width 0.3s cubic-bezier(.4,0,.2,1); }
+
+      /* Cards */
+      .card {
+        background: #16213e;
+        border: 1px solid #2a2a4a;
+        border-radius: 8px;
+      }
+      .badge-max {
+        font-size: 8px;
+        background: #7fff7f22; color: #7fff7f;
+        border: 1px solid #7fff7f44;
+        border-radius: 3px; padding: 1px 4px;
+      }
+
+      /* Collapsible panel */
+      .panel-toggle {
+        width: 100%; background: #16213e;
+        border: 1px solid #2a2a4a; border-radius: 8px;
+        color: #555; font-size: 11px; padding: 8px;
+        cursor: pointer; font-family: inherit;
+        letter-spacing: 1px; text-align: center;
+      }
+      .panel-body {
+        background: #0d1a2e;
+        border: 1px solid; border-top: none;
+        border-radius: 0 0 8px 8px;
+        padding: 12px;
+      }
+
+      /* Inputs */
+      input, textarea, select { outline: none; font-family: inherit; }
+      .input-dark {
+        background: #16213e;
+        border: 1px solid #3a3a5a;
+        border-radius: 6px;
+        color: #e8e8e8;
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+      textarea.input-dark { resize: none; overflow: hidden; }
+
+      /* PC layout */
+      @media (min-width: 768px) {
+        .app-wrap { padding-bottom: 24px; }
+        .app-layout {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+          max-width: 980px;
+          margin: 0 auto;
+          align-items: start;
+        }
+        .col-hidden { display: block !important; }
+        .bottom-nav { display: none !important; }
+      }
+    </style>
   </head>
-  <body style="margin:0">
+  <body>
     <div id="root"></div>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script type="text/babel">
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
+
+// ─── constants ──────────────────────────────────────────────────────────────
 
 const DEFAULT_PARTY = [
   { name: "リザードン", icon: "🔥", color: "#FF6B35", memo: "" },
@@ -31,57 +140,19 @@ const STATS = [
   { key: "spe", jp: "すばやさ" },
 ];
 
-// ビタミン名（ステータス順）
-const VITAMINS = { hp: "HPアップ", atk: "タンパクネス", def: "てっけつ", spa: "おだやかミント", spd: "せいしんりょく", spe: "スピーダー" };
+const STAT_JP  = Object.fromEntries(STATS.map(s => [s.key, s.jp]));
+const STAT_COL = { hp:"#7fff7f", atk:"#ff6b6b", def:"#f5a623", spa:"#4a90d9", spd:"#7ed321", spe:"#e880a0" };
 
 const COLORS = ["#FF6B35","#4A90D9","#7DBE8A","#F5D020","#E880A0","#A0A0A0","#C97AE0","#FF8FAB","#5ECDE5","#F4A261"];
 const ICONS  = ["🔥","💧","🌿","⚡","🧊","🌊","💀","😴","💋","🦅","🐉","👊","🌙","☀️","🌀","🪨","🎭","🤖","🐭","🐣"];
 
-const MAX_STAT = 252;
+const MAX_STAT  = 252;
 const MAX_TOTAL = 510;
-const VITAMIN_CAP = 100; // 第3世代: EVが100未満のときのみビタミン使用可
+const VITAMIN_CAP = 100;
 
 const initEVs = () => Object.fromEntries(STATS.map(s => [s.key, 0]));
-
-// EV稼ぎガイド（FR/LG）
-// ★ = 出現率ほぼ100%で他EV混入なし
-const EV_GUIDE = [
-  { stat: "hp",  jp: "ＨＰ", spots: [
-    { name: "マリル",     ev: 2, note: "廃虚の谷サーフ 100%（FR）★ ※島4解放後" },
-    { name: "プリン",     ev: 2, note: "おつきみやま周辺・3番道路 10%" },
-    { name: "ヤドン",     ev: 1, note: "22番道路ほかサーフ 100%（LG）★" },
-  ]},
-  { stat: "atk", jp: "こうげき", spots: [
-    { name: "パラス",     ev: 1, note: "おつきみやまB1F 100%★" },
-    { name: "マンキー",   ev: 1, note: "22番道路 45%（FR）" },
-    { name: "オコリザル", ev: 2, note: "勝利への道路・洞窟（FR）10%" },
-  ]},
-  { stat: "def", jp: "ぼうぎょ", spots: [
-    { name: "モンジャラ", ev: 1, note: "21番道路 100%★" },
-    { name: "サンド",     ev: 1, note: "4〜11番道路 25〜40%（LG）" },
-    { name: "イシツブテ", ev: 1, note: "おつきみやま / 岩山の洞窟 35%" },
-  ]},
-  { stat: "spa", jp: "とくこう", spots: [
-    { name: "ゴース",     ev: 1, note: "ポケモンタワー3〜6F 85〜90%★" },
-    { name: "ゴースト",   ev: 2, note: "ポケモンタワー7F 15%" },
-    { name: "コダック",   ev: 1, note: "各所サーフ 100%（FR）★" },
-  ]},
-  { stat: "spd", jp: "とくぼう", spots: [
-    { name: "メノクラゲ", ev: 1, note: "サーフ全般 100%★（20〜21番道路ほか）" },
-    { name: "ドククラゲ", ev: 2, note: "サーフ中に低確率で混在" },
-    { name: "コンパン",    ev: 1, note: "12〜15番道路 30%（草むら）" },
-  ]},
-  { stat: "spe", jp: "すばやさ", spots: [
-    { name: "ディグダ",   ev: 1, note: "ディグダのあな 95%★" },
-    { name: "ダグトリオ", ev: 2, note: "ディグダのあな 5%" },
-    { name: "コラッタ",   ev: 1, note: "1番道路 50% / 22番道路 45%" },
-  ]},
-];
-
-// ビタミンの残り使用可能回数（第3世代ルール）
 const vitaminLeft = (ev) => ev < VITAMIN_CAP ? Math.ceil((VITAMIN_CAP - ev) / 10) : 0;
 
-// 性格データ（日本語名・上昇・下降ステータス）
 const NATURES = [
   { name:"がんばりや", up:null,  dn:null  },
   { name:"さみしがり", up:"atk", dn:"def" },
@@ -258,30 +329,357 @@ const EV_YIELD = [
   [0,0,0,3,0,0],[3,0,0,0,0,0], // 150-151
 ];
 
+// EV稼ぎガイド（FR/LG）
+const EV_GUIDE = [
+  { stat: "hp",  jp: "ＨＰ", spots: [
+    { name: "マリル",     ev: 2, note: "廃虚の谷サーフ 100%（FR）★ ※島4解放後" },
+    { name: "プリン",     ev: 2, note: "おつきみやま周辺・3番道路 10%" },
+    { name: "ヤドン",     ev: 1, note: "22番道路ほかサーフ 100%（LG）★" },
+  ]},
+  { stat: "atk", jp: "こうげき", spots: [
+    { name: "パラス",     ev: 1, note: "おつきみやまB1F 100%★" },
+    { name: "マンキー",   ev: 1, note: "22番道路 45%（FR）" },
+    { name: "オコリザル", ev: 2, note: "勝利への道路・洞窟（FR）10%" },
+  ]},
+  { stat: "def", jp: "ぼうぎょ", spots: [
+    { name: "モンジャラ", ev: 1, note: "21番道路 100%★" },
+    { name: "サンド",     ev: 1, note: "4〜11番道路 25〜40%（LG）" },
+    { name: "イシツブテ", ev: 1, note: "おつきみやま / 岩山の洞窟 35%" },
+  ]},
+  { stat: "spa", jp: "とくこう", spots: [
+    { name: "ゴース",     ev: 1, note: "ポケモンタワー3〜6F 85〜90%★" },
+    { name: "ゴースト",   ev: 2, note: "ポケモンタワー7F 15%" },
+    { name: "コダック",   ev: 1, note: "各所サーフ 100%（FR）★" },
+  ]},
+  { stat: "spd", jp: "とくぼう", spots: [
+    { name: "メノクラゲ", ev: 1, note: "サーフ全般 100%★（20〜21番道路ほか）" },
+    { name: "ドククラゲ", ev: 2, note: "サーフ中に低確率で混在" },
+    { name: "コンパン",   ev: 1, note: "12〜15番道路 30%（草むら）" },
+  ]},
+  { stat: "spe", jp: "すばやさ", spots: [
+    { name: "ディグダ",   ev: 1, note: "ディグダのあな 95%★" },
+    { name: "ダグトリオ", ev: 2, note: "ディグダのあな 5%" },
+    { name: "コラッタ",   ev: 1, note: "1番道路 50% / 22番道路 45%" },
+  ]},
+];
+
+// ─── helper components ───────────────────────────────────────────────────────
+
+function AutoTextarea({ value, onChange, placeholder }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    ref.current.style.height = "auto";
+    ref.current.style.height = ref.current.scrollHeight + "px";
+  }, [value]);
+  return (
+    <textarea
+      ref={ref}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      rows={1}
+      className="input-dark"
+      style={{ width: "100%", lineHeight: "1.5", fontSize: "11px", padding: "7px 10px", background: "#0d0d1a", border: "1px solid #2a2a4a" }}
+    />
+  );
+}
+
+function Panel({ title, open, onToggle, color, children }) {
+  return (
+    <div style={{ marginBottom: "10px" }}>
+      <button
+        onClick={onToggle}
+        className="panel-toggle"
+        style={{
+          background: open ? "#0d1a2e" : "#16213e",
+          borderColor: open ? color + "88" : "#2a2a4a",
+          borderRadius: open ? "8px 8px 0 0" : "8px",
+          color: open ? color : "#555",
+        }}
+      >
+        {title}{open ? "　▲" : "　▼"}
+      </button>
+      {open && (
+        <div className="panel-body" style={{ borderColor: color + "44" }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatRow({ stat, val, color, macho, onChange }) {
+  const isMaxed = val >= MAX_STAT;
+  const vLeft   = vitaminLeft(val);
+  const plusLabels = macho ? ["＋8", "＋2"] : ["＋4", "＋"];
+  return (
+    <div className="card" style={{ padding: "9px 12px", borderColor: isMaxed ? "#7fff7f44" : "#2a2a4a" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
+        <span style={{ fontSize: "11px", minWidth: "62px", color: isMaxed ? "#7fff7f" : "#888" }}>{stat.jp}</span>
+        <span style={{ fontSize: "15px", minWidth: "36px", textAlign: "right", fontWeight: "bold" }}>{val}</span>
+        {isMaxed
+          ? <span className="badge-max">MAX</span>
+          : vLeft > 0 && <span style={{ fontSize: "8px", color: "#aaa" }}>💊×{vLeft}</span>
+        }
+        <div style={{ display: "flex", gap: "3px", marginLeft: "auto" }}>
+          {[[-1,"－"],[-4,"－4"],[4,plusLabels[0]],[1,plusLabels[1]]].map(([d, label]) => (
+            <button
+              key={d}
+              className="step-btn"
+              onClick={() => onChange(d)}
+              style={{
+                background: d > 0 ? `${color}33` : "#1e1e3a",
+                border: `1px solid ${d > 0 ? color + "55" : "#3a3a5a"}`,
+                color: d > 0 ? color : "#777",
+              }}
+            >{label}</button>
+          ))}
+        </div>
+      </div>
+      <div className="bar-bg" style={{ height: "4px" }}>
+        <div className="bar-fill" style={{ height: "100%", width: `${(val / MAX_STAT) * 100}%`, background: isMaxed ? "#7fff7f" : color, borderRadius: "3px" }} />
+      </div>
+    </div>
+  );
+}
+
+// ─── feature components ──────────────────────────────────────────────────────
+
+function AddMonModal({ newName, newIcon, newColor, setNewName, setNewIcon, setNewColor, onAdd, onCancel, borderColor }) {
+  return (
+    <div className="card" style={{ padding: "14px", marginBottom: "14px", borderColor: borderColor + "55", borderRadius: "12px" }}>
+      <div style={{ fontSize: "11px", color: "#888", marginBottom: "10px", letterSpacing: "2px" }}>ポケモンを追加</div>
+      <input
+        value={newName}
+        onChange={e => setNewName(e.target.value)}
+        onKeyDown={e => e.key === "Enter" && onAdd()}
+        placeholder="なまえ（例：ゲンガー）"
+        className="input-dark"
+        style={{ width: "100%", fontSize: "13px", padding: "8px 10px", marginBottom: "8px" }}
+      />
+      <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px" }}>アイコン</div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "10px" }}>
+        {ICONS.map(ic => (
+          <button key={ic} onClick={() => setNewIcon(ic)} style={{ background: newIcon === ic ? "#2a2a4a" : "transparent", border: newIcon === ic ? "1px solid #888" : "1px solid transparent", borderRadius: "6px", padding: "3px 5px", cursor: "pointer", fontSize: "16px" }}>{ic}</button>
+        ))}
+      </div>
+      <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px" }}>カラー</div>
+      <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
+        {COLORS.map(c => (
+          <button key={c} onClick={() => setNewColor(c)} style={{ width: "24px", height: "24px", background: c, border: newColor === c ? "2px solid #fff" : "2px solid transparent", borderRadius: "50%", cursor: "pointer" }} />
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: "8px" }}>
+        <button onClick={onAdd} style={{ flex: 1, background: `${newColor}33`, border: `1px solid ${newColor}88`, borderRadius: "7px", color: newColor, fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit" }}>追加する</button>
+        <button onClick={onCancel} style={{ flex: 1, background: "transparent", border: "1px solid #3a3a5a", borderRadius: "7px", color: "#666", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit" }}>キャンセル</button>
+      </div>
+    </div>
+  );
+}
+
+function IVChecker({ color }) {
+  const [open,   setOpen]   = useState(false);
+  const [mon,    setMon]    = useState(0);
+  const [lv,     setLv]     = useState(50);
+  const [nat,    setNat]    = useState(0);
+  const [actual, setActual] = useState({hp:"",atk:"",def:"",spa:"",spd:"",spe:""});
+  const [ev,     setEV]     = useState({hp:0,atk:0,def:0,spa:0,spd:0,spe:0});
+
+  const nature = NATURES[nat];
+  const pmon   = POKEMON_DATA[mon];
+
+  const calcIV = (statKey) => {
+    const a = parseInt(actual[statKey]);
+    if (isNaN(a) || a <= 0) return null;
+    const base  = pmon[PD[statKey]];
+    const evVal = Math.max(0, Math.min(255, parseInt(ev[statKey]) || 0));
+    const res   = [];
+    for (let iv = 0; iv <= 31; iv++) {
+      const inner = Math.floor((2 * base + iv + Math.floor(evVal / 4)) * lv / 100);
+      const s5    = inner + 5;
+      const stat  = statKey === "hp" ? inner + lv + 10
+        : nature.up === statKey ? Math.floor(s5 * 11 / 10)
+        : nature.dn === statKey ? Math.floor(s5 *  9 / 10)
+        : s5;
+      if (stat === a) res.push(iv);
+    }
+    return res;
+  };
+
+  const ivDisp = (k) => {
+    const r = calcIV(k);
+    if (r === null)    return "—";
+    if (r.length === 0) return "？";
+    if (r.length === 1) return `${r[0]}`;
+    return `${r[0]}〜${r[r.length - 1]}`;
+  };
+
+  const ivColor = (k) => {
+    const r = calcIV(k);
+    if (!r || r.length === 0)    return "#555";
+    if (r[0] >= 28)              return "#7fff7f";
+    if (r[r.length - 1] <= 10)  return "#ff6b6b";
+    return "#f5d020";
+  };
+
+  const natLabel = (n) => n.up
+    ? `${n.name}（↑${STAT_JP[n.up]} / ↓${STAT_JP[n.dn]}）`
+    : `${n.name}（補正なし）`;
+
+  return (
+    <Panel title="🔬 個体値チェッカー（Gen III）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      <select value={mon} onChange={e => setMon(Number(e.target.value))} className="input-dark" style={{ width: "100%", marginBottom: "8px" }}>
+        {POKEMON_DATA.map((p, i) => (
+          <option key={p[0]} value={i}>{String(p[0]).padStart(3,"0")} {p[1]}</option>
+        ))}
+      </select>
+
+      <div style={{ display: "flex", gap: "6px", marginBottom: "10px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+          <div style={{ fontSize: "9px", color: "#555" }}>レベル</div>
+          <input
+            type="number" min="1" max="100" value={lv}
+            onChange={e => setLv(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+            className="input-dark"
+            style={{ width: "54px", fontSize: "13px", padding: "5px 6px", textAlign: "center" }}
+          />
+        </div>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "3px" }}>
+          <div style={{ fontSize: "9px", color: "#555" }}>性格</div>
+          <select value={nat} onChange={e => setNat(Number(e.target.value))} className="input-dark" style={{ width: "100%", fontSize: "11px", padding: "5px 6px" }}>
+            {NATURES.map((n, i) => <option key={i} value={i}>{natLabel(n)}</option>)}
+          </select>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "62px 52px 1fr 44px", gap: "3px 6px", alignItems: "center", marginBottom: "4px" }}>
+        {["ステータス","努力値","実数値","個体値"].map((h, i) => (
+          <div key={h} style={{ fontSize: "9px", color: "#444", textAlign: i > 0 ? "center" : undefined }}>{h}</div>
+        ))}
+      </div>
+      {STATS.map(stat => {
+        const isUp = nature.up === stat.key;
+        const isDn = nature.dn === stat.key;
+        return (
+          <div key={stat.key} style={{ display: "grid", gridTemplateColumns: "62px 52px 1fr 44px", gap: "3px 6px", alignItems: "center", marginBottom: "4px" }}>
+            <div style={{ fontSize: "11px", color: isUp ? "#f5d020" : isDn ? "#ff6b6b" : "#888" }}>
+              {stat.jp}{isUp ? "↑" : isDn ? "↓" : ""}
+            </div>
+            <input
+              type="number" min="0" max="255" value={ev[stat.key]}
+              onChange={e => setEV(prev => ({ ...prev, [stat.key]: Math.max(0, Math.min(255, parseInt(e.target.value) || 0)) }))}
+              className="input-dark"
+              style={{ fontSize: "11px", padding: "4px 5px", textAlign: "center", width: "100%", color: "#aaa" }}
+            />
+            <input
+              type="number" min="1" value={actual[stat.key]}
+              onChange={e => setActual(prev => ({ ...prev, [stat.key]: e.target.value }))}
+              placeholder="実数値"
+              className="input-dark"
+              style={{ fontSize: "11px", padding: "4px 5px", textAlign: "center", width: "100%" }}
+            />
+            <div style={{ fontSize: "13px", fontWeight: "bold", color: ivColor(stat.key), textAlign: "center" }}>{ivDisp(stat.key)}</div>
+          </div>
+        );
+      })}
+      <div style={{ fontSize: "8px", color: "#333", marginTop: "6px" }}>「？」は実数値・努力値・レベルを確認してください</div>
+    </Panel>
+  );
+}
+
+function EVSearch({ macho, color }) {
+  const [open,   setOpen]   = useState(false);
+  const [query,  setQuery]  = useState("");
+  const [filter, setFilter] = useState(null);
+
+  const STAT_KEYS = STATS.map(s => s.key);
+
+  const results = POKEMON_DATA.filter((p, i) => {
+    const y = EV_YIELD[i];
+    return (!query || p[1].includes(query))
+      && (!filter || y[STAT_KEYS.indexOf(filter)] > 0)
+      && y.some(v => v > 0);
+  });
+
+  return (
+    <Panel title="🔍 もらえるEVを調べる" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      <div style={{ display: "flex", gap: "4px", marginBottom: "8px", flexWrap: "wrap" }}>
+        <button onClick={() => setFilter(null)} style={{ background: filter === null ? "#2a2a4a" : "transparent", border: "1px solid #3a3a5a", borderRadius: "4px", color: filter === null ? "#e8e8e8" : "#555", fontSize: "9px", padding: "3px 7px", cursor: "pointer", fontFamily: "inherit" }}>すべて</button>
+        {STAT_KEYS.map(k => (
+          <button key={k} onClick={() => setFilter(filter === k ? null : k)} style={{ background: filter === k ? STAT_COL[k]+"44" : "transparent", border: `1px solid ${filter === k ? STAT_COL[k] : "#3a3a5a"}`, borderRadius: "4px", color: filter === k ? STAT_COL[k] : "#555", fontSize: "9px", padding: "3px 7px", cursor: "pointer", fontFamily: "inherit" }}>
+            {STAT_JP[k]}
+          </button>
+        ))}
+      </div>
+
+      <input
+        value={query} onChange={e => setQuery(e.target.value)}
+        placeholder="ポケモン名で検索…"
+        className="input-dark"
+        style={{ width: "100%", marginBottom: "8px" }}
+      />
+
+      <div style={{ maxHeight: "260px", overflowY: "auto" }}>
+        {results.length === 0 && <div style={{ color: "#444", fontSize: "11px", textAlign: "center", padding: "12px 0" }}>該当なし</div>}
+        {results.map(p => {
+          const y     = EV_YIELD[p[0] - 1];
+          const parts = STAT_KEYS.map((k, ki) => y[ki] > 0 ? { key: k, val: y[ki] } : null).filter(Boolean);
+          return (
+            <div key={p[0]} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "5px 2px", borderBottom: "1px solid #1a1a2e" }}>
+              <span style={{ fontSize: "9px", color: "#444", minWidth: "24px" }}>{String(p[0]).padStart(3,"0")}</span>
+              <span style={{ fontSize: "11px", color: "#ccc", minWidth: "80px" }}>{p[1]}</span>
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                {parts.map(({ key, val }) => (
+                  <span key={key} style={{ fontSize: "10px", background: STAT_COL[key]+"22", color: STAT_COL[key], border: `1px solid ${STAT_COL[key]}44`, borderRadius: "3px", padding: "1px 5px" }}>
+                    {STAT_JP[key]} +{macho ? val * 2 : val}{macho && <span style={{ fontSize: "8px", opacity: 0.7 }}>（×2）</span>}
+                  </span>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {macho && <div style={{ fontSize: "8px", color: "#ff6b35", marginTop: "6px" }}>🥊 強制ギプス装備中：EV×2表示</div>}
+    </Panel>
+  );
+}
+
+function EVGuide({ color }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Panel title="📖 EV稼ぎガイド（FR/LG）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      {EV_GUIDE.map(({ stat, jp, spots }) => (
+        <div key={stat} style={{ marginBottom: "10px" }}>
+          <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px", letterSpacing: "1px" }}>{jp}</div>
+          {spots.map(s => (
+            <div key={s.name} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "10px", marginBottom: "3px", paddingLeft: "4px" }}>
+              <span style={{ color: "#ccc", minWidth: "72px" }}>{s.name}</span>
+              <span style={{ color: "#7fff7f", minWidth: "24px", textAlign: "right" }}>+{s.ev}</span>
+              <span style={{ color: "#444" }}>{s.note}</span>
+            </div>
+          ))}
+        </div>
+      ))}
+      <div style={{ fontSize: "8px", color: "#333", marginTop: "4px" }}>強制ギプス装備で獲得EV×2</div>
+    </Panel>
+  );
+}
+
+// ─── main component ──────────────────────────────────────────────────────────
+
 function EVTracker() {
-  const [party, setParty] = useState(DEFAULT_PARTY);
-  const [allEVs, setAllEVs] = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
-  const [selected, setSelected] = useState(DEFAULT_PARTY[0].name);
-  const [loaded, setLoaded] = useState(false);
-  const [macho, setMacho] = useState(false); // 強制ギプス（EV×2）
-  const [showGuide, setShowGuide] = useState(false);
-  const [showIVC,      setShowIVC]      = useState(false);
-  const [showEVSearch, setShowEVSearch] = useState(false);
-  const [evQuery,      setEvQuery]      = useState("");
-  const [evFilter,     setEvFilter]     = useState(null); // null=全て or "hp"/"atk"/etc
-  const [ivcMon,    setIvcMon]    = useState(0);
-  const [ivcLv,     setIvcLv]     = useState(50);
-  const [ivcNat,    setIvcNat]    = useState(0);
-  const [ivcActual, setIvcActual] = useState({hp:"",atk:"",def:"",spa:"",spd:"",spe:""});
-  const [ivcEV,     setIvcEV]     = useState({hp:0,atk:0,def:0,spa:0,spd:0,spe:0});
-  const [activeTab, setActiveTab] = useState("ikusei"); // "ikusei" or "chosa"
+  const [party,     setParty]    = useState(DEFAULT_PARTY);
+  const [allEVs,    setAllEVs]   = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
+  const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
+  const [loaded,    setLoaded]   = useState(false);
+  const [macho,     setMacho]    = useState(false);
+  const [activeTab, setActiveTab] = useState("ikusei");
+  const [adding,    setAdding]   = useState(false);
+  const [newName,   setNewName]  = useState("");
+  const [newIcon,   setNewIcon]  = useState("🐣");
+  const [newColor,  setNewColor] = useState(COLORS[0]);
 
-  const [adding, setAdding] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [newIcon, setNewIcon] = useState("🐣");
-  const [newColor, setNewColor] = useState(COLORS[0]);
-
-  // Load from server
   useEffect(() => {
     fetch("/api/data")
       .then(r => r.json())
@@ -294,7 +692,6 @@ function EVTracker() {
       .finally(() => setLoaded(true));
   }, []);
 
-  // Save to server whenever data changes
   useEffect(() => {
     if (!loaded) return;
     fetch("/api/data", {
@@ -304,69 +701,25 @@ function EVTracker() {
     }).catch(() => {});
   }, [party, allEVs, selected, loaded]);
 
-  const mon = party.find(p => p.name === selected) || party[0];
-  const evs = allEVs[selected] || initEVs();
-  const total = Object.values(evs).reduce((a, b) => a + b, 0);
+  const mon       = party.find(p => p.name === selected) || party[0];
+  const evs       = allEVs[selected] || initEVs();
+  const total     = Object.values(evs).reduce((a, b) => a + b, 0);
   const remaining = MAX_TOTAL - total;
 
   const change = (key, delta) => {
-    // 強制ギプス装備時：加算方向のみ2倍
-    const actualDelta = delta > 0 ? delta * (macho ? 2 : 1) : delta;
+    const d = delta > 0 ? delta * (macho ? 2 : 1) : delta;
     setAllEVs(prev => {
-      const cur = (prev[selected] || initEVs())[key];
+      const cur      = (prev[selected] || initEVs())[key];
       const curTotal = Object.values(prev[selected] || initEVs()).reduce((a, b) => a + b, 0);
-      let next = Math.max(0, Math.min(MAX_STAT, cur + actualDelta));
+      let next = Math.max(0, Math.min(MAX_STAT, cur + d));
       if (curTotal - cur + next > MAX_TOTAL) next = cur + (MAX_TOTAL - curTotal);
-      next = Math.max(0, next);
-      return { ...prev, [selected]: { ...(prev[selected] || initEVs()), [key]: next } };
+      return { ...prev, [selected]: { ...(prev[selected] || initEVs()), [key]: Math.max(0, next) } };
     });
   };
 
   const reset = () => setAllEVs(prev => ({ ...prev, [selected]: initEVs() }));
 
-  // 個体値計算（第3世代）
-  const ivCalc = (statKey) => {
-    const actual = parseInt(ivcActual[statKey]);
-    if (isNaN(actual) || actual <= 0) return null;
-    const mon = POKEMON_DATA[ivcMon];
-    const base = mon[PD[statKey]];
-    const ev = Math.max(0, Math.min(255, parseInt(ivcEV[statKey]) || 0));
-    const nat = NATURES[ivcNat];
-    const isHP = statKey === "hp";
-    const res = [];
-    for (let iv = 0; iv <= 31; iv++) {
-      const inner = Math.floor((2 * base + iv + Math.floor(ev / 4)) * ivcLv / 100);
-      let stat;
-      if (isHP) {
-        stat = inner + ivcLv + 10;
-      } else {
-        const s5 = inner + 5;
-        stat = nat.up === statKey ? Math.floor(s5 * 11 / 10)
-             : nat.dn === statKey ? Math.floor(s5 * 9  / 10)
-             : s5;
-      }
-      if (stat === actual) res.push(iv);
-    }
-    return res;
-  };
-  const ivDisp = (statKey) => {
-    const res = ivCalc(statKey);
-    if (res === null) return "—";
-    if (res.length === 0) return "？";
-    if (res.length === 1) return `${res[0]}`;
-    return `${res[0]}〜${res[res.length - 1]}`;
-  };
-  const ivColor = (statKey) => {
-    const res = ivCalc(statKey);
-    if (!res || res.length === 0) return "#555";
-    if (res[0] >= 28) return "#7fff7f";
-    if (res[res.length - 1] <= 10) return "#ff6b6b";
-    return "#f5d020";
-  };
-
-  const updateMemo = (text) => {
-    setParty(prev => prev.map(p => p.name === selected ? { ...p, memo: text } : p));
-  };
+  const updateMemo = (text) => setParty(prev => prev.map(p => p.name === selected ? { ...p, memo: text } : p));
 
   const removeMon = (name) => {
     const next = party.filter(p => p.name !== name);
@@ -378,8 +731,7 @@ function EVTracker() {
   const addMon = () => {
     const trimmed = newName.trim();
     if (!trimmed || party.find(p => p.name === trimmed)) return;
-    const newMon = { name: trimmed, icon: newIcon, color: newColor, memo: "" };
-    setParty(prev => [...prev, newMon]);
+    setParty(prev => [...prev, { name: trimmed, icon: newIcon, color: newColor, memo: "" }]);
     setAllEVs(prev => ({ ...prev, [trimmed]: initEVs() }));
     setSelected(trimmed);
     setAdding(false);
@@ -393,49 +745,7 @@ function EVTracker() {
   );
 
   return (
-    <div className="app-wrap" style={{ minHeight: "100vh", background: "#1a1a2e", fontFamily: "'DotGothic16', 'Courier New', monospace", color: "#e8e8e8" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
-        * { box-sizing: border-box; }
-        .app-wrap { padding: 16px; padding-bottom: 72px; }
-        .mon-btn { transition: all 0.15s; }
-        .mon-btn:hover { transform: translateY(-2px); filter: brightness(1.15); }
-        .mon-btn.active { box-shadow: 0 0 12px rgba(255,255,255,0.3); }
-        .step-btn:hover { filter: brightness(1.3); transform: scale(1.08); }
-        .step-btn:active { transform: scale(0.95); }
-        .bar-fill { transition: width 0.3s cubic-bezier(.4,0,.2,1); }
-        input, textarea { outline: none; }
-        .del-btn { opacity: 0; transition: opacity 0.15s; }
-        .mon-wrap:hover .del-btn { opacity: 1; }
-        textarea { resize: none; overflow: hidden; }
-        .col-hidden { display: none; }
-        .bottom-nav {
-          position: fixed; bottom: 0; left: 0; right: 0;
-          display: flex; background: #0d0d1a;
-          border-top: 1px solid #2a2a4a; z-index: 100;
-        }
-        .bottom-nav button {
-          flex: 1; padding: 13px 8px; background: transparent; border: none;
-          color: #555; font-size: 13px; cursor: pointer;
-          font-family: inherit; letter-spacing: 1px;
-          border-top: 2px solid transparent;
-          transition: color 0.15s;
-        }
-        @media (min-width: 768px) {
-          .app-wrap { padding-bottom: 24px; }
-          .app-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            max-width: 980px;
-            margin: 0 auto;
-            align-items: start;
-          }
-          .col-hidden { display: block !important; }
-          .bottom-nav { display: none !important; }
-        }
-      `}</style>
-
+    <div className="app-wrap">
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: "18px" }}>
         <div style={{ fontSize: "10px", letterSpacing: "4px", color: "#555", marginBottom: "2px" }}>FireRed · AUTO SAVE</div>
@@ -444,16 +754,14 @@ function EVTracker() {
         </div>
       </div>
 
-      {/* Two-column layout */}
       <div className="app-layout">
-
         {/* ===== 育成カラム ===== */}
         <div className={activeTab === "ikusei" ? "" : "col-hidden"}>
 
           {/* Party grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "7px", marginBottom: "16px" }}>
             {party.map(p => {
-              const t = Object.values(allEVs[p.name] || initEVs()).reduce((a, b) => a + b, 0);
+              const t        = Object.values(allEVs[p.name] || initEVs()).reduce((a, b) => a + b, 0);
               const isActive = selected === p.name;
               return (
                 <div key={p.name} className="mon-wrap" style={{ position: "relative" }}>
@@ -461,14 +769,10 @@ function EVTracker() {
                     className={`mon-btn${isActive ? " active" : ""}`}
                     onClick={() => setSelected(p.name)}
                     style={{
-                      width: "100%",
+                      width: "100%", cursor: "pointer", color: "#e8e8e8", textAlign: "center",
                       background: isActive ? `${p.color}22` : "#16213e",
                       border: `2px solid ${isActive ? p.color : "#2a2a4a"}`,
-                      borderRadius: "10px",
-                      padding: "10px 6px 8px",
-                      cursor: "pointer",
-                      color: "#e8e8e8",
-                      textAlign: "center",
+                      borderRadius: "10px", padding: "10px 6px 8px",
                     }}
                   >
                     <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
@@ -479,13 +783,12 @@ function EVTracker() {
                     <button
                       className="del-btn"
                       onClick={() => removeMon(p.name)}
-                      style={{ position: "absolute", top: "3px", right: "3px", background: "#ff4444", border: "none", borderRadius: "50%", width: "16px", height: "16px", cursor: "pointer", color: "#fff", fontSize: "9px", lineHeight: "16px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+                      style={{ position: "absolute", top: "3px", right: "3px", background: "#ff4444", border: "none", borderRadius: "50%", width: "16px", height: "16px", cursor: "pointer", color: "#fff", fontSize: "9px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
                     >✕</button>
                   )}
                 </div>
               );
             })}
-
             <button
               onClick={() => setAdding(true)}
               style={{ background: "#16213e", border: "2px dashed #2a2a4a", borderRadius: "10px", padding: "10px 6px", cursor: "pointer", color: "#555", fontSize: "20px", textAlign: "center", lineHeight: 1 }}
@@ -495,62 +798,36 @@ function EVTracker() {
             </button>
           </div>
 
-          {/* Add modal */}
           {adding && (
-            <div style={{ background: "#16213e", border: `1px solid ${mon.color}55`, borderRadius: "12px", padding: "14px", marginBottom: "14px" }}>
-              <div style={{ fontSize: "11px", color: "#888", marginBottom: "10px", letterSpacing: "2px" }}>ポケモンを追加</div>
-              <input
-                value={newName}
-                onChange={e => setNewName(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && addMon()}
-                placeholder="なまえ（例：ゲンガー）"
-                style={{ width: "100%", background: "#0d0d1a", border: "1px solid #3a3a5a", borderRadius: "6px", color: "#e8e8e8", fontSize: "13px", padding: "8px 10px", marginBottom: "8px", fontFamily: "inherit" }}
-              />
-              <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px" }}>アイコン</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "10px" }}>
-                {ICONS.map(ic => (
-                  <button key={ic} onClick={() => setNewIcon(ic)} style={{ background: newIcon === ic ? "#2a2a4a" : "transparent", border: newIcon === ic ? "1px solid #888" : "1px solid transparent", borderRadius: "6px", padding: "3px 5px", cursor: "pointer", fontSize: "16px" }}>{ic}</button>
-                ))}
-              </div>
-              <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px" }}>カラー</div>
-              <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
-                {COLORS.map(c => (
-                  <button key={c} onClick={() => setNewColor(c)} style={{ width: "24px", height: "24px", background: c, border: newColor === c ? "2px solid #fff" : "2px solid transparent", borderRadius: "50%", cursor: "pointer" }} />
-                ))}
-              </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button onClick={addMon} style={{ flex: 1, background: `${newColor}33`, border: `1px solid ${newColor}88`, borderRadius: "7px", color: newColor, fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit" }}>追加する</button>
-                <button onClick={() => { setAdding(false); setNewName(""); }} style={{ flex: 1, background: "transparent", border: "1px solid #3a3a5a", borderRadius: "7px", color: "#666", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit" }}>キャンセル</button>
-              </div>
-            </div>
+            <AddMonModal
+              newName={newName} newIcon={newIcon} newColor={newColor}
+              setNewName={setNewName} setNewIcon={setNewIcon} setNewColor={setNewColor}
+              onAdd={addMon}
+              onCancel={() => { setAdding(false); setNewName(""); }}
+              borderColor={mon.color}
+            />
           )}
 
           {/* Total bar */}
-          <div style={{ background: "#16213e", borderRadius: "8px", padding: "10px 14px", marginBottom: "10px", border: `1px solid ${mon.color}33` }}>
+          <div className="card" style={{ padding: "10px 14px", marginBottom: "10px", borderColor: mon.color + "33" }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "5px" }}>
               <span style={{ color: mon.color }}>合計努力値</span>
               <span>{total}/{MAX_TOTAL}　残り<span style={{ color: remaining < 50 ? "#ff6b6b" : "#aaa" }}>{remaining}</span></span>
             </div>
-            <div style={{ background: "#0d0d1a", borderRadius: "4px", height: "7px", overflow: "hidden" }}>
+            <div className="bar-bg" style={{ height: "7px" }}>
               <div className="bar-fill" style={{ height: "100%", width: `${(total / MAX_TOTAL) * 100}%`, background: total >= MAX_TOTAL ? "#7fff7f" : `linear-gradient(90deg, ${mon.color}88, ${mon.color})`, borderRadius: "4px" }} />
             </div>
           </div>
 
-          {/* 強制ギプス トグル */}
+          {/* 強制ギプス */}
           <button
             onClick={() => setMacho(v => !v)}
             style={{
-              width: "100%",
+              width: "100%", cursor: "pointer", fontFamily: "inherit",
               background: macho ? "#3a1a1a" : "#16213e",
               border: `1px solid ${macho ? "#ff6b35aa" : "#2a2a4a"}`,
-              borderRadius: "7px",
-              color: macho ? "#ff6b35" : "#555",
-              fontSize: "11px",
-              padding: "7px",
-              cursor: "pointer",
-              fontFamily: "inherit",
-              marginBottom: "10px",
-              letterSpacing: "1px",
+              borderRadius: "7px", color: macho ? "#ff6b35" : "#555",
+              fontSize: "11px", padding: "7px", marginBottom: "10px", letterSpacing: "1px",
             }}
           >
             {macho ? "🥊 強制ギプス装備中（EV×2）" : "🥊 強制ギプス　OFF"}
@@ -558,46 +835,15 @@ function EVTracker() {
 
           {/* Stats */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "14px" }}>
-            {STATS.map(stat => {
-              const val = evs[stat.key] || 0;
-              const isMaxed = val >= MAX_STAT;
-              const vLeft = vitaminLeft(val);
-              const plusLabels = macho ? ["＋8", "＋2"] : ["＋4", "＋"];
-              return (
-                <div key={stat.key} style={{ background: "#16213e", borderRadius: "8px", padding: "9px 12px", border: `1px solid ${isMaxed ? "#7fff7f44" : "#2a2a4a"}` }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
-                    <span style={{ fontSize: "11px", minWidth: "62px", color: isMaxed ? "#7fff7f" : "#888" }}>{stat.jp}</span>
-                    <span style={{ fontSize: "15px", minWidth: "36px", textAlign: "right", fontWeight: "bold" }}>{val}</span>
-                    {isMaxed
-                      ? <span style={{ fontSize: "8px", background: "#7fff7f22", color: "#7fff7f", border: "1px solid #7fff7f44", borderRadius: "3px", padding: "1px 4px" }}>MAX</span>
-                      : vLeft > 0 && <span style={{ fontSize: "8px", color: "#aaa88" }}>💊×{vLeft}</span>
-                    }
-                    <div style={{ display: "flex", gap: "3px", marginLeft: "auto" }}>
-                      {[[-1,"－"],[-4,"－4"],[4, plusLabels[0]],[1, plusLabels[1]]].map(([d, label]) => (
-                        <button key={d} className="step-btn" onClick={() => change(stat.key, d)} style={{ background: d > 0 ? `${mon.color}33` : "#1e1e3a", border: `1px solid ${d > 0 ? mon.color + "55" : "#3a3a5a"}`, borderRadius: "4px", color: d > 0 ? mon.color : "#777", fontSize: "10px", padding: "3px 6px", cursor: "pointer", minWidth: "28px", fontFamily: "inherit", transition: "all 0.1s" }}>{label}</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div style={{ background: "#0d0d1a", borderRadius: "3px", height: "4px", overflow: "hidden" }}>
-                    <div className="bar-fill" style={{ height: "100%", width: `${(val / MAX_STAT) * 100}%`, background: isMaxed ? "#7fff7f" : mon.color, borderRadius: "3px" }} />
-                  </div>
-                </div>
-              );
-            })}
+            {STATS.map(stat => (
+              <StatRow key={stat.key} stat={stat} val={evs[stat.key] || 0} color={mon.color} macho={macho} onChange={d => change(stat.key, d)} />
+            ))}
           </div>
 
-          {/* メモ欄 */}
-          <div style={{ background: "#16213e", border: `1px solid ${mon.color}22`, borderRadius: "8px", padding: "10px 12px", marginBottom: "10px" }}>
+          {/* メモ */}
+          <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: mon.color + "22" }}>
             <div style={{ fontSize: "10px", color: "#555", marginBottom: "6px", letterSpacing: "1px" }}>メモ（性格・持ち物・技など）</div>
-            <textarea
-              value={mon.memo || ""}
-              onChange={e => { updateMemo(e.target.value); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
-              onFocus={e => { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
-              ref={el => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
-              placeholder="例：ようき　こだわりスカーフ　地震 / 岩雪崩 / …"
-              rows={1}
-              style={{ width: "100%", background: "#0d0d1a", border: "1px solid #2a2a4a", borderRadius: "6px", color: "#e8e8e8", fontSize: "11px", padding: "7px 10px", fontFamily: "inherit", lineHeight: "1.5" }}
-            />
+            <AutoTextarea value={mon.memo || ""} onChange={updateMemo} placeholder="例：ようき　こだわりスカーフ　地震 / 岩雪崩 / …" />
           </div>
 
           <button onClick={reset} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px", marginBottom: "10px" }}>
@@ -607,231 +853,25 @@ function EVTracker() {
           <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", letterSpacing: "1px" }}>
             GEN III · MAX 252/STAT · MAX 510/TOTAL · AUTO SAVE
           </div>
-
-        </div>{/* /育成カラム */}
+        </div>
 
         {/* ===== 調査カラム ===== */}
         <div className={activeTab === "chosa" ? "" : "col-hidden"}>
+          <IVChecker color={mon.color} />
+          <EVSearch macho={macho} color={mon.color} />
+          <EVGuide color={mon.color} />
+        </div>
+      </div>
 
-          {/* 個体値チェッカー */}
-          <div style={{ marginBottom: "10px" }}>
-            <button
-              onClick={() => setShowIVC(v => !v)}
-              style={{ width:"100%", background: showIVC ? "#0d1a2e" : "#16213e", border:`1px solid ${showIVC ? mon.color+"88" : "#2a2a4a"}`, borderRadius: showIVC ? "8px 8px 0 0" : "8px", color: showIVC ? mon.color : "#555", fontSize:"11px", padding:"8px", cursor:"pointer", fontFamily:"inherit", letterSpacing:"1px" }}
-            >
-              🔬 個体値チェッカー（Gen III）{showIVC ? "　▲" : "　▼"}
-            </button>
-            {showIVC && (() => {
-              const nat = NATURES[ivcNat];
-              const statLabel = { hp:"ＨＰ", atk:"こうげき", def:"ぼうぎょ", spa:"とくこう", spd:"とくぼう", spe:"すばやさ" };
-              const natLabel = (n) => n.up ? `${n.name}（↑${statLabel[n.up]} / ↓${statLabel[n.dn]}）` : `${n.name}（補正なし）`;
-              return (
-                <div style={{ background:"#0d1a2e", border:`1px solid ${mon.color}44`, borderTop:"none", borderRadius:"0 0 8px 8px", padding:"12px" }}>
-                  {/* ポケモン選択 */}
-                  <select
-                    value={ivcMon}
-                    onChange={e => setIvcMon(Number(e.target.value))}
-                    style={{ width:"100%", background:"#16213e", border:"1px solid #3a3a5a", borderRadius:"6px", color:"#e8e8e8", fontSize:"12px", padding:"6px 8px", marginBottom:"8px", fontFamily:"inherit" }}
-                  >
-                    {POKEMON_DATA.map((p, i) => (
-                      <option key={p[0]} value={i}>{String(p[0]).padStart(3,"0")} {p[1]}</option>
-                    ))}
-                  </select>
-
-                  {/* レベル・性格 */}
-                  <div style={{ display:"flex", gap:"6px", marginBottom:"10px" }}>
-                    <div style={{ display:"flex", flexDirection:"column", gap:"3px" }}>
-                      <div style={{ fontSize:"9px", color:"#555" }}>レベル</div>
-                      <input
-                        type="number" min="1" max="100"
-                        value={ivcLv}
-                        onChange={e => setIvcLv(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
-                        style={{ width:"54px", background:"#16213e", border:"1px solid #3a3a5a", borderRadius:"6px", color:"#e8e8e8", fontSize:"13px", padding:"5px 6px", fontFamily:"inherit", textAlign:"center" }}
-                      />
-                    </div>
-                    <div style={{ flex:1, display:"flex", flexDirection:"column", gap:"3px" }}>
-                      <div style={{ fontSize:"9px", color:"#555" }}>性格</div>
-                      <select
-                        value={ivcNat}
-                        onChange={e => setIvcNat(Number(e.target.value))}
-                        style={{ width:"100%", background:"#16213e", border:"1px solid #3a3a5a", borderRadius:"6px", color:"#e8e8e8", fontSize:"11px", padding:"5px 6px", fontFamily:"inherit" }}
-                      >
-                        {NATURES.map((n, i) => <option key={i} value={i}>{natLabel(n)}</option>)}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* ステータス入力テーブル */}
-                  <div style={{ display:"grid", gridTemplateColumns:"62px 52px 1fr 44px", gap:"3px 6px", alignItems:"center", marginBottom:"4px" }}>
-                    <div style={{ fontSize:"9px", color:"#444" }}>ステータス</div>
-                    <div style={{ fontSize:"9px", color:"#444", textAlign:"center" }}>努力値</div>
-                    <div style={{ fontSize:"9px", color:"#444", textAlign:"center" }}>実数値</div>
-                    <div style={{ fontSize:"9px", color:"#444", textAlign:"center" }}>個体値</div>
-                  </div>
-                  {STATS.map(stat => {
-                    const isUp = nat.up === stat.key;
-                    const isDn = nat.dn === stat.key;
-                    const disp = ivDisp(stat.key);
-                    const col  = ivColor(stat.key);
-                    return (
-                      <div key={stat.key} style={{ display:"grid", gridTemplateColumns:"62px 52px 1fr 44px", gap:"3px 6px", alignItems:"center", marginBottom:"4px" }}>
-                        <div style={{ fontSize:"11px", color: isUp ? "#f5d020" : isDn ? "#ff6b6b" : "#888" }}>
-                          {stat.jp}{isUp ? "↑" : isDn ? "↓" : ""}
-                        </div>
-                        <input
-                          type="number" min="0" max="255"
-                          value={ivcEV[stat.key]}
-                          onChange={e => setIvcEV(prev => ({ ...prev, [stat.key]: Math.max(0, Math.min(255, parseInt(e.target.value) || 0)) }))}
-                          style={{ background:"#16213e", border:"1px solid #2a2a4a", borderRadius:"4px", color:"#aaa", fontSize:"11px", padding:"4px 5px", fontFamily:"inherit", textAlign:"center", width:"100%" }}
-                        />
-                        <input
-                          type="number" min="1"
-                          value={ivcActual[stat.key]}
-                          onChange={e => setIvcActual(prev => ({ ...prev, [stat.key]: e.target.value }))}
-                          placeholder="実数値"
-                          style={{ background:"#16213e", border:"1px solid #3a3a5a", borderRadius:"4px", color:"#e8e8e8", fontSize:"11px", padding:"4px 5px", fontFamily:"inherit", textAlign:"center", width:"100%" }}
-                        />
-                        <div style={{ fontSize:"13px", fontWeight:"bold", color:col, textAlign:"center" }}>{disp}</div>
-                      </div>
-                    );
-                  })}
-                  <div style={{ fontSize:"8px", color:"#333", marginTop:"6px" }}>「？」は実数値・努力値・レベルを確認してください</div>
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* EVサーチ */}
-          <div style={{ marginBottom: "10px" }}>
-            <button
-              onClick={() => setShowEVSearch(v => !v)}
-              style={{ width:"100%", background: showEVSearch ? "#0d1a2e" : "#16213e", border:`1px solid ${showEVSearch ? mon.color+"88" : "#2a2a4a"}`, borderRadius: showEVSearch ? "8px 8px 0 0" : "8px", color: showEVSearch ? mon.color : "#555", fontSize:"11px", padding:"8px", cursor:"pointer", fontFamily:"inherit", letterSpacing:"1px" }}
-            >
-              🔍 もらえるEVを調べる{showEVSearch ? "　▲" : "　▼"}
-            </button>
-            {showEVSearch && (() => {
-              const STAT_KEYS = ["hp","atk","def","spa","spd","spe"];
-              const STAT_JP   = { hp:"ＨＰ", atk:"こうげき", def:"ぼうぎょ", spa:"とくこう", spd:"とくぼう", spe:"すばやさ" };
-              const STAT_COL  = { hp:"#7fff7f", atk:"#ff6b6b", def:"#f5a623", spa:"#4a90d9", spd:"#7ed321", spe:"#e880a0" };
-
-              const results = POKEMON_DATA.filter((p, i) => {
-                const yield_ = EV_YIELD[i];
-                const nameMatch = !evQuery || p[1].includes(evQuery);
-                const statMatch = !evFilter || yield_[STAT_KEYS.indexOf(evFilter)] > 0;
-                const hasAnyEV  = yield_.some(v => v > 0);
-                return nameMatch && statMatch && hasAnyEV;
-              });
-
-              return (
-                <div style={{ background:"#0d1a2e", border:`1px solid ${mon.color}44`, borderTop:"none", borderRadius:"0 0 8px 8px", padding:"12px" }}>
-                  {/* ステータス絞り込みボタン */}
-                  <div style={{ display:"flex", gap:"4px", marginBottom:"8px", flexWrap:"wrap" }}>
-                    <button onClick={() => setEvFilter(null)} style={{ background: evFilter === null ? "#2a2a4a" : "transparent", border:"1px solid #3a3a5a", borderRadius:"4px", color: evFilter === null ? "#e8e8e8" : "#555", fontSize:"9px", padding:"3px 7px", cursor:"pointer", fontFamily:"inherit" }}>すべて</button>
-                    {STAT_KEYS.map(k => (
-                      <button key={k} onClick={() => setEvFilter(evFilter === k ? null : k)} style={{ background: evFilter === k ? STAT_COL[k]+"44" : "transparent", border:`1px solid ${evFilter === k ? STAT_COL[k] : "#3a3a5a"}`, borderRadius:"4px", color: evFilter === k ? STAT_COL[k] : "#555", fontSize:"9px", padding:"3px 7px", cursor:"pointer", fontFamily:"inherit" }}>
-                        {STAT_JP[k]}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* 名前検索 */}
-                  <input
-                    value={evQuery}
-                    onChange={e => setEvQuery(e.target.value)}
-                    placeholder="ポケモン名で検索…"
-                    style={{ width:"100%", background:"#16213e", border:"1px solid #3a3a5a", borderRadius:"6px", color:"#e8e8e8", fontSize:"12px", padding:"6px 10px", fontFamily:"inherit", marginBottom:"8px" }}
-                  />
-
-                  {/* 検索結果 */}
-                  <div style={{ maxHeight:"260px", overflowY:"auto" }}>
-                    {results.length === 0 && (
-                      <div style={{ color:"#444", fontSize:"11px", textAlign:"center", padding:"12px 0" }}>該当なし</div>
-                    )}
-                    {results.map((p, _) => {
-                      const i = p[0] - 1; // Pokedex No → array index
-                      const yield_ = EV_YIELD[i];
-                      const evParts = STAT_KEYS
-                        .map((k, ki) => yield_[ki] > 0 ? { key:k, val: yield_[ki] } : null)
-                        .filter(Boolean);
-                      return (
-                        <div key={p[0]} style={{ display:"flex", alignItems:"center", gap:"8px", padding:"5px 2px", borderBottom:"1px solid #1a1a2e" }}>
-                          <span style={{ fontSize:"9px", color:"#444", minWidth:"24px" }}>{String(p[0]).padStart(3,"0")}</span>
-                          <span style={{ fontSize:"11px", color:"#ccc", minWidth:"80px" }}>{p[1]}</span>
-                          <div style={{ display:"flex", gap:"6px", flexWrap:"wrap" }}>
-                            {evParts.map(({ key, val }) => {
-                              const disp = macho ? val * 2 : val;
-                              return (
-                                <span key={key} style={{ fontSize:"10px", background: STAT_COL[key]+"22", color: STAT_COL[key], border:`1px solid ${STAT_COL[key]}44`, borderRadius:"3px", padding:"1px 5px" }}>
-                                  {STAT_JP[key]} +{disp}{macho && <span style={{ fontSize:"8px", opacity:0.7 }}>（×2）</span>}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {macho && <div style={{ fontSize:"8px", color:"#ff6b35", marginTop:"6px" }}>🥊 強制ギプス装備中：EV×2表示</div>}
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* EV稼ぎガイド */}
-          <div style={{ marginBottom: "10px" }}>
-            <button
-              onClick={() => setShowGuide(v => !v)}
-              style={{ width: "100%", background: showGuide ? "#0d1a2e" : "#16213e", border: `1px solid ${showGuide ? mon.color + "88" : "#2a2a4a"}`, borderRadius: showGuide ? "8px 8px 0 0" : "8px", color: showGuide ? mon.color : "#555", fontSize: "11px", padding: "8px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px" }}
-            >
-              📖 EV稼ぎガイド（FR/LG）{showGuide ? "　▲" : "　▼"}
-            </button>
-            {showGuide && (
-              <div style={{ background: "#0d1a2e", border: `1px solid ${mon.color}44`, borderTop: "none", borderRadius: "0 0 8px 8px", padding: "10px 12px" }}>
-                {EV_GUIDE.map(({ stat, jp, spots }) => {
-                  return (
-                    <div key={stat} style={{ marginBottom: "10px" }}>
-                      <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px", letterSpacing: "1px" }}>{jp}</div>
-                      {spots.map(s => (
-                        <div key={s.name} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "10px", marginBottom: "3px", paddingLeft: "4px" }}>
-                          <span style={{ color: "#ccc", minWidth: "72px" }}>{s.name}</span>
-                          <span style={{ color: "#7fff7f", minWidth: "24px", textAlign: "right" }}>+{s.ev}</span>
-                          <span style={{ color: "#444" }}>{s.note}</span>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })}
-                <div style={{ fontSize: "8px", color: "#333", marginTop: "4px" }}>強制ギプス装備で獲得EV×2</div>
-              </div>
-            )}
-          </div>
-
-        </div>{/* /調査カラム */}
-
-      </div>{/* /app-layout */}
-
-      {/* Bottom nav（モバイルのみ表示） */}
+      {/* Bottom nav（モバイルのみ） */}
       <nav className="bottom-nav">
-        <button
-          onClick={() => setActiveTab("ikusei")}
-          style={{
-            color: activeTab === "ikusei" ? mon.color : "#555",
-            borderTop: `2px solid ${activeTab === "ikusei" ? mon.color : "transparent"}`,
-          }}
-        >
+        <button onClick={() => setActiveTab("ikusei")} style={{ color: activeTab === "ikusei" ? mon.color : "#555", borderTopColor: activeTab === "ikusei" ? mon.color : "transparent" }}>
           💪 育成
         </button>
-        <button
-          onClick={() => setActiveTab("chosa")}
-          style={{
-            color: activeTab === "chosa" ? mon.color : "#555",
-            borderTop: `2px solid ${activeTab === "chosa" ? mon.color : "transparent"}`,
-          }}
-        >
+        <button onClick={() => setActiveTab("chosa")} style={{ color: activeTab === "chosa" ? mon.color : "#555", borderTopColor: activeTab === "chosa" ? mon.color : "transparent" }}>
           🔬 調査
         </button>
       </nav>
-
     </div>
   );
 }
