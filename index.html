@@ -39,8 +39,6 @@
       .mon-btn { transition: all 0.15s; }
       .mon-btn:hover { transform: translateY(-2px); filter: brightness(1.15); }
       .mon-btn.active { box-shadow: 0 0 12px rgba(255,255,255,0.3); }
-      .mon-wrap .del-btn { opacity: 0; transition: opacity 0.15s; }
-      .mon-wrap:hover .del-btn { opacity: 1; }
 
       /* EV step buttons */
       .step-btn {
@@ -764,29 +762,21 @@ function EVTracker() {
               const t        = Object.values(allEVs[p.name] || initEVs()).reduce((a, b) => a + b, 0);
               const isActive = selected === p.name;
               return (
-                <div key={p.name} className="mon-wrap" style={{ position: "relative" }}>
-                  <button
-                    className={`mon-btn${isActive ? " active" : ""}`}
-                    onClick={() => setSelected(p.name)}
-                    style={{
-                      width: "100%", cursor: "pointer", color: "#e8e8e8", textAlign: "center",
-                      background: isActive ? `${p.color}22` : "#16213e",
-                      border: `2px solid ${isActive ? p.color : "#2a2a4a"}`,
-                      borderRadius: "10px", padding: "10px 6px 8px",
-                    }}
-                  >
-                    <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
-                    <div style={{ fontSize: "10px", color: isActive ? p.color : "#aaa", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                    <div style={{ fontSize: "9px", color: t >= MAX_TOTAL ? "#7fff7f" : "#555", marginTop: "2px" }}>{t}/{MAX_TOTAL}</div>
-                  </button>
-                  {party.length > 1 && (
-                    <button
-                      className="del-btn"
-                      onClick={() => removeMon(p.name)}
-                      style={{ position: "absolute", top: "3px", right: "3px", background: "#ff4444", border: "none", borderRadius: "50%", width: "16px", height: "16px", cursor: "pointer", color: "#fff", fontSize: "9px", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
-                    >✕</button>
-                  )}
-                </div>
+                <button
+                  key={p.name}
+                  className={`mon-btn${isActive ? " active" : ""}`}
+                  onClick={() => setSelected(p.name)}
+                  style={{
+                    width: "100%", cursor: "pointer", color: "#e8e8e8", textAlign: "center",
+                    background: isActive ? `${p.color}22` : "#16213e",
+                    border: `2px solid ${isActive ? p.color : "#2a2a4a"}`,
+                    borderRadius: "10px", padding: "10px 6px 8px",
+                  }}
+                >
+                  <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
+                  <div style={{ fontSize: "10px", color: isActive ? p.color : "#aaa", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                  <div style={{ fontSize: "9px", color: t >= MAX_TOTAL ? "#7fff7f" : "#555", marginTop: "2px" }}>{t}/{MAX_TOTAL}</div>
+                </button>
               );
             })}
             <button
@@ -846,9 +836,16 @@ function EVTracker() {
             <AutoTextarea value={mon.memo || ""} onChange={updateMemo} placeholder="例：ようき　こだわりスカーフ　地震 / 岩雪崩 / …" />
           </div>
 
-          <button onClick={reset} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px", marginBottom: "10px" }}>
-            {selected} をリセット
-          </button>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
+            <button onClick={reset} style={{ flex: 1, background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
+              EV リセット
+            </button>
+            {party.length > 1 && (
+              <button onClick={() => removeMon(selected)} style={{ flex: 1, background: "transparent", border: "1px solid #ff444444", borderRadius: "7px", color: "#ff6666", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
+                {selected} を削除
+              </button>
+            )}
+          </div>
 
           <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", letterSpacing: "1px" }}>
             GEN III · MAX 252/STAT · MAX 510/TOTAL · AUTO SAVE
