@@ -407,7 +407,7 @@ function EVTracker() {
         input, textarea { outline: none; }
         .del-btn { opacity: 0; transition: opacity 0.15s; }
         .mon-wrap:hover .del-btn { opacity: 1; }
-        textarea { resize: vertical; }
+        textarea { resize: none; overflow: hidden; }
         .col-hidden { display: none; }
         .bottom-nav {
           position: fixed; bottom: 0; left: 0; right: 0;
@@ -591,9 +591,11 @@ function EVTracker() {
             <div style={{ fontSize: "10px", color: "#555", marginBottom: "6px", letterSpacing: "1px" }}>メモ（性格・持ち物・技など）</div>
             <textarea
               value={mon.memo || ""}
-              onChange={e => updateMemo(e.target.value)}
+              onChange={e => { updateMemo(e.target.value); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
+              onFocus={e => { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
+              ref={el => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
               placeholder="例：ようき　こだわりスカーフ　地震 / 岩雪崩 / …"
-              rows={2}
+              rows={1}
               style={{ width: "100%", background: "#0d0d1a", border: "1px solid #2a2a4a", borderRadius: "6px", color: "#e8e8e8", fontSize: "11px", padding: "7px 10px", fontFamily: "inherit", lineHeight: "1.5" }}
             />
           </div>
