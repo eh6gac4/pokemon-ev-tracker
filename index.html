@@ -186,6 +186,78 @@ const POKEMON_DATA = [
 // [id, name, hp, atk, def, spa, spd, spe] のインデックス
 const PD = { hp:2, atk:3, def:4, spa:5, spd:6, spe:7 };
 
+// 倒した時に得られるEV [hp,atk,def,spa,spd,spe]（Bulbapedia Gen III）
+const EV_YIELD = [
+  [0,0,0,1,0,0],[0,0,0,1,1,0],[0,0,0,2,1,0], // 001-003
+  [0,0,0,0,0,1],[0,0,0,1,0,1],[0,0,0,3,0,0], // 004-006
+  [0,0,1,0,0,0],[0,0,1,0,1,0],[0,0,0,0,3,0], // 007-009
+  [1,0,0,0,0,0],[0,0,2,0,0,0],[0,0,0,2,1,0], // 010-012
+  [0,0,0,0,0,1],[0,0,2,0,0,0],[0,2,0,0,1,0], // 013-015
+  [0,0,0,0,0,1],[0,0,0,0,0,2],[0,0,0,0,0,3], // 016-018
+  [0,0,0,0,0,1],[0,0,0,0,0,2],[0,0,0,0,0,1],[0,0,0,0,0,2], // 019-022
+  [0,1,0,0,0,0],[0,2,0,0,0,0], // 023-024
+  [0,0,0,0,0,2],[0,0,0,0,0,3], // 025-026
+  [0,0,1,0,0,0],[0,0,2,0,0,0], // 027-028
+  [1,0,0,0,0,0],[2,0,0,0,0,0],[3,0,0,0,0,0], // 029-031
+  [0,1,0,0,0,0],[0,2,0,0,0,0],[0,3,0,0,0,0], // 032-034
+  [2,0,0,0,0,0],[3,0,0,0,0,0], // 035-036
+  [0,0,0,0,0,1],[0,0,0,0,1,1], // 037-038
+  [2,0,0,0,0,0],[3,0,0,0,0,0], // 039-040
+  [0,0,0,0,0,1],[0,0,0,0,0,2], // 041-042
+  [0,0,0,1,0,0],[0,0,0,2,0,0],[0,0,0,3,0,0], // 043-045
+  [0,1,0,0,0,0],[0,2,1,0,0,0], // 046-047
+  [0,0,0,0,1,0],[0,0,0,1,0,1], // 048-049
+  [0,0,0,0,0,1],[0,0,0,0,0,2], // 050-051
+  [0,0,0,0,0,1],[0,0,0,0,0,2], // 052-053
+  [0,0,0,1,0,0],[0,0,0,2,0,0], // 054-055
+  [0,1,0,0,0,0],[0,2,0,0,0,0], // 056-057
+  [0,1,0,0,0,0],[0,2,0,0,0,0], // 058-059
+  [0,0,0,0,0,1],[0,0,0,0,0,2],[0,0,3,0,0,0], // 060-062
+  [0,0,0,1,0,0],[0,0,0,2,0,0],[0,0,0,3,0,0], // 063-065
+  [0,1,0,0,0,0],[0,2,0,0,0,0],[0,3,0,0,0,0], // 066-068
+  [0,1,0,0,0,0],[0,2,0,0,0,0],[0,3,0,0,0,0], // 069-071
+  [0,0,0,0,1,0],[0,0,0,0,2,0], // 072-073
+  [0,0,1,0,0,0],[0,0,2,0,0,0],[0,0,3,0,0,0], // 074-076
+  [0,0,0,0,0,1],[0,0,0,0,0,2], // 077-078
+  [1,0,0,0,0,0],[0,0,2,0,0,0], // 079-080
+  [0,0,0,1,0,0],[0,0,0,2,0,0], // 081-082
+  [0,1,0,0,0,0], // 083
+  [0,1,0,0,0,0],[0,2,0,0,0,0], // 084-085
+  [0,0,0,0,1,0],[0,0,0,0,2,0], // 086-087
+  [1,0,0,0,0,0],[1,1,0,0,0,0], // 088-089
+  [0,0,1,0,0,0],[0,0,2,0,0,0], // 090-091
+  [0,0,0,1,0,0],[0,0,0,2,0,0],[0,0,0,3,0,0], // 092-094
+  [0,0,1,0,0,0], // 095
+  [0,0,0,0,1,0],[0,0,0,0,2,0], // 096-097
+  [0,1,0,0,0,0],[0,2,0,0,0,0], // 098-099
+  [0,0,0,0,0,1],[0,0,0,0,0,2], // 100-101
+  [0,0,1,0,0,0],[0,0,0,2,0,0], // 102-103
+  [0,0,1,0,0,0],[0,0,2,0,0,0], // 104-105
+  [0,2,0,0,0,0],[0,0,0,0,2,0], // 106-107
+  [2,0,0,0,0,0], // 108
+  [0,0,1,0,0,0],[0,0,2,0,0,0], // 109-110
+  [0,0,1,0,0,0],[0,2,0,0,0,0], // 111-112
+  [2,0,0,0,0,0],[0,0,1,0,0,0],[2,0,0,0,0,0], // 113-115
+  [0,0,0,1,0,0],[0,0,1,1,0,0], // 116-117
+  [0,1,0,0,0,0],[0,2,0,0,0,0], // 118-119
+  [0,0,0,0,0,1],[0,0,0,0,0,2], // 120-121
+  [0,0,0,0,2,0],[0,1,0,0,0,0], // 122-123
+  [0,0,0,2,0,0], // 124
+  [0,0,0,0,0,2],[0,0,0,2,0,0], // 125-126
+  [0,2,0,0,0,0],[0,1,0,0,0,1], // 127-128
+  [0,0,0,0,0,1],[0,2,0,0,0,0], // 129-130
+  [2,0,0,0,0,0],[1,0,0,0,0,0], // 131-132
+  [0,0,0,0,1,0], // 133
+  [2,0,0,0,0,0],[0,0,0,0,0,2],[0,2,0,0,0,0], // 134-136
+  [0,0,0,1,0,0], // 137
+  [0,0,1,0,0,0],[0,0,2,0,0,0], // 138-139
+  [0,0,1,0,0,0],[0,2,0,0,0,0], // 140-141
+  [0,0,0,0,0,2],[2,0,0,0,0,0], // 142-143
+  [0,0,0,0,3,0],[0,0,0,3,0,0],[0,0,0,3,0,0], // 144-146
+  [0,1,0,0,0,0],[0,2,0,0,0,0],[0,3,0,0,0,0], // 147-149
+  [0,0,0,3,0,0],[3,0,0,0,0,0], // 150-151
+];
+
 function EVTracker() {
   const [party, setParty] = useState(DEFAULT_PARTY);
   const [allEVs, setAllEVs] = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
@@ -193,7 +265,10 @@ function EVTracker() {
   const [loaded, setLoaded] = useState(false);
   const [macho, setMacho] = useState(false); // 強制ギプス（EV×2）
   const [showGuide, setShowGuide] = useState(false);
-  const [showIVC, setShowIVC] = useState(false);
+  const [showIVC,      setShowIVC]      = useState(false);
+  const [showEVSearch, setShowEVSearch] = useState(false);
+  const [evQuery,      setEvQuery]      = useState("");
+  const [evFilter,     setEvFilter]     = useState(null); // null=全て or "hp"/"atk"/etc
   const [ivcMon,    setIvcMon]    = useState(0);
   const [ivcLv,     setIvcLv]     = useState(50);
   const [ivcNat,    setIvcNat]    = useState(0);
@@ -559,6 +634,82 @@ function EVTracker() {
                 );
               })}
               <div style={{ fontSize:"8px", color:"#333", marginTop:"6px" }}>「？」は実数値・努力値・レベルを確認してください</div>
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* EVサーチ */}
+      <div style={{ marginBottom: "10px" }}>
+        <button
+          onClick={() => setShowEVSearch(v => !v)}
+          style={{ width:"100%", background: showEVSearch ? "#0d1a2e" : "#16213e", border:`1px solid ${showEVSearch ? mon.color+"88" : "#2a2a4a"}`, borderRadius: showEVSearch ? "8px 8px 0 0" : "8px", color: showEVSearch ? mon.color : "#555", fontSize:"11px", padding:"8px", cursor:"pointer", fontFamily:"inherit", letterSpacing:"1px" }}
+        >
+          🔍 もらえるEVを調べる{showEVSearch ? "　▲" : "　▼"}
+        </button>
+        {showEVSearch && (() => {
+          const STAT_KEYS = ["hp","atk","def","spa","spd","spe"];
+          const STAT_JP   = { hp:"ＨＰ", atk:"こうげき", def:"ぼうぎょ", spa:"とくこう", spd:"とくぼう", spe:"すばやさ" };
+          const STAT_COL  = { hp:"#7fff7f", atk:"#ff6b6b", def:"#f5a623", spa:"#4a90d9", spd:"#7ed321", spe:"#e880a0" };
+
+          const results = POKEMON_DATA.filter((p, i) => {
+            const yield_ = EV_YIELD[i];
+            const nameMatch = !evQuery || p[1].includes(evQuery);
+            const statMatch = !evFilter || yield_[STAT_KEYS.indexOf(evFilter)] > 0;
+            const hasAnyEV  = yield_.some(v => v > 0);
+            return nameMatch && statMatch && hasAnyEV;
+          });
+
+          return (
+            <div style={{ background:"#0d1a2e", border:`1px solid ${mon.color}44`, borderTop:"none", borderRadius:"0 0 8px 8px", padding:"12px" }}>
+              {/* ステータス絞り込みボタン */}
+              <div style={{ display:"flex", gap:"4px", marginBottom:"8px", flexWrap:"wrap" }}>
+                <button onClick={() => setEvFilter(null)} style={{ background: evFilter === null ? "#2a2a4a" : "transparent", border:"1px solid #3a3a5a", borderRadius:"4px", color: evFilter === null ? "#e8e8e8" : "#555", fontSize:"9px", padding:"3px 7px", cursor:"pointer", fontFamily:"inherit" }}>すべて</button>
+                {STAT_KEYS.map(k => (
+                  <button key={k} onClick={() => setEvFilter(evFilter === k ? null : k)} style={{ background: evFilter === k ? STAT_COL[k]+"44" : "transparent", border:`1px solid ${evFilter === k ? STAT_COL[k] : "#3a3a5a"}`, borderRadius:"4px", color: evFilter === k ? STAT_COL[k] : "#555", fontSize:"9px", padding:"3px 7px", cursor:"pointer", fontFamily:"inherit" }}>
+                    {STAT_JP[k]}
+                  </button>
+                ))}
+              </div>
+
+              {/* 名前検索 */}
+              <input
+                value={evQuery}
+                onChange={e => setEvQuery(e.target.value)}
+                placeholder="ポケモン名で検索…"
+                style={{ width:"100%", background:"#16213e", border:"1px solid #3a3a5a", borderRadius:"6px", color:"#e8e8e8", fontSize:"12px", padding:"6px 10px", fontFamily:"inherit", marginBottom:"8px" }}
+              />
+
+              {/* 検索結果 */}
+              <div style={{ maxHeight:"260px", overflowY:"auto" }}>
+                {results.length === 0 && (
+                  <div style={{ color:"#444", fontSize:"11px", textAlign:"center", padding:"12px 0" }}>該当なし</div>
+                )}
+                {results.map((p, _) => {
+                  const i = p[0] - 1; // Pokedex No → array index
+                  const yield_ = EV_YIELD[i];
+                  const evParts = STAT_KEYS
+                    .map((k, ki) => yield_[ki] > 0 ? { key:k, val: yield_[ki] } : null)
+                    .filter(Boolean);
+                  return (
+                    <div key={p[0]} style={{ display:"flex", alignItems:"center", gap:"8px", padding:"5px 2px", borderBottom:"1px solid #1a1a2e" }}>
+                      <span style={{ fontSize:"9px", color:"#444", minWidth:"24px" }}>{String(p[0]).padStart(3,"0")}</span>
+                      <span style={{ fontSize:"11px", color:"#ccc", minWidth:"80px" }}>{p[1]}</span>
+                      <div style={{ display:"flex", gap:"6px", flexWrap:"wrap" }}>
+                        {evParts.map(({ key, val }) => {
+                          const disp = macho ? val * 2 : val;
+                          return (
+                            <span key={key} style={{ fontSize:"10px", background: STAT_COL[key]+"22", color: STAT_COL[key], border:`1px solid ${STAT_COL[key]}44`, borderRadius:"3px", padding:"1px 5px" }}>
+                              {STAT_JP[key]} +{disp}{macho && <span style={{ fontSize:"8px", opacity:0.7 }}>（×2）</span>}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {macho && <div style={{ fontSize:"8px", color:"#ff6b35", marginTop:"6px" }}>🥊 強制ギプス装備中：EV×2表示</div>}
             </div>
           );
         })()}
