@@ -11,7 +11,8 @@ services:
 
   cloudflared:
     image: cloudflare/cloudflared:latest
-    command: tunnel run nuc-tunnel
+    command: tunnel --config /etc/cloudflared/config.yml run
+    user: "1000"
     volumes:
       - $\{CLOUDFLARED_DIR\}:/etc/cloudflared:ro
     restart: unless-stopped
