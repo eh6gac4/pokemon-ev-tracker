@@ -8,3 +8,10 @@ services:
       - ./data:/app/data
     environment:
       - DB_PATH=/app/data/ev_data.db
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run nuc-tunnel
+    volumes:
+      - $\{CLOUDFLARED_DIR\}:/etc/cloudflared:ro
+    restart: unless-stopped
