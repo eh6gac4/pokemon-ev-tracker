@@ -29,7 +29,7 @@
 保存形式：
 ```json
 {
-  "party":    [ { "name": "...", "icon": "...", "color": "..." } ],
+  "party":    [ { "name": "...", "icon": "...", "color": "...", "memo": "..." } ],
   "allEVs":   { "ポケモン名": { "hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0 } },
   "selected": "ポケモン名"
 }
@@ -41,13 +41,29 @@
 - 全ステータスの合計最大値: 510
 - これらの制約はフロントエンド（`change()`関数）で強制している
 
-## よくある作業
+## フロントエンドの主要データ定数
 
-**コンテナ再ビルド（コード変更後）：**
+| 定数 | 内容 |
+|------|------|
+| `POKEMON_DATA` | カントー151匹の種族値 `[id, 日本語名, hp, atk, def, spa, spd, spe]` |
+| `EV_YIELD` | 151匹のEV yield `[hp, atk, def, spa, spd, spe]`（0-indexed、Bulbapedia Gen III） |
+| `NATURES` | 25性格の日本語名・上昇・下降ステータス（Bulbapediaで確認済み） |
+| `EV_GUIDE` | FR/LG向けEV稼ぎスポット一覧 |
+
+## テスト
+
 ```bash
-docker compose up -d --build
+python3 test_server.py
 ```
 
-**フロントエンドのみ変更した場合はビルド不要**（`index.html`はコンテナ起動時にCOPYされるため再ビルドが必要）。
+標準ライブラリの `unittest` のみ使用。DB・HTTP・EVルール・強制ギプス・ビタミン・メモのテストを含む。
+
+## よくある作業
+
+**コード変更後は必ずセットで実行：**
+```bash
+git add . && git commit -m "..." && git push
+docker compose up -d --build
+```
 
 **ポート変更：** `docker-compose.yml` の `ports` を変更してコンテナ再起動。
