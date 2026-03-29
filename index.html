@@ -99,6 +99,7 @@
         padding: 6px 8px;
       }
       textarea.input-dark { resize: none; overflow: hidden; }
+      .search-item:hover { background: #2a2a4a !important; color: #e8e8e8 !important; }
 
       /* PC layout */
       @media (min-width: 768px) {
@@ -483,12 +484,14 @@ function AddMonModal({ newName, newIcon, newColor, setNewName, setNewIcon, setNe
 }
 
 function IVChecker({ color }) {
-  const [open,   setOpen]   = useState(false);
-  const [mon,    setMon]    = useState(0);
-  const [lv,     setLv]     = useState(50);
-  const [nat,    setNat]    = useState(0);
-  const [actual, setActual] = useState({hp:"",atk:"",def:"",spa:"",spd:"",spe:""});
-  const [ev,     setEV]     = useState({hp:0,atk:0,def:0,spa:0,spd:0,spe:0});
+  const [open,        setOpen]       = useState(false);
+  const [mon,         setMon]        = useState(0);
+  const [lv,          setLv]         = useState(50);
+  const [nat,         setNat]        = useState(0);
+  const [actual,      setActual]     = useState({hp:"",atk:"",def:"",spa:"",spd:"",spe:""});
+  const [ev,          setEV]         = useState({hp:0,atk:0,def:0,spa:0,spd:0,spe:0});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch,  setShowSearch]  = useState(false);
 
   const nature = NATURES[nat];
   const pmon   = POKEMON_DATA[mon];
@@ -533,11 +536,39 @@ function IVChecker({ color }) {
 
   return (
     <Panel title="🔬 個体値チェッカー（Gen III）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
-      <select value={mon} onChange={e => setMon(Number(e.target.value))} className="input-dark" style={{ width: "100%", marginBottom: "8px" }}>
-        {POKEMON_DATA.map((p, i) => (
-          <option key={p[0]} value={i}>{String(p[0]).padStart(3,"0")} {p[1]}</option>
-        ))}
-      </select>
+      <div style={{ position: "relative", marginBottom: "8px" }}>
+        <input
+          value={showSearch ? searchQuery : `${String(POKEMON_DATA[mon][0]).padStart(3,"0")} ${POKEMON_DATA[mon][1]}`}
+          onChange={e => { setSearchQuery(e.target.value); setShowSearch(true); }}
+          onFocus={() => { setSearchQuery(""); setShowSearch(true); }}
+          onBlur={() => setTimeout(() => setShowSearch(false), 150)}
+          placeholder="ポケモン名・番号で検索…"
+          className="input-dark"
+          style={{ width: "100%" }}
+        />
+        {showSearch && (() => {
+          const results = searchQuery
+            ? POKEMON_DATA.filter(p => p[1].includes(searchQuery) || String(p[0]).padStart(3,"0").includes(searchQuery))
+            : POKEMON_DATA;
+          return (
+            <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#16213e", border: "1px solid #3a3a5a", borderTop: "none", borderRadius: "0 0 6px 6px", maxHeight: "200px", overflowY: "auto", zIndex: 50 }}>
+              {results.length === 0
+                ? <div style={{ padding: "8px", fontSize: "11px", color: "#444" }}>該当なし</div>
+                : results.map(p => (
+                    <div
+                      key={p[0]}
+                      className="search-item"
+                      onMouseDown={() => { setMon(p[0] - 1); setSearchQuery(""); setShowSearch(false); }}
+                      style={{ padding: "5px 8px", cursor: "pointer", fontSize: "12px", color: mon === p[0] - 1 ? color : "#ccc", background: mon === p[0] - 1 ? color + "22" : "transparent" }}
+                    >
+                      {String(p[0]).padStart(3,"0")} {p[1]}
+                    </div>
+                  ))
+              }
+            </div>
+          );
+        })()}
+      </div>
 
       <div style={{ display: "flex", gap: "6px", marginBottom: "10px" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
