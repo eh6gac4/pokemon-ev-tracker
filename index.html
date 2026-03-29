@@ -263,6 +263,90 @@ const EV_GUIDE = [
   ]},
 ];
 
+const LOCATION_DATA = [
+  { name: "ディグダのあな", ver: "",
+    pokemon: [
+      { name: "ディグダ",   evs: { spe: 1 }, rate: "95%", best: true },
+      { name: "ダグトリオ", evs: { spe: 2 }, rate: "5%" },
+    ]
+  },
+  { name: "おつきみやまB1F", ver: "",
+    pokemon: [
+      { name: "パラス",     evs: { atk: 1 }, rate: "100%", best: true },
+      { name: "イシツブテ", evs: { def: 1 }, rate: "35%" },
+    ]
+  },
+  { name: "おつきみやま（周辺・3番道路）", ver: "",
+    pokemon: [
+      { name: "プリン",     evs: { hp: 2 },  rate: "10%" },
+      { name: "イシツブテ", evs: { def: 1 }, rate: "35%" },
+    ]
+  },
+  { name: "1番道路", ver: "",
+    pokemon: [
+      { name: "コラッタ", evs: { spe: 1 }, rate: "50%" },
+    ]
+  },
+  { name: "22番道路（草むら）", ver: "",
+    pokemon: [
+      { name: "コラッタ", evs: { spe: 1 }, rate: "45%" },
+      { name: "マンキー", evs: { atk: 1 }, rate: "45%", fr: true },
+    ]
+  },
+  { name: "ポケモンタワー 3〜6F", ver: "",
+    pokemon: [
+      { name: "ゴース",   evs: { spa: 1 }, rate: "85〜90%", best: true },
+    ]
+  },
+  { name: "ポケモンタワー 7F", ver: "",
+    pokemon: [
+      { name: "ゴース",   evs: { spa: 1 }, rate: "85%" },
+      { name: "ゴースト", evs: { spa: 2 }, rate: "15%" },
+    ]
+  },
+  { name: "21番道路（草むら）", ver: "",
+    pokemon: [
+      { name: "モンジャラ", evs: { def: 1 }, rate: "100%", best: true },
+    ]
+  },
+  { name: "12〜15番道路", ver: "",
+    pokemon: [
+      { name: "コンパン", evs: { spd: 1 }, rate: "30%" },
+    ]
+  },
+  { name: "なみのり全般", ver: "",
+    pokemon: [
+      { name: "メノクラゲ", evs: { spd: 1 }, rate: "100%", best: true },
+      { name: "ドククラゲ", evs: { spd: 2 }, rate: "低確率" },
+    ]
+  },
+  { name: "4〜11番道路", ver: "LG",
+    pokemon: [
+      { name: "サンド", evs: { def: 1 }, rate: "25〜40%", best: true },
+    ]
+  },
+  { name: "22番道路（なみのり）", ver: "LG",
+    pokemon: [
+      { name: "ヤドン", evs: { hp: 1 }, rate: "100%", best: true },
+    ]
+  },
+  { name: "廃虚の谷（なみのり）", ver: "FR", note: "島4解放後",
+    pokemon: [
+      { name: "マリル", evs: { hp: 2 }, rate: "100%", best: true },
+    ]
+  },
+  { name: "チャンピオンロード", ver: "FR",
+    pokemon: [
+      { name: "オコリザル", evs: { atk: 2 }, rate: "10%" },
+    ]
+  },
+  { name: "各所（なみのり）", ver: "FR",
+    pokemon: [
+      { name: "コダック", evs: { spa: 1 }, rate: "100%", best: true },
+    ]
+  },
+];
+
 // ─── helper components ───────────────────────────────────────────────────────
 
 function AutoTextarea({ value, onChange, placeholder }) {
@@ -598,6 +682,61 @@ function EVGuide({ color }) {
   );
 }
 
+function LocationGuide({ color }) {
+  const [open, setOpen] = useState(false);
+  const [ver, setVer] = useState("all");
+
+  const list = LOCATION_DATA.filter(loc =>
+    ver === "fr" ? loc.ver !== "LG" :
+    ver === "lg" ? loc.ver !== "FR" : true
+  );
+
+  return (
+    <Panel title="🗺 場所別出現ポケモン（FR/LG）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      <div style={{ display: "flex", gap: "5px", marginBottom: "12px" }}>
+        {[["all","すべて"],["fr","FR"],["lg","LG"]].map(([v, label]) => (
+          <button key={v} onClick={() => setVer(v)}
+            style={{ fontSize: "10px", padding: "3px 10px", borderRadius: "4px", cursor: "pointer", border: "1px solid", fontFamily: "inherit",
+              background: ver === v ? "#1a1a3e" : "transparent",
+              borderColor: ver === v ? "#5555cc" : "#333",
+              color: ver === v ? "#aaaaff" : "#555" }}>
+            {label}
+          </button>
+        ))}
+      </div>
+      {list.map(loc => (
+        <div key={loc.name + loc.ver} style={{ marginBottom: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "4px" }}>
+            <span style={{ fontSize: "10px", color: "#bbb" }}>{loc.name}</span>
+            {loc.ver && (
+              <span style={{ fontSize: "8px", padding: "1px 4px", borderRadius: "3px",
+                background: loc.ver === "FR" ? "#cc222233" : "#2244cc33",
+                color:      loc.ver === "FR" ? "#ff8888"   : "#8888ff",
+                border: `1px solid ${loc.ver === "FR" ? "#cc222255" : "#2244cc55"}` }}>
+                {loc.ver}
+              </span>
+            )}
+            {loc.note && <span style={{ fontSize: "8px", color: "#555" }}>{loc.note}</span>}
+          </div>
+          {loc.pokemon.map(p => (
+            <div key={p.name} style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "10px", marginBottom: "3px", paddingLeft: "8px" }}>
+              <span style={{ color: "#ccc", minWidth: "78px" }}>{p.name}</span>
+              {Object.entries(p.evs).map(([st, val]) => (
+                <span key={st} style={{ fontSize: "9px", padding: "1px 5px", borderRadius: "3px",
+                  background: STAT_COL[st] + "22", color: STAT_COL[st], border: `1px solid ${STAT_COL[st]}44` }}>
+                  {STAT_JP[st]} +{val}
+                </span>
+              ))}
+              <span style={{ fontSize: "9px", color: p.best ? "#7fff7f" : "#555" }}>{p.rate}{p.best ? "★" : ""}</span>
+            </div>
+          ))}
+        </div>
+      ))}
+      <div style={{ fontSize: "8px", color: "#333", marginTop: "4px" }}>強制ギプス装備で獲得EV×2</div>
+    </Panel>
+  );
+}
+
 // ─── main component ──────────────────────────────────────────────────────────
 
 function EVTracker() {
@@ -790,6 +929,7 @@ function EVTracker() {
         <div className={activeTab === "chosa" ? "" : "col-hidden"}>
           <IVChecker color={mon.color} />
           <EVSearch macho={macho} color={mon.color} />
+          <LocationGuide color={mon.color} />
           <EVGuide color={mon.color} />
         </div>
       </div>
