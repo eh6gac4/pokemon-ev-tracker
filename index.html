@@ -264,7 +264,7 @@ const EV_GUIDE = [
 ];
 
 const LOCATION_DATA = [
-  // ─── 道路（草むら） ───
+  // ─── マサラタウン → トキワシティ ───
   { name: "1番道路", ver: "", pokemon: [
     { name: "ポッポ",     evs: { spe: 1 }, rate: "50%" },
     { name: "コラッタ",   evs: { spe: 1 }, rate: "50%" },
@@ -275,6 +275,12 @@ const LOCATION_DATA = [
     { name: "キャタピー", evs: { hp: 1 },  rate: "5%",  ver: "FR" },
     { name: "ビードル",   evs: { spe: 1 }, rate: "5%",  ver: "LG" },
   ]},
+  { name: "22番道路（草むら）", ver: "", pokemon: [
+    { name: "マンキー",   evs: { atk: 1 }, rate: "45%", best: true },
+    { name: "コラッタ",   evs: { spe: 1 }, rate: "45%" },
+    { name: "オニスズメ", evs: { spe: 1 }, rate: "10%" },
+  ]},
+  // ─── ニビシティ → ハナダシティ（おつきみやま経由） ───
   { name: "3番道路", ver: "", pokemon: [
     { name: "オニスズメ", evs: { spe: 1 }, rate: "35%" },
     { name: "ポッポ",     evs: { spe: 1 }, rate: "30%" },
@@ -283,6 +289,21 @@ const LOCATION_DATA = [
     { name: "ニドラン♂",  evs: { atk: 1 }, rate: "14%", ver: "FR" },
     { name: "ニドラン♀",  evs: { hp: 1 },  rate: "14%", ver: "LG" },
   ]},
+  { name: "おつきみやま 1F", ver: "", pokemon: [
+    { name: "ズバット",   evs: { spe: 1 }, rate: "69%", best: true },
+    { name: "イシツブテ", evs: { def: 1 }, rate: "25%" },
+    { name: "パラス",     evs: { atk: 1 }, rate: "5%" },
+    { name: "ピッピ",     evs: { hp: 2 },  rate: "1%" },
+  ]},
+  { name: "おつきみやま B1F", ver: "", pokemon: [
+    { name: "パラス",     evs: { atk: 1 }, rate: "100%", best: true },
+  ]},
+  { name: "おつきみやま B2F", ver: "", pokemon: [
+    { name: "ズバット",   evs: { spe: 1 }, rate: "49%" },
+    { name: "イシツブテ", evs: { def: 1 }, rate: "30%" },
+    { name: "パラス",     evs: { atk: 1 }, rate: "15%" },
+    { name: "ピッピ",     evs: { hp: 2 },  rate: "6%" },
+  ]},
   { name: "4番道路", ver: "", pokemon: [
     { name: "コラッタ",   evs: { spe: 1 }, rate: "35%" },
     { name: "オニスズメ", evs: { spe: 1 }, rate: "35%" },
@@ -290,6 +311,18 @@ const LOCATION_DATA = [
     { name: "サンド",     evs: { def: 1 }, rate: "25%", ver: "LG" },
     { name: "マンキー",   evs: { atk: 1 }, rate: "5%" },
   ]},
+  // ─── ハナダシティ周辺 ───
+  { name: "24・25番道路", ver: "", pokemon: [
+    { name: "ポッポ",     evs: { spe: 1 }, rate: "15%" },
+    { name: "キャタピー", evs: { hp: 1 },  rate: "20%", ver: "FR" },
+    { name: "トランセル", evs: { def: 2 }, rate: "4%",  ver: "FR" },
+    { name: "ビードル",   evs: { spe: 1 }, rate: "20%", ver: "LG" },
+    { name: "コクーン",   evs: { def: 2 }, rate: "4%",  ver: "LG" },
+    { name: "ナゾノクサ", evs: { spa: 1 }, rate: "25%", ver: "FR" },
+    { name: "マダツボミ", evs: { atk: 1 }, rate: "25%", ver: "LG" },
+    { name: "アブラ",     evs: { spa: 1 }, rate: "15%" },
+  ]},
+  // ─── クチバシティ方面 ───
   { name: "5番道路", ver: "", pokemon: [
     { name: "ポッポ",     evs: { spe: 1 }, rate: "40%" },
     { name: "ニャース",   evs: { spe: 1 }, rate: "35%" },
@@ -302,36 +335,11 @@ const LOCATION_DATA = [
     { name: "ナゾノクサ", evs: { spa: 1 }, rate: "25%", ver: "FR" },
     { name: "マダツボミ", evs: { atk: 1 }, rate: "25%", ver: "LG" },
   ]},
-  { name: "7番道路", ver: "", pokemon: [
-    { name: "ニャース",   evs: { spe: 1 }, rate: "40%" },
-    { name: "ポッポ",     evs: { spe: 1 }, rate: "30%" },
-    { name: "ナゾノクサ", evs: { spa: 1 }, rate: "20%", ver: "FR" },
-    { name: "ガーディ",   evs: { atk: 1 }, rate: "10%", ver: "FR" },
-    { name: "マダツボミ", evs: { atk: 1 }, rate: "20%", ver: "LG" },
-    { name: "ロコン",     evs: { spe: 1 }, rate: "10%", ver: "LG" },
+  { name: "ディグダのあな", ver: "", pokemon: [
+    { name: "ディグダ",   evs: { spe: 1 }, rate: "95%", best: true },
+    { name: "ダグトリオ", evs: { spe: 2 }, rate: "5%" },
   ]},
-  { name: "8番道路", ver: "", pokemon: [
-    { name: "ニャース",   evs: { spe: 1 }, rate: "30%" },
-    { name: "ピジョン",   evs: { spe: 2 }, rate: "30%" },
-    { name: "アーボ",     evs: { atk: 1 }, rate: "20%", ver: "FR" },
-    { name: "ガーディ",   evs: { atk: 1 }, rate: "20%", ver: "FR" },
-    { name: "サンドパン", evs: { def: 2 }, rate: "20%", ver: "LG" },
-    { name: "ロコン",     evs: { spe: 1 }, rate: "20%", ver: "LG" },
-    { name: "アブラ",     evs: { spa: 1 }, rate: "15%" },
-    { name: "カダブラ",   evs: { spa: 2 }, rate: "5%" },
-  ]},
-  { name: "9番道路", ver: "", pokemon: [
-    { name: "コラッタ",   evs: { spe: 1 }, rate: "40%" },
-    { name: "オニスズメ", evs: { spe: 1 }, rate: "35%" },
-    { name: "アーボ",     evs: { atk: 1 }, rate: "25%", ver: "FR" },
-    { name: "サンド",     evs: { def: 1 }, rate: "25%", ver: "LG" },
-  ]},
-  { name: "10番道路", ver: "", pokemon: [
-    { name: "ビリリダマ", evs: { spe: 1 }, rate: "40%", best: true },
-    { name: "オニスズメ", evs: { spe: 1 }, rate: "35%" },
-    { name: "アーボ",     evs: { atk: 1 }, rate: "25%", ver: "FR" },
-    { name: "サンド",     evs: { def: 1 }, rate: "25%", ver: "LG" },
-  ]},
+  // ─── クチバシティ東 → ラベンダータウン方面 ───
   { name: "11番道路", ver: "", pokemon: [
     { name: "アーボ",     evs: { atk: 1 }, rate: "40%", ver: "FR" },
     { name: "サンド",     evs: { def: 1 }, rate: "40%", ver: "LG", best: true },
@@ -376,83 +384,37 @@ const LOCATION_DATA = [
     { name: "ピジョン",   evs: { spe: 2 }, rate: "5%" },
     { name: "メタモン",   evs: { hp: 1 },  rate: "5%" },
   ]},
-  { name: "16番道路", ver: "", pokemon: [
-    { name: "ドードー",   evs: { atk: 1 }, rate: "35%", best: true },
-    { name: "コラッタ",   evs: { spe: 1 }, rate: "30%" },
-    { name: "オニスズメ", evs: { spe: 1 }, rate: "30%" },
-    { name: "ラッタ",     evs: { spe: 2 }, rate: "5%" },
+  // ─── タマムシシティ方面 ───
+  { name: "7番道路", ver: "", pokemon: [
+    { name: "ニャース",   evs: { spe: 1 }, rate: "40%" },
+    { name: "ポッポ",     evs: { spe: 1 }, rate: "30%" },
+    { name: "ナゾノクサ", evs: { spa: 1 }, rate: "20%", ver: "FR" },
+    { name: "ガーディ",   evs: { atk: 1 }, rate: "10%", ver: "FR" },
+    { name: "マダツボミ", evs: { atk: 1 }, rate: "20%", ver: "LG" },
+    { name: "ロコン",     evs: { spe: 1 }, rate: "10%", ver: "LG" },
   ]},
-  { name: "17番道路", ver: "", note: "サイクリングロード", pokemon: [
-    { name: "ドードー",   evs: { atk: 1 }, rate: "35%", best: true },
-    { name: "オニドリル", evs: { spe: 2 }, rate: "30%" },
-    { name: "ラッタ",     evs: { spe: 2 }, rate: "25%" },
-    { name: "コラッタ",   evs: { spe: 1 }, rate: "10%" },
-  ]},
-  { name: "18番道路", ver: "", pokemon: [
-    { name: "ドードー",   evs: { atk: 1 }, rate: "35%", best: true },
-    { name: "オニスズメ", evs: { spe: 1 }, rate: "30%" },
-    { name: "オニドリル", evs: { spe: 2 }, rate: "15%" },
-    { name: "ラッタ",     evs: { spe: 2 }, rate: "15%" },
-    { name: "コラッタ",   evs: { spe: 1 }, rate: "5%" },
-  ]},
-  { name: "21番道路（草むら）", ver: "", pokemon: [
-    { name: "モンジャラ", evs: { def: 1 }, rate: "100%", best: true },
-  ]},
-  { name: "22番道路（草むら）", ver: "", pokemon: [
-    { name: "マンキー",   evs: { atk: 1 }, rate: "45%", best: true },
-    { name: "コラッタ",   evs: { spe: 1 }, rate: "45%" },
-    { name: "オニスズメ", evs: { spe: 1 }, rate: "10%" },
-  ]},
-  { name: "23番道路", ver: "", pokemon: [
-    { name: "マンキー",   evs: { atk: 1 }, rate: "30%" },
-    { name: "オニドリル", evs: { spe: 2 }, rate: "25%" },
+  { name: "8番道路", ver: "", pokemon: [
+    { name: "ニャース",   evs: { spe: 1 }, rate: "30%" },
+    { name: "ピジョン",   evs: { spe: 2 }, rate: "30%" },
     { name: "アーボ",     evs: { atk: 1 }, rate: "20%", ver: "FR" },
-    { name: "サンド",     evs: { def: 1 }, rate: "20%", ver: "LG" },
-    { name: "オニスズメ", evs: { spe: 1 }, rate: "15%" },
-    { name: "アーボック", evs: { atk: 2 }, rate: "5%",  ver: "FR" },
-    { name: "サンドパン", evs: { def: 2 }, rate: "5%",  ver: "LG" },
-    { name: "オコリザル", evs: { atk: 2 }, rate: "5%" },
-  ]},
-  { name: "24・25番道路", ver: "", pokemon: [
-    { name: "ポッポ",     evs: { spe: 1 }, rate: "15%" },
-    { name: "キャタピー", evs: { hp: 1 },  rate: "20%", ver: "FR" },
-    { name: "トランセル", evs: { def: 2 }, rate: "4%",  ver: "FR" },
-    { name: "ビードル",   evs: { spe: 1 }, rate: "20%", ver: "LG" },
-    { name: "コクーン",   evs: { def: 2 }, rate: "4%",  ver: "LG" },
-    { name: "ナゾノクサ", evs: { spa: 1 }, rate: "25%", ver: "FR" },
-    { name: "マダツボミ", evs: { atk: 1 }, rate: "25%", ver: "LG" },
+    { name: "ガーディ",   evs: { atk: 1 }, rate: "20%", ver: "FR" },
+    { name: "サンドパン", evs: { def: 2 }, rate: "20%", ver: "LG" },
+    { name: "ロコン",     evs: { spe: 1 }, rate: "20%", ver: "LG" },
     { name: "アブラ",     evs: { spa: 1 }, rate: "15%" },
+    { name: "カダブラ",   evs: { spa: 2 }, rate: "5%" },
   ]},
-
-  // ─── 水上（なみのり） ───
-  { name: "4・10〜13番道路（なみのり）", ver: "", pokemon: [
-    { name: "メノクラゲ", evs: { spd: 1 }, rate: "100%", best: true },
+  // ─── ラベンダータウン → 岩山の洞窟 ───
+  { name: "9番道路", ver: "", pokemon: [
+    { name: "コラッタ",   evs: { spe: 1 }, rate: "40%" },
+    { name: "オニスズメ", evs: { spe: 1 }, rate: "35%" },
+    { name: "アーボ",     evs: { atk: 1 }, rate: "25%", ver: "FR" },
+    { name: "サンド",     evs: { def: 1 }, rate: "25%", ver: "LG" },
   ]},
-  { name: "19〜21番道路（なみのり）", ver: "", pokemon: [
-    { name: "メノクラゲ", evs: { spd: 1 }, rate: "100%", best: true },
-  ]},
-  { name: "6・22・23番道路（なみのり）", ver: "FR", pokemon: [
-    { name: "コダック", evs: { spa: 1 }, rate: "100%", best: true },
-  ]},
-  { name: "6・22・23番道路（なみのり）", ver: "LG", pokemon: [
-    { name: "ヤドン", evs: { hp: 1 }, rate: "100%", best: true },
-  ]},
-
-  // ─── ダンジョン ───
-  { name: "おつきみやま 1F", ver: "", pokemon: [
-    { name: "ズバット",   evs: { spe: 1 }, rate: "69%", best: true },
-    { name: "イシツブテ", evs: { def: 1 }, rate: "25%" },
-    { name: "パラス",     evs: { atk: 1 }, rate: "5%" },
-    { name: "ピッピ",     evs: { hp: 2 },  rate: "1%" },
-  ]},
-  { name: "おつきみやま B1F", ver: "", pokemon: [
-    { name: "パラス",     evs: { atk: 1 }, rate: "100%", best: true },
-  ]},
-  { name: "おつきみやま B2F", ver: "", pokemon: [
-    { name: "ズバット",   evs: { spe: 1 }, rate: "49%" },
-    { name: "イシツブテ", evs: { def: 1 }, rate: "30%" },
-    { name: "パラス",     evs: { atk: 1 }, rate: "15%" },
-    { name: "ピッピ",     evs: { hp: 2 },  rate: "6%" },
+  { name: "10番道路", ver: "", pokemon: [
+    { name: "ビリリダマ", evs: { spe: 1 }, rate: "40%", best: true },
+    { name: "オニスズメ", evs: { spe: 1 }, rate: "35%" },
+    { name: "アーボ",     evs: { atk: 1 }, rate: "25%", ver: "FR" },
+    { name: "サンド",     evs: { def: 1 }, rate: "25%", ver: "LG" },
   ]},
   { name: "岩山の洞窟 1F", ver: "", pokemon: [
     { name: "イシツブテ", evs: { def: 1 }, rate: "35%", best: true },
@@ -468,10 +430,7 @@ const LOCATION_DATA = [
     { name: "ワンリキー", evs: { atk: 1 }, rate: "10%" },
     { name: "イワーク",   evs: { def: 2 }, rate: "10%" },
   ]},
-  { name: "ディグダのあな", ver: "", pokemon: [
-    { name: "ディグダ",   evs: { spe: 1 }, rate: "95%", best: true },
-    { name: "ダグトリオ", evs: { spe: 2 }, rate: "5%" },
-  ]},
+  // ─── ラベンダータウン → ポケモンタワー ───
   { name: "ポケモンタワー 3F", ver: "", pokemon: [
     { name: "ゴース",   evs: { spa: 1 }, rate: "90%", best: true },
     { name: "ガラガラ", evs: { def: 2 }, rate: "9%" },
@@ -492,12 +451,38 @@ const LOCATION_DATA = [
     { name: "ガラガラ", evs: { def: 2 }, rate: "10%" },
     { name: "ゴースト", evs: { spa: 2 }, rate: "15%" },
   ]},
-  { name: "はつでんしょ", ver: "", pokemon: [
-    { name: "ビリリダマ", evs: { spe: 1 }, rate: "40%", best: true },
-    { name: "コイル",     evs: { spa: 1 }, rate: "35%" },
-    { name: "レアコイル", evs: { spa: 2 }, rate: "20%" },
-    { name: "マルマイン", evs: { spe: 2 }, rate: "4%" },
-    { name: "エレブー",   evs: { spe: 2 }, rate: "1%",  ver: "FR" },
+  // ─── セキチクシティ方面（サイクリングロード） ───
+  { name: "16番道路", ver: "", pokemon: [
+    { name: "ドードー",   evs: { atk: 1 }, rate: "35%", best: true },
+    { name: "コラッタ",   evs: { spe: 1 }, rate: "30%" },
+    { name: "オニスズメ", evs: { spe: 1 }, rate: "30%" },
+    { name: "ラッタ",     evs: { spe: 2 }, rate: "5%" },
+  ]},
+  { name: "17番道路", ver: "", note: "サイクリングロード", pokemon: [
+    { name: "ドードー",   evs: { atk: 1 }, rate: "35%", best: true },
+    { name: "オニドリル", evs: { spe: 2 }, rate: "30%" },
+    { name: "ラッタ",     evs: { spe: 2 }, rate: "25%" },
+    { name: "コラッタ",   evs: { spe: 1 }, rate: "10%" },
+  ]},
+  { name: "18番道路", ver: "", pokemon: [
+    { name: "ドードー",   evs: { atk: 1 }, rate: "35%", best: true },
+    { name: "オニスズメ", evs: { spe: 1 }, rate: "30%" },
+    { name: "オニドリル", evs: { spe: 2 }, rate: "15%" },
+    { name: "ラッタ",     evs: { spe: 2 }, rate: "15%" },
+    { name: "コラッタ",   evs: { spe: 1 }, rate: "5%" },
+  ]},
+  // ─── なみのり解放後 ───
+  { name: "4・10〜13番道路（なみのり）", ver: "", pokemon: [
+    { name: "メノクラゲ", evs: { spd: 1 }, rate: "100%", best: true },
+  ]},
+  { name: "6・22・23番道路（なみのり）", ver: "FR", pokemon: [
+    { name: "コダック", evs: { spa: 1 }, rate: "100%", best: true },
+  ]},
+  { name: "6・22・23番道路（なみのり）", ver: "LG", pokemon: [
+    { name: "ヤドン", evs: { hp: 1 }, rate: "100%", best: true },
+  ]},
+  { name: "19〜21番道路（なみのり）", ver: "", pokemon: [
+    { name: "メノクラゲ", evs: { spd: 1 }, rate: "100%", best: true },
   ]},
   { name: "シーフォームアイランズ 1F", ver: "", pokemon: [
     { name: "コダック",   evs: { spa: 1 }, rate: "55%", ver: "FR" },
@@ -513,6 +498,28 @@ const LOCATION_DATA = [
     { name: "パウワウ",   evs: { spd: 1 }, rate: "10%" },
     { name: "ゴルダック", evs: { spa: 2 }, rate: "5%",  ver: "FR" },
     { name: "ヤドラン",   evs: { def: 2 }, rate: "5%",  ver: "LG" },
+  ]},
+  { name: "21番道路（草むら）", ver: "", pokemon: [
+    { name: "モンジャラ", evs: { def: 1 }, rate: "100%", best: true },
+  ]},
+  // ─── グレン島 ───
+  { name: "はつでんしょ", ver: "", pokemon: [
+    { name: "ビリリダマ", evs: { spe: 1 }, rate: "40%", best: true },
+    { name: "コイル",     evs: { spa: 1 }, rate: "35%" },
+    { name: "レアコイル", evs: { spa: 2 }, rate: "20%" },
+    { name: "マルマイン", evs: { spe: 2 }, rate: "4%" },
+    { name: "エレブー",   evs: { spe: 2 }, rate: "1%",  ver: "FR" },
+  ]},
+  // ─── エンディング前 ───
+  { name: "23番道路", ver: "", pokemon: [
+    { name: "マンキー",   evs: { atk: 1 }, rate: "30%" },
+    { name: "オニドリル", evs: { spe: 2 }, rate: "25%" },
+    { name: "アーボ",     evs: { atk: 1 }, rate: "20%", ver: "FR" },
+    { name: "サンド",     evs: { def: 1 }, rate: "20%", ver: "LG" },
+    { name: "オニスズメ", evs: { spe: 1 }, rate: "15%" },
+    { name: "アーボック", evs: { atk: 2 }, rate: "5%",  ver: "FR" },
+    { name: "サンドパン", evs: { def: 2 }, rate: "5%",  ver: "LG" },
+    { name: "オコリザル", evs: { atk: 2 }, rate: "5%" },
   ]},
   { name: "チャンピオンロード 1F・3F", ver: "", pokemon: [
     { name: "イワーク",   evs: { def: 2 }, rate: "30%" },
@@ -537,8 +544,7 @@ const LOCATION_DATA = [
     { name: "ガラガラ",   evs: { def: 2 }, rate: "5%" },
     { name: "ゴルバット", evs: { spe: 2 }, rate: "5%" },
   ]},
-
-  // ─── 島 ───
+  // ─── クリア後（島） ───
   { name: "廃虚の谷（なみのり）", ver: "FR", note: "1番島・島4解放後", pokemon: [
     { name: "マリル", evs: { hp: 2 }, rate: "100%", best: true },
   ]},
