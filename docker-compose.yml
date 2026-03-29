@@ -16,3 +16,5 @@ services:
     volumes:
       - ${CLOUDFLARED_DIR}:/etc/cloudflared:ro
     restart: unless-stopped
+    profiles:
+      - disabled
