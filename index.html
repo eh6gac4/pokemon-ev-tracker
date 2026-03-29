@@ -381,13 +381,14 @@ function AddMonModal({ newName, newIcon, newColor, setNewName, setNewIcon, setNe
 function IVChecker({ color }) {
   const [open,        setOpen]       = useState(false);
   const [mon,         setMon]        = useState(0);
-  const [lv,          setLv]         = useState(50);
+  const [lvStr,       setLvStr]      = useState("50");
   const [nat,         setNat]        = useState(0);
   const [actual,      setActual]     = useState({hp:"",atk:"",def:"",spa:"",spd:"",spe:""});
   const [ev,          setEV]         = useState({hp:0,atk:0,def:0,spa:0,spd:0,spe:0});
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch,  setShowSearch]  = useState(false);
 
+  const lv     = Math.max(1, Math.min(100, parseInt(lvStr) || 1));
   const nature = NATURES[nat];
   const pmon   = POKEMON_DATA[mon];
 
@@ -469,8 +470,9 @@ function IVChecker({ color }) {
         <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
           <div style={{ fontSize: "9px", color: "#555" }}>レベル</div>
           <input
-            type="number" min="1" max="100" value={lv}
-            onChange={e => setLv(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+            type="number" min="1" max="100" value={lvStr}
+            onChange={e => setLvStr(e.target.value)}
+            onBlur={() => setLvStr(String(lv))}
             className="input-dark"
             style={{ width: "54px", fontSize: "13px", padding: "5px 6px", textAlign: "center" }}
           />
