@@ -23,12 +23,12 @@ const { useState, useEffect, useRef } = React;
 // ─── constants ──────────────────────────────────────────────────────────────
 
 const DEFAULT_PARTY = [
-  { name: "リザードン", icon: "🔥", color: "#FF6B35", memo: "" },
-  { name: "ガラガラ",   icon: "💀", color: "#A0A0A0", memo: "" },
-  { name: "ギャラドス", icon: "🌊", color: "#4A90D9", memo: "" },
-  { name: "カビゴン",   icon: "😴", color: "#7DBE8A", memo: "" },
-  { name: "サンダー",   icon: "⚡", color: "#F5D020", memo: "" },
-  { name: "ルージュラ", icon: "💋", color: "#E880A0", memo: "" },
+  { name: "リザードン", icon: "🔥", color: "#FF6B35", memo: "", nature: "" },
+  { name: "ガラガラ",   icon: "💀", color: "#A0A0A0", memo: "", nature: "" },
+  { name: "ギャラドス", icon: "🌊", color: "#4A90D9", memo: "", nature: "" },
+  { name: "カビゴン",   icon: "😴", color: "#7DBE8A", memo: "", nature: "" },
+  { name: "サンダー",   icon: "⚡", color: "#F5D020", memo: "", nature: "" },
+  { name: "ルージュラ", icon: "💋", color: "#E880A0", memo: "", nature: "" },
 ];
 
 const STATS = [
@@ -1190,10 +1190,6 @@ function IVChecker({ color }) {
     return "#f5d020";
   };
 
-  const natLabel = (n) => n.up
-    ? `${n.name}（↑${STAT_JP[n.up]} / ↓${STAT_JP[n.dn]}）`
-    : `${n.name}（補正なし）`;
-
   return (
     <Panel title="🔬 個体値チェッカー（Gen III）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
       <div style={{ position: "relative", marginBottom: "8px" }}>
@@ -1562,6 +1558,92 @@ function LocationGuide({ color }) {
   );
 }
 
+// ─── nature picker ───────────────────────────────────────────────────────────
+
+const natLabel = (n) => n.up
+  ? `${n.name}（↑${STAT_JP[n.up]} / ↓${STAT_JP[n.dn]}）`
+  : `${n.name}（補正なし）`;
+
+function NaturePicker({ value, color, onChange }) {
+  const [open,  setOpen]  = useState(false);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef(null);
+
+  const filtered = query.trim()
+    ? NATURES.filter(n => n.name.includes(query.trim()))
+    : NATURES;
+
+  const select = (name) => {
+    onChange(name);
+    setOpen(false);
+    setQuery("");
+  };
+
+  const current = NATURES.find(n => n.name === value) || null;
+
+  return (
+    <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: color + "22" }}>
+      <div style={{ fontSize: "10px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>性格</div>
+      <button
+        onClick={() => { setOpen(v => !v); if (!open) setTimeout(() => inputRef.current?.focus(), 30); setQuery(""); }}
+        style={{
+          width: "100%", textAlign: "left", fontFamily: "inherit",
+          background: open ? color + "22" : "#16213e",
+          border: `1px solid ${open ? color : "#2a2a4a"}`,
+          borderRadius: open ? "6px 6px 0 0" : "6px",
+          padding: "7px 10px", cursor: "pointer",
+          color: current ? "#e8e8e8" : "#444", fontSize: "12px",
+        }}
+      >
+        {current ? (
+          <>
+            <span style={{ color: color, marginRight: "6px" }}>{current.name}</span>
+            {current.up
+              ? <span style={{ fontSize: "10px", color: "#888" }}>↑{STAT_JP[current.up]} / ↓{STAT_JP[current.dn]}</span>
+              : <span style={{ fontSize: "10px", color: "#888" }}>補正なし</span>}
+          </>
+        ) : "── 未設定 ──"}
+      </button>
+      {open && (
+        <div style={{ background: "#0d1b2a", border: `1px solid ${color}44`, borderTop: "none", borderRadius: "0 0 6px 6px", padding: "6px" }}>
+          <div style={{ display: "flex", gap: "4px", marginBottom: "4px" }}>
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="性格名で検索…"
+              style={{ flex: 1, background: "#16213e", border: `1px solid ${color}44`, borderRadius: "4px", padding: "5px 8px", color: "#e8e8e8", fontFamily: "inherit", fontSize: "11px", outline: "none" }}
+            />
+            {value && (
+              <button onClick={() => select("")} style={{ background: "transparent", border: "1px solid #ff444466", borderRadius: "4px", color: "#ff6666", fontSize: "10px", padding: "5px 8px", cursor: "pointer", fontFamily: "inherit" }}>
+                クリア
+              </button>
+            )}
+          </div>
+          <div style={{ maxHeight: "160px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
+            {filtered.map(n => (
+              <button key={n.name} onClick={() => select(n.name)}
+                style={{
+                  textAlign: "left", background: n.name === value ? color + "33" : "transparent",
+                  border: "none", borderRadius: "3px", padding: "4px 8px",
+                  color: n.name === value ? color : "#aaa", fontSize: "11px", cursor: "pointer", fontFamily: "inherit",
+                  display: "flex", justifyContent: "space-between", alignItems: "center",
+                }}
+              >
+                <span>{n.name}</span>
+                {n.up
+                  ? <span style={{ fontSize: "10px", color: "#555" }}>↑{STAT_JP[n.up]} / ↓{STAT_JP[n.dn]}</span>
+                  : <span style={{ fontSize: "10px", color: "#555" }}>補正なし</span>}
+              </button>
+            ))}
+            {filtered.length === 0 && <div style={{ color: "#444", fontSize: "11px", padding: "4px 8px" }}>該当なし</div>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── main component ──────────────────────────────────────────────────────────
 
 function MovePicker({ moves, color, onChange }) {
@@ -1695,7 +1777,8 @@ function EVTracker() {
 
   const reset = () => setAllEVs(prev => ({ ...prev, [selected]: initEVs() }));
 
-  const updateMemo = (text) => setParty(prev => prev.map(p => p.name === selected ? { ...p, memo: text } : p));
+  const updateMemo   = (text) => setParty(prev => prev.map(p => p.name === selected ? { ...p, memo: text } : p));
+  const updateNature = (name) => setParty(prev => prev.map(p => p.name === selected ? { ...p, nature: name } : p));
 
   const updateMove = (slot, move) => setAllMoves(prev => {
     const cur = prev[selected] || ["","","",""];
@@ -1715,7 +1798,7 @@ function EVTracker() {
   const addMon = () => {
     const trimmed = newName.trim();
     if (!trimmed || party.find(p => p.name === trimmed)) return;
-    setParty(prev => [...prev, { name: trimmed, icon: newIcon, color: newColor, memo: "" }]);
+    setParty(prev => [...prev, { name: trimmed, icon: newIcon, color: newColor, memo: "", nature: "" }]);
     setAllEVs(prev => ({ ...prev, [trimmed]: initEVs() }));
     setAllMoves(prev => ({ ...prev, [trimmed]: ["","","",""] }));
     setSelected(trimmed);
@@ -1820,9 +1903,12 @@ function EVTracker() {
           {/* 技セット */}
           <MovePicker moves={allMoves[selected] || ["","","",""]} color={mon.color} onChange={updateMove} />
 
+          {/* 性格 */}
+          <NaturePicker value={mon.nature || ""} color={mon.color} onChange={updateNature} />
+
           {/* メモ */}
           <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: mon.color + "22" }}>
-            <div style={{ fontSize: "10px", color: "#555", marginBottom: "6px", letterSpacing: "1px" }}>メモ（性格・持ち物など）</div>
+            <div style={{ fontSize: "10px", color: "#555", marginBottom: "6px", letterSpacing: "1px" }}>メモ（持ち物など）</div>
             <AutoTextarea value={mon.memo || ""} onChange={updateMemo} placeholder="例：ようき　こだわりスカーフ　…" />
           </div>
 
