@@ -19,6 +19,7 @@ body { margin: 0; }
   position: fixed; bottom: 0; left: 0; right: 0;
   display: flex; background: #0d0d1a;
   border-top: 1px solid #2a2a4a; z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .bottom-nav button {
   flex: 1; padding: 13px 8px;
@@ -35,9 +36,9 @@ body { margin: 0; }
 
 /* EV step buttons */
 .step-btn {
-  border-radius: 4px; font-size: 10px;
-  padding: 3px 6px; cursor: pointer;
-  min-width: 28px; font-family: inherit;
+  border-radius: 6px; font-size: 13px;
+  padding: 6px 10px; cursor: pointer;
+  min-width: 38px; font-family: inherit;
   transition: all 0.1s;
 }
 .step-btn:hover { filter: brightness(1.3); transform: scale(1.08); }
