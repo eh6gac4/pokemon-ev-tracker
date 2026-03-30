@@ -1379,6 +1379,9 @@ function EVTracker() {
             )}
           </div>
 
+          <EVSearch macho={macho} color={mon.color} />
+          <LocationGuide color={mon.color} />
+
           <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", letterSpacing: "1px" }}>
             GEN III · MAX 252/STAT · MAX 510/TOTAL · AUTO SAVE
           </div>
@@ -1388,8 +1391,6 @@ function EVTracker() {
         <div className={activeTab === "chosa" ? "" : "col-hidden"}>
           <PokedexPanel color={mon.color} />
           <IVChecker color={mon.color} />
-          <EVSearch macho={macho} color={mon.color} />
-          <LocationGuide color={mon.color} />
           <EVGuide color={mon.color} />
         </div>
       </div>
