@@ -1019,6 +1019,13 @@ null,  // 0-indexed placeholder
   [],  // ミュウ
 ];
 
+// 全技一覧（レベルアップ・TM/HM・遺伝技から収集、重複なし・五十音順）
+const ALL_MOVES = [...new Set([
+  ...LEARNSET.filter(Boolean).flat().map(([, name]) => name),
+  ...TM_MOVES.filter(Boolean).flat().map(s => s.replace(/（[TH]M\d+）/g, "").trim()),
+  ...EGG_MOVES.filter(Boolean).flat(),
+])].sort((a, b) => a.localeCompare(b, "ja"));
+
 // ─── helper components ───────────────────────────────────────────────────────
 
 function AutoTextarea({ value, onChange, placeholder }) {
@@ -1557,9 +1564,88 @@ function LocationGuide({ color }) {
 
 // ─── main component ──────────────────────────────────────────────────────────
 
+function MovePicker({ moves, color, onChange }) {
+  const [activeSlot, setActiveSlot] = useState(null);
+  const [query, setQuery]           = useState("");
+  const inputRef = useRef(null);
+
+  const filtered = query.trim()
+    ? ALL_MOVES.filter(m => m.includes(query.trim()))
+    : ALL_MOVES;
+
+  const select = (move) => {
+    onChange(activeSlot, move);
+    setActiveSlot(null);
+    setQuery("");
+  };
+
+  const openSlot = (i) => {
+    setActiveSlot(i);
+    setQuery("");
+    setTimeout(() => inputRef.current?.focus(), 30);
+  };
+
+  return (
+    <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: color + "22" }}>
+      <div style={{ fontSize: "10px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>技セット</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+        {moves.map((move, i) => (
+          <div key={i}>
+            <button
+              onClick={() => { if (activeSlot === i) { setActiveSlot(null); setQuery(""); } else { openSlot(i); } }}
+              style={{
+                width: "100%", textAlign: "left", fontFamily: "inherit",
+                background: activeSlot === i ? color + "22" : "#16213e",
+                border: `1px solid ${activeSlot === i ? color : "#2a2a4a"}`,
+                borderRadius: activeSlot === i ? "6px 6px 0 0" : "6px",
+                padding: "7px 10px", cursor: "pointer",
+                color: move ? "#e8e8e8" : "#444", fontSize: "12px",
+              }}
+            >
+              <span style={{ color: color, fontSize: "10px", marginRight: "8px" }}>わざ{i + 1}</span>
+              {move || "── 未設定 ──"}
+            </button>
+            {activeSlot === i && (
+              <div style={{ background: "#0d1b2a", border: `1px solid ${color}44`, borderTop: "none", borderRadius: "0 0 6px 6px", padding: "6px" }}>
+                <div style={{ display: "flex", gap: "4px", marginBottom: "4px" }}>
+                  <input
+                    ref={inputRef}
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    placeholder="技名で検索…"
+                    style={{ flex: 1, background: "#16213e", border: `1px solid ${color}44`, borderRadius: "4px", padding: "5px 8px", color: "#e8e8e8", fontFamily: "inherit", fontSize: "11px", outline: "none" }}
+                  />
+                  {move && (
+                    <button onClick={() => select("")} style={{ background: "transparent", border: "1px solid #ff444466", borderRadius: "4px", color: "#ff6666", fontSize: "10px", padding: "5px 8px", cursor: "pointer", fontFamily: "inherit" }}>
+                      クリア
+                    </button>
+                  )}
+                </div>
+                <div style={{ maxHeight: "160px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
+                  {filtered.slice(0, 80).map(m => (
+                    <button key={m} onClick={() => select(m)}
+                      style={{
+                        textAlign: "left", background: m === move ? color + "33" : "transparent",
+                        border: "none", borderRadius: "3px", padding: "4px 8px",
+                        color: m === move ? color : "#aaa", fontSize: "11px", cursor: "pointer", fontFamily: "inherit",
+                      }}
+                    >{m}</button>
+                  ))}
+                  {filtered.length === 0 && <div style={{ color: "#444", fontSize: "11px", padding: "4px 8px" }}>該当なし</div>}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function EVTracker() {
   const [party,     setParty]    = useState(DEFAULT_PARTY);
   const [allEVs,    setAllEVs]   = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
+  const [allMoves,  setAllMoves] = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, ["","","",""]])));
   const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
   const [loaded,    setLoaded]   = useState(false);
   const [macho,     setMacho]    = useState(false);
@@ -1573,9 +1659,10 @@ function EVTracker() {
     fetch("/api/data")
       .then(r => r.json())
       .then(saved => {
-        if (saved.party)    setParty(saved.party);
-        if (saved.allEVs)   setAllEVs(saved.allEVs);
-        if (saved.selected) setSelected(saved.selected);
+        if (saved.party)     setParty(saved.party);
+        if (saved.allEVs)    setAllEVs(saved.allEVs);
+        if (saved.allMoves)  setAllMoves(saved.allMoves);
+        if (saved.selected)  setSelected(saved.selected);
       })
       .catch(() => {})
       .finally(() => setLoaded(true));
@@ -1586,9 +1673,9 @@ function EVTracker() {
     fetch("/api/data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ party, allEVs, selected }),
+      body: JSON.stringify({ party, allEVs, allMoves, selected }),
     }).catch(() => {});
-  }, [party, allEVs, selected, loaded]);
+  }, [party, allEVs, allMoves, selected, loaded]);
 
   const mon       = party.find(p => p.name === selected) || party[0];
   const evs       = allEVs[selected] || initEVs();
@@ -1610,10 +1697,18 @@ function EVTracker() {
 
   const updateMemo = (text) => setParty(prev => prev.map(p => p.name === selected ? { ...p, memo: text } : p));
 
+  const updateMove = (slot, move) => setAllMoves(prev => {
+    const cur = prev[selected] || ["","","",""];
+    const next = [...cur];
+    next[slot] = move;
+    return { ...prev, [selected]: next };
+  });
+
   const removeMon = (name) => {
     const next = party.filter(p => p.name !== name);
     setParty(next);
     setAllEVs(prev => { const n = { ...prev }; delete n[name]; return n; });
+    setAllMoves(prev => { const n = { ...prev }; delete n[name]; return n; });
     if (selected === name && next.length > 0) setSelected(next[0].name);
   };
 
@@ -1622,6 +1717,7 @@ function EVTracker() {
     if (!trimmed || party.find(p => p.name === trimmed)) return;
     setParty(prev => [...prev, { name: trimmed, icon: newIcon, color: newColor, memo: "" }]);
     setAllEVs(prev => ({ ...prev, [trimmed]: initEVs() }));
+    setAllMoves(prev => ({ ...prev, [trimmed]: ["","","",""] }));
     setSelected(trimmed);
     setAdding(false);
     setNewName("");
@@ -1721,10 +1817,13 @@ function EVTracker() {
             ))}
           </div>
 
+          {/* 技セット */}
+          <MovePicker moves={allMoves[selected] || ["","","",""]} color={mon.color} onChange={updateMove} />
+
           {/* メモ */}
           <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: mon.color + "22" }}>
-            <div style={{ fontSize: "10px", color: "#555", marginBottom: "6px", letterSpacing: "1px" }}>メモ（性格・持ち物・技など）</div>
-            <AutoTextarea value={mon.memo || ""} onChange={updateMemo} placeholder="例：ようき　こだわりスカーフ　地震 / 岩雪崩 / …" />
+            <div style={{ fontSize: "10px", color: "#555", marginBottom: "6px", letterSpacing: "1px" }}>メモ（性格・持ち物など）</div>
+            <AutoTextarea value={mon.memo || ""} onChange={updateMemo} placeholder="例：ようき　こだわりスカーフ　…" />
           </div>
 
           <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
