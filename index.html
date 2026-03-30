@@ -599,7 +599,7 @@ function Panel({ title, open, onToggle, color, children }) {
 function StatRow({ stat, val, color, macho, onChange }) {
   const isMaxed = val >= MAX_STAT;
   const vLeft   = vitaminLeft(val);
-  const plusLabels = macho ? ["＋8", "＋2"] : ["＋4", "＋"];
+  const steps = macho ? [[-1,"－"],[1,"＋2"],[2,"＋4"],[3,"＋6"]] : [[-1,"－"],[1,"＋1"],[2,"＋2"],[3,"＋3"]];
   return (
     <div className="card" style={{ padding: "9px 12px", borderColor: isMaxed ? "#7fff7f44" : "#2a2a4a" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
@@ -610,7 +610,7 @@ function StatRow({ stat, val, color, macho, onChange }) {
           : vLeft > 0 && <span style={{ fontSize: "8px", color: "#aaa" }}>💊×{vLeft}</span>
         }
         <div style={{ display: "flex", gap: "3px", marginLeft: "auto" }}>
-          {[[-1,"－"],[-4,"－4"],[4,plusLabels[0]],[1,plusLabels[1]]].map(([d, label]) => (
+          {steps.map(([d, label]) => (
             <button
               key={d}
               className="step-btn"
