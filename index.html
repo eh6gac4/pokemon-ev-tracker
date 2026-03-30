@@ -2002,14 +2002,15 @@ function NaturePicker({ value, color, onChange }) {
 
 // ─── main component ──────────────────────────────────────────────────────────
 
-function MovePicker({ moves, color, onChange }) {
+function MovePicker({ moves, color, onChange, learnableMoves }) {
   const [activeSlot, setActiveSlot] = useState(null);
   const [query, setQuery]           = useState("");
   const inputRef = useRef(null);
 
+  const moveList = learnableMoves || ALL_MOVES;
   const filtered = query.trim()
-    ? ALL_MOVES.filter(m => m.includes(query.trim()))
-    : ALL_MOVES;
+    ? moveList.filter(m => m.includes(query.trim()))
+    : moveList;
 
   const select = (move) => {
     onChange(activeSlot, move);
@@ -2027,7 +2028,10 @@ function MovePicker({ moves, color, onChange }) {
     <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: color + "22" }}>
       <div style={{ fontSize: "10px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>技セット</div>
       <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-        {moves.map((move, i) => (
+        {moves.map((move, i) => {
+          const md = move ? MOVE_DATA[move] : null;
+          const tc = md ? (TYPE_COLORS[md[0]] || "#555") : null;
+          return (
           <div key={i}>
             <button
               onClick={() => { if (activeSlot === i) { setActiveSlot(null); setQuery(""); } else { openSlot(i); } }}
@@ -2038,10 +2042,17 @@ function MovePicker({ moves, color, onChange }) {
                 borderRadius: activeSlot === i ? "6px 6px 0 0" : "6px",
                 padding: "7px 10px", cursor: "pointer",
                 color: move ? "#e8e8e8" : "#444", fontSize: "12px",
+                display: "flex", alignItems: "center", gap: "6px",
               }}
             >
-              <span style={{ color: color, fontSize: "10px", marginRight: "8px" }}>わざ{i + 1}</span>
-              {move || "── 未設定 ──"}
+              <span style={{ color: color, fontSize: "10px", flexShrink: 0 }}>わざ{i + 1}</span>
+              {tc && <span style={{ fontSize: "8px", color: "#fff", background: tc + "cc", borderRadius: "3px", padding: "1px 3px", flexShrink: 0 }}>{md[0]}</span>}
+              <span style={{ flex: 1 }}>{move || "── 未設定 ──"}</span>
+              {md && <span style={{ fontSize: "8px", color: "#555", display: "flex", gap: "3px", flexShrink: 0 }}>
+                <span style={{ color: md[1] !== null ? "#b0a0d8" : "#383848" }}>P:{md[1] !== null ? md[1] : "---"}</span>
+                <span style={{ color: md[2] !== null ? "#6898b8" : "#383848" }}>A:{md[2] !== null ? md[2] : "---"}</span>
+                <span style={{ color: "#484858" }}>PP:{md[3]}</span>
+              </span>}
             </button>
             {activeSlot === i && (
               <div style={{ background: "#0d1b2a", border: `1px solid ${color}44`, borderTop: "none", borderRadius: "0 0 6px 6px", padding: "6px" }}>
@@ -2060,21 +2071,38 @@ function MovePicker({ moves, color, onChange }) {
                   )}
                 </div>
                 <div style={{ maxHeight: "160px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
-                  {filtered.slice(0, 80).map(m => (
-                    <button key={m} onClick={() => select(m)}
-                      style={{
-                        textAlign: "left", background: m === move ? color + "33" : "transparent",
-                        border: "none", borderRadius: "3px", padding: "4px 8px",
-                        color: m === move ? color : "#aaa", fontSize: "11px", cursor: "pointer", fontFamily: "inherit",
-                      }}
-                    >{m}</button>
-                  ))}
+                  {filtered.slice(0, 100).map(m => {
+                    const mmd = MOVE_DATA[m];
+                    const mtc = mmd ? (TYPE_COLORS[mmd[0]] || "#555") : null;
+                    return (
+                      <button key={m} onClick={() => select(m)}
+                        style={{
+                          textAlign: "left", background: m === move ? color + "33" : "transparent",
+                          border: "none", borderRadius: "3px", padding: "4px 8px",
+                          color: m === move ? color : "#aaa", fontSize: "11px", cursor: "pointer", fontFamily: "inherit",
+                          display: "flex", alignItems: "center", gap: "4px",
+                        }}
+                      >
+                        {mtc
+                          ? <span style={{ fontSize: "8px", color: "#fff", background: mtc + "cc", borderRadius: "3px", padding: "1px 3px", whiteSpace: "nowrap", flexShrink: 0 }}>{mmd[0]}</span>
+                          : <span style={{ fontSize: "8px", color: "#333", background: "#1a1a2e", borderRadius: "3px", padding: "1px 3px", flexShrink: 0 }}>?</span>
+                        }
+                        <span style={{ flex: 1 }}>{m}</span>
+                        {mmd && <span style={{ fontSize: "8px", color: "#555", display: "flex", gap: "3px", flexShrink: 0 }}>
+                          <span style={{ color: mmd[1] !== null ? "#b0a0d8" : "#383848" }}>P:{mmd[1] !== null ? mmd[1] : "---"}</span>
+                          <span style={{ color: mmd[2] !== null ? "#6898b8" : "#383848" }}>A:{mmd[2] !== null ? mmd[2] : "---"}</span>
+                          <span style={{ color: "#484858" }}>PP:{mmd[3]}</span>
+                        </span>}
+                      </button>
+                    );
+                  })}
                   {filtered.length === 0 && <div style={{ color: "#444", fontSize: "11px", padding: "4px 8px" }}>該当なし</div>}
                 </div>
               </div>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -2257,7 +2285,17 @@ function EVTracker() {
           </div>
 
           {/* 技セット */}
-          <MovePicker moves={allMoves[selected] || ["","","",""]} color={mon.color} onChange={updateMove} />
+          {(() => {
+            const selPData = POKEMON_DATA[mon.name];
+            const selLearnableMoves = selPData ? (() => {
+              const idx = selPData[0];
+              const lvMs  = (LEARNSET[idx]  || []).map(([, m]) => m);
+              const tmMs  = (TM_MOVES[idx]  || []).map(s => s.replace(/（[TH]M\d+）/g, "").trim());
+              const eggMs = EGG_MOVES[idx]  || [];
+              return [...new Set([...lvMs, ...tmMs, ...eggMs])].sort();
+            })() : ALL_MOVES;
+            return <MovePicker moves={allMoves[selected] || ["","","",""]} color={mon.color} onChange={updateMove} learnableMoves={selLearnableMoves} />;
+          })()}
 
           {/* 性格 */}
           <NaturePicker value={mon.nature || ""} color={mon.color} onChange={updateNature} />
