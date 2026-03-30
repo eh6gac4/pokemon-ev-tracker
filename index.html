@@ -23,12 +23,12 @@ const { useState, useEffect, useRef } = React;
 // ─── constants ──────────────────────────────────────────────────────────────
 
 const DEFAULT_PARTY = [
-  { name: "リザードン", icon: "🔥", color: "#FF6B35", memo: "", nature: "" },
-  { name: "ガラガラ",   icon: "💀", color: "#A0A0A0", memo: "", nature: "" },
-  { name: "ギャラドス", icon: "🌊", color: "#4A90D9", memo: "", nature: "" },
-  { name: "カビゴン",   icon: "😴", color: "#7DBE8A", memo: "", nature: "" },
-  { name: "サンダー",   icon: "⚡", color: "#F5D020", memo: "", nature: "" },
-  { name: "ルージュラ", icon: "💋", color: "#E880A0", memo: "", nature: "" },
+  { name: "リザードン", icon: "🔥", color: "#FF6B35", memo: "", nature: "", dexId: 5   },
+  { name: "ガラガラ",   icon: "💀", color: "#A0A0A0", memo: "", nature: "", dexId: 104 },
+  { name: "ギャラドス", icon: "🌊", color: "#4A90D9", memo: "", nature: "", dexId: 129 },
+  { name: "カビゴン",   icon: "😴", color: "#7DBE8A", memo: "", nature: "", dexId: 142 },
+  { name: "サンダー",   icon: "⚡", color: "#F5D020", memo: "", nature: "", dexId: 144 },
+  { name: "ルージュラ", icon: "💋", color: "#E880A0", memo: "", nature: "", dexId: 123 },
 ];
 
 const STATS = [
@@ -1424,10 +1424,57 @@ function StatRow({ stat, val, color, macho, onChange }) {
 
 // ─── feature components ──────────────────────────────────────────────────────
 
-function AddMonModal({ newName, newIcon, newColor, setNewName, setNewIcon, setNewColor, onAdd, onCancel, borderColor }) {
+function AddMonModal({ newName, newIcon, newColor, newDexId, setNewName, setNewIcon, setNewColor, setNewDexId, onAdd, onCancel, borderColor }) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch,  setShowSearch]  = useState(false);
+
   return (
     <div className="card" style={{ padding: "14px", marginBottom: "14px", borderColor: borderColor + "55", borderRadius: "12px" }}>
       <div style={{ fontSize: "11px", color: "#888", marginBottom: "10px", letterSpacing: "2px" }}>ポケモンを追加</div>
+
+      {/* 図鑑検索 */}
+      <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px" }}>図鑑から選択</div>
+      <div style={{ position: "relative", marginBottom: "8px" }}>
+        <input
+          value={showSearch ? searchQuery : (newDexId != null ? `${String(POKEMON_DATA[newDexId][0]).padStart(3,"0")} ${POKEMON_DATA[newDexId][1]}` : "")}
+          onChange={e => { setSearchQuery(e.target.value); setShowSearch(true); }}
+          onFocus={() => { setSearchQuery(""); setShowSearch(true); }}
+          onBlur={() => setTimeout(() => setShowSearch(false), 150)}
+          placeholder="なまえ・番号で検索…"
+          className="input-dark"
+          style={{ width: "100%" }}
+        />
+        {showSearch && (() => {
+          const results = searchQuery
+            ? POKEMON_DATA.filter(p => p[1].includes(searchQuery) || String(p[0]).padStart(3,"0").includes(searchQuery))
+            : POKEMON_DATA;
+          return (
+            <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#16213e", border: "1px solid #3a3a5a", borderTop: "none", borderRadius: "0 0 6px 6px", maxHeight: "160px", overflowY: "auto", zIndex: 50 }}>
+              {results.length === 0
+                ? <div style={{ padding: "8px", fontSize: "11px", color: "#444" }}>該当なし</div>
+                : results.map(p => (
+                    <div
+                      key={p[0]}
+                      className="search-item"
+                      onMouseDown={() => {
+                        setNewDexId(p[0] - 1);
+                        setNewName(p[1]);
+                        setSearchQuery("");
+                        setShowSearch(false);
+                      }}
+                      style={{ padding: "5px 8px", cursor: "pointer", fontSize: "12px", color: newDexId === p[0] - 1 ? borderColor : "#ccc", background: newDexId === p[0] - 1 ? borderColor + "22" : "transparent" }}
+                    >
+                      {String(p[0]).padStart(3,"0")} {p[1]}
+                    </div>
+                  ))
+              }
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* 表示名（図鑑選択後に自動入力、変更可） */}
+      <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px" }}>表示名</div>
       <input
         value={newName}
         onChange={e => setNewName(e.target.value)}
@@ -2120,12 +2167,17 @@ function EVTracker() {
   const [newName,   setNewName]  = useState("");
   const [newIcon,   setNewIcon]  = useState("🐣");
   const [newColor,  setNewColor] = useState(COLORS[0]);
+  const [newDexId,  setNewDexId] = useState(null);
 
   useEffect(() => {
     fetch("/api/data")
       .then(r => r.json())
       .then(saved => {
-        if (saved.party)     setParty(saved.party);
+        if (saved.party)     setParty(saved.party.map(p => {
+          if (p.dexId != null) return p;
+          const idx = POKEMON_DATA.findIndex(pd => pd[1] === p.name);
+          return { ...p, dexId: idx >= 0 ? idx : null };
+        }));
         if (saved.allEVs)    setAllEVs(saved.allEVs);
         if (saved.allMoves)  setAllMoves(saved.allMoves);
         if (saved.selected)  setSelected(saved.selected);
@@ -2182,12 +2234,13 @@ function EVTracker() {
   const addMon = () => {
     const trimmed = newName.trim();
     if (!trimmed || party.find(p => p.name === trimmed)) return;
-    setParty(prev => [...prev, { name: trimmed, icon: newIcon, color: newColor, memo: "", nature: "" }]);
+    setParty(prev => [...prev, { name: trimmed, icon: newIcon, color: newColor, memo: "", nature: "", dexId: newDexId }]);
     setAllEVs(prev => ({ ...prev, [trimmed]: initEVs() }));
     setAllMoves(prev => ({ ...prev, [trimmed]: ["","","",""] }));
     setSelected(trimmed);
     setAdding(false);
     setNewName("");
+    setNewDexId(null);
   };
 
   if (!loaded) return (
@@ -2244,10 +2297,10 @@ function EVTracker() {
 
           {adding && (
             <AddMonModal
-              newName={newName} newIcon={newIcon} newColor={newColor}
-              setNewName={setNewName} setNewIcon={setNewIcon} setNewColor={setNewColor}
+              newName={newName} newIcon={newIcon} newColor={newColor} newDexId={newDexId}
+              setNewName={setNewName} setNewIcon={setNewIcon} setNewColor={setNewColor} setNewDexId={setNewDexId}
               onAdd={addMon}
-              onCancel={() => { setAdding(false); setNewName(""); }}
+              onCancel={() => { setAdding(false); setNewName(""); setNewDexId(null); }}
               borderColor={mon.color}
             />
           )}
@@ -2286,7 +2339,7 @@ function EVTracker() {
 
           {/* 技セット */}
           {(() => {
-            const selPData = POKEMON_DATA[mon.name];
+            const selPData = mon.dexId != null ? POKEMON_DATA[mon.dexId] : null;
             const selLearnableMoves = selPData ? (() => {
               const idx = selPData[0];
               const lvMs  = (LEARNSET[idx]  || []).map(([, m]) => m);
