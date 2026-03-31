@@ -2081,6 +2081,86 @@ function EVGuide({ color }) {
   );
 }
 
+function TypeChart({ color }) {
+  const [open, setOpen] = useState(false);
+
+  const TYPES = ["ノーマル","ほのお","みず","でんき","くさ","こおり","かくとう","どく","じめん","ひこう","エスパー","むし","いわ","ゴースト","りゅう","あく","はがね"];
+
+  // [攻撃タイプ][防御タイプ] の倍率（Gen III準拠）
+  const CHART = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,.5,0,1,1,.5],     // ノーマル
+    [1,.5,.5,1,2,2,1,1,1,1,1,2,.5,1,.5,1,2],    // ほのお
+    [1,2,.5,1,.5,1,1,1,2,1,1,1,2,1,.5,1,1],     // みず
+    [1,1,2,.5,.5,1,1,1,0,2,1,1,1,1,.5,1,1],     // でんき
+    [1,.5,2,1,.5,1,1,.5,2,.5,1,.5,2,1,.5,1,.5], // くさ
+    [1,.5,.5,1,2,.5,1,1,2,2,1,1,1,1,2,1,.5],    // こおり
+    [2,1,1,1,1,2,1,.5,1,.5,.5,.5,2,0,1,2,2],    // かくとう
+    [1,1,1,1,2,1,1,.5,1,1,1,1,.5,.5,1,1,0],     // どく
+    [1,2,1,2,.5,1,1,2,1,0,1,.5,2,1,1,1,2],      // じめん
+    [1,1,1,.5,2,1,2,1,1,1,1,2,.5,1,1,1,.5],     // ひこう
+    [1,1,1,1,1,1,2,2,1,1,.5,1,1,1,1,0,.5],      // エスパー
+    [1,.5,1,1,2,1,.5,.5,1,.5,2,1,1,.5,1,2,.5],  // むし
+    [1,2,1,1,1,2,.5,1,.5,2,1,2,1,1,1,1,.5],     // いわ
+    [0,1,1,1,1,1,1,1,1,1,2,1,1,2,1,.5,.5],      // ゴースト
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,.5],       // りゅう
+    [1,1,1,1,1,1,.5,1,1,1,2,1,1,2,1,.5,1],      // あく
+    [1,.5,.5,.5,.5,2,1,0,1,1,1,1,2,1,1,1,.5],   // はがね
+  ];
+
+  const cellStyle = (val) => {
+    if (val === 0)   return { bg: "#111",    fg: "#333",    text: "✕" };
+    if (val === 2)   return { bg: "#1a3a1a", fg: "#7fff7f", text: "2" };
+    if (val === 0.5) return { bg: "#3a1a1a", fg: "#ff8888", text: "½" };
+    return { bg: "transparent", fg: "#222", text: "·" };
+  };
+
+  return (
+    <Panel title="⚔ タイプ相性表（Gen III）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      <div style={{ fontSize: "8px", color: "#555", marginBottom: "6px" }}>縦＝攻撃タイプ　横＝防御タイプ</div>
+      <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+        <table style={{ borderCollapse: "collapse", fontSize: "8px", width: "max-content", tableLayout: "fixed" }}>
+          <thead>
+            <tr>
+              <td style={{ width: "44px" }} />
+              {TYPES.map(t => (
+                <th key={t} style={{ width: "14px", padding: "1px", textAlign: "center",
+                  color: TYPE_COLORS[t] || "#888", fontWeight: "normal",
+                  writingMode: "vertical-rl", height: "48px", verticalAlign: "bottom" }}>
+                  {t}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {CHART.map((row, ri) => (
+              <tr key={TYPES[ri]}>
+                <td style={{ padding: "1px 4px 1px 0", color: TYPE_COLORS[TYPES[ri]] || "#888",
+                  textAlign: "right", whiteSpace: "nowrap", fontSize: "8px" }}>
+                  {TYPES[ri]}
+                </td>
+                {row.map((val, ci) => {
+                  const s = cellStyle(val);
+                  return (
+                    <td key={ci} style={{ textAlign: "center", padding: "1px 0",
+                      background: s.bg, color: s.fg, border: "1px solid #111" }}>
+                      {s.text}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div style={{ display: "flex", gap: "12px", marginTop: "8px", fontSize: "8px" }}>
+        <span style={{ color: "#7fff7f" }}>2 ばつぐん</span>
+        <span style={{ color: "#ff8888" }}>½ いまひとつ</span>
+        <span style={{ color: "#444" }}>✕ こうかなし</span>
+      </div>
+    </Panel>
+  );
+}
+
 function VerBadge({ v }) {
   if (!v) return null;
   const isFR = v === "FR";
@@ -2565,8 +2645,9 @@ function EVTracker() {
           </div>
         </div>
 
-        {/* ===== 調査カラム ===== */}
+        {/* ===== データカラム ===== */}
         <div className={activeTab === "chosa" ? "" : "col-hidden"}>
+          <TypeChart color={mon.color} />
           <PokedexPanel color={mon.color} />
           <IVChecker color={mon.color} />
           <EVGuide color={mon.color} />
@@ -2579,7 +2660,7 @@ function EVTracker() {
           💪 育成
         </button>
         <button onClick={() => setActiveTab("chosa")} style={{ color: activeTab === "chosa" ? mon.color : "#555", borderTopColor: activeTab === "chosa" ? mon.color : "transparent" }}>
-          🔬 調査
+          📊 データ
         </button>
       </nav>
     </div>
