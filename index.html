@@ -1928,6 +1928,33 @@ function PokedexPanel({ color }) {
         <div style={{ textAlign: "right", fontSize: "9px", color: "#444", marginTop: "2px" }}>合計 {total}</div>
       </div>
 
+      {/* 出現場所 */}
+      {(() => {
+        const locations = LOCATION_DATA.flatMap(loc =>
+          loc.pokemon
+            .filter(pk => pk.name === p[1])
+            .map(pk => ({ locName: loc.name, locVer: loc.ver, pkVer: pk.ver || "", rate: pk.rate }))
+        );
+        return (
+          <div style={{ marginBottom: "14px" }}>
+            <div style={{ fontSize: "10px", color: "#555", marginBottom: "5px", letterSpacing: "1px" }}>出現場所（FR/LG）</div>
+            {locations.length === 0
+              ? <div style={{ fontSize: "10px", color: "#333" }}>出現しない（FR/LG）</div>
+              : locations.map((loc, i) => {
+                  const ver = loc.pkVer || loc.locVer;
+                  return (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "2px 0", borderBottom: "1px solid #14142a" }}>
+                      <div style={{ fontSize: "11px", color: "#bbb", flex: 1 }}>{loc.locName}</div>
+                      {ver && <div style={{ fontSize: "8px", color: "#fff", background: ver === "FR" ? "#883030cc" : "#303088cc", borderRadius: "3px", padding: "1px 4px", flexShrink: 0 }}>{ver}</div>}
+                      <div style={{ fontSize: "9px", color: "#666", flexShrink: 0 }}>{loc.rate}</div>
+                    </div>
+                  );
+                })
+            }
+          </div>
+        );
+      })()}
+
       {/* わざ タブ */}
       <div>
         <div style={{ display: "flex", gap: "4px", marginBottom: "8px" }}>
