@@ -550,6 +550,67 @@ const LOCATION_DATA = [
   ]},
 ];
 
+// FR/LG フィールドアイテム・もらいものチェックリスト
+// type: "field"=拾う / "gift"=もらう / "gym"=ジム制覇
+const FIELD_ITEMS = [
+  { area: "マサラタウン", items: [
+    { id:"m01", name:"タウンマップ", type:"gift", note:"自宅2F・姉からもらう" },
+  ]},
+  { area: "ルート2", items: [
+    { id:"r2_01", name:"ひでんマシン05（フラッシュ）", type:"gift", note:"ルート2南の建物・オーキドの助手（ポケモンを10匹以上図鑑登録）" },
+  ]},
+  { area: "ニビシティ", items: [
+    { id:"nv01", name:"わざマシン39（いわおとし）", type:"gym",   note:"ニビジム・タケシを倒す" },
+    { id:"nv02", name:"むかしのこはく", type:"gift",              note:"ニビのはくぶつかん・地下にいる科学者から（プテラ復元）" },
+  ]},
+  { area: "おつきみやま", items: [
+    { id:"ot01", name:"めざましいし", type:"field", note:"B1F・アイテムボール" },
+    { id:"ot02", name:"こうらのかせき または ドームのかせき", type:"gift", note:"B2F・ロケット団員から（どちらか1つ選択）→ ハナダシティ・グレンタウン化石博士に持参でポケモン復元" },
+  ]},
+  { area: "ハナダシティ", items: [
+    { id:"hd01", name:"SSアンのチケット", type:"gift", note:"ビルの家・ビルから（ポケモン変身解除の手伝い後）" },
+    { id:"hd02", name:"わざマシン03（みずのはどう）", type:"gym", note:"ハナダジム・カスミを倒す" },
+  ]},
+  { area: "クチバシティ・SSアン", items: [
+    { id:"ss01", name:"ひでんマシン01（きりさく）", type:"gift",  note:"SSアン船長の部屋・背中をなでてあげる" },
+    { id:"ss02", name:"わざマシン28（あなをほる）", type:"field", note:"SSアン船内・アイテムボール" },
+    { id:"kb01", name:"わざマシン34（でんきショック）", type:"gym", note:"クチバジム・マチスを倒す" },
+  ]},
+  { area: "ラベンダータウン・ポケモンタワー", items: [
+    { id:"rv01", name:"ポケフルート", type:"gift", note:"ポケモンタワー7F・フジ老人を救出後にもらう（カビゴン起こしに必須）" },
+  ]},
+  { area: "タマムシシティ・ロケット団アジト", items: [
+    { id:"tm01", name:"ひでんマシン02（そらをとぶ）", type:"gift", note:"16番道路西・自転車専用道路の女の子（きりさく必要）" },
+    { id:"tm02", name:"わざマシン19（ギガドレイン）", type:"gym",  note:"タマムシジム・エリカを倒す" },
+    { id:"tm03", name:"シルフのスコープ", type:"gift",             note:"タマムシゲームコーナー地下ロケット団アジト・ジョバンニを倒す（ポケモンタワー進行に必須）" },
+  ]},
+  { area: "ヤマブキシティ・シルフカンパニー", items: [
+    { id:"yk01", name:"ラプラス", type:"gift",             note:"シルフカンパニー7F・社員からもらう（シルフカンパニー解放後）" },
+    { id:"yk02", name:"わざマシン（サブリナ）", type:"gym", note:"ヤマブキジム・サブリナを倒す" },
+  ]},
+  { area: "セキチクシティ・サファリゾーン", items: [
+    { id:"sc01", name:"わざマシン（キョウ）", type:"gym",          note:"セキチクジム・キョウを倒す" },
+    { id:"sc02", name:"きんのいれば", type:"field",                note:"サファリゾーン奥エリア・アイテムボール（なみのり・かいりき必要）" },
+    { id:"sc03", name:"ひでんマシン03（なみのり）", type:"field",  note:"サファリゾーン奥・秘密の家" },
+    { id:"sc04", name:"ひでんマシン04（かいりき）", type:"gift",   note:"セキチクシティ・ポケモンサファリの園長（きんのいれば返却後）" },
+  ]},
+  { area: "グレンタウン", items: [
+    { id:"gl01", name:"わざマシン（カツラ）", type:"gym", note:"グレンジム・カツラを倒す" },
+  ]},
+  { area: "トキワシティ（8番目のジム）", items: [
+    { id:"tw01", name:"わざマシン（サカキ）", type:"gym", note:"トキワジム・サカキを倒す（8つ目のバッジ）" },
+  ]},
+  { area: "チャンピオンロード", items: [
+    { id:"cr01", name:"わざマシン26（じしん）", type:"field", note:"チャンピオンロード・アイテムボール（かいりき必要）" },
+  ]},
+  { area: "島1（きのこじま）", items: [
+    { id:"i1_01", name:"ひでんマシン06（いわくだき）", type:"gift", note:"ホットスパ・温泉にいる人からもらう" },
+  ]},
+  { area: "島4（たんすいじま）", items: [
+    { id:"i4_01", name:"ひでんマシン07（たきのぼり）", type:"gift", note:"こおりのぬけみち・奥にいる人からもらう" },
+  ]},
+];
+
 // FR/LG レベルアップ習得わざ [レベル, わざ名]（PokéAPI Gen III/FR/LG準拠）
 const LEARNSET = [
   null,
@@ -2404,6 +2465,128 @@ function MovePicker({ moves, color, onChange, learnableMoves, learnset }) {
   );
 }
 
+function AdventureTab({ color }) {
+  const [checked,   setChecked]   = useState(() => {
+    try { return JSON.parse(localStorage.getItem("ev-adventure") || "{}"); }
+    catch { return {}; }
+  });
+  const [collapsed, setCollapsed] = useState({});
+
+  useEffect(() => {
+    localStorage.setItem("ev-adventure", JSON.stringify(checked));
+  }, [checked]);
+
+  const toggle      = (id) => setChecked(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggleArea  = (area) => setCollapsed(prev => ({ ...prev, [area]: !prev[area] }));
+
+  const totalItems   = FIELD_ITEMS.reduce((s, a) => s + a.items.length, 0);
+  const totalChecked = FIELD_ITEMS.reduce((s, a) => s + a.items.filter(i => checked[i.id]).length, 0);
+
+  const TYPE_META = {
+    field: { label: "拾う",   bg: "#1a3a1a", col: "#7fff7f" },
+    gift:  { label: "もらう", bg: "#1a2a3a", col: "#5ecde5" },
+    gym:   { label: "ジム",   bg: "#3a1a2a", col: "#e880a0" },
+  };
+
+  return (
+    <div>
+      {/* 全体進捗 */}
+      <div className="card" style={{ padding: "10px 14px", marginBottom: "12px", borderColor: color + "33" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "6px" }}>
+          <span style={{ color }}>アイテムチェック</span>
+          <span style={{ color: totalChecked >= totalItems ? "#7fff7f" : "#aaa" }}>{totalChecked} / {totalItems}</span>
+        </div>
+        <div className="bar-bg" style={{ height: "6px" }}>
+          <div className="bar-fill" style={{
+            height: "100%", borderRadius: "4px",
+            width: `${totalItems ? (totalChecked / totalItems) * 100 : 0}%`,
+            background: totalChecked >= totalItems ? "#7fff7f" : `linear-gradient(90deg, ${color}88, ${color})`,
+          }} />
+        </div>
+      </div>
+
+      {/* エリアごとリスト */}
+      {FIELD_ITEMS.map(({ area, items }) => {
+        const areaChecked = items.filter(i => checked[i.id]).length;
+        const allDone     = areaChecked === items.length;
+        const isOpen      = !collapsed[area];
+        return (
+          <div key={area} className="card" style={{ padding: 0, marginBottom: "8px", borderColor: allDone ? color + "55" : "#2a2a4a" }}>
+            <button
+              onClick={() => toggleArea(area)}
+              style={{
+                width: "100%", background: "transparent", border: "none", cursor: "pointer",
+                padding: "9px 12px", display: "flex", justifyContent: "space-between", alignItems: "center",
+                fontFamily: "inherit",
+              }}
+            >
+              <span style={{ fontSize: "11px", color: allDone ? color : "#ccc" }}>
+                {isOpen ? "▼" : "▶"} {area}
+              </span>
+              <span style={{ fontSize: "10px", color: allDone ? color : "#555" }}>
+                {areaChecked}/{items.length}
+              </span>
+            </button>
+
+            {isOpen && (
+              <div style={{ borderTop: "1px solid #2a2a4a" }}>
+                {items.map(item => {
+                  const meta  = TYPE_META[item.type] || TYPE_META.gift;
+                  const isDone = !!checked[item.id];
+                  return (
+                    <label key={item.id} style={{
+                      display: "flex", alignItems: "flex-start", gap: "8px",
+                      padding: "7px 12px", cursor: "pointer",
+                      background: isDone ? "#ffffff06" : "transparent",
+                      borderBottom: "1px solid #1a1a2e",
+                    }}>
+                      <input
+                        type="checkbox" checked={isDone}
+                        onChange={() => toggle(item.id)}
+                        style={{ marginTop: "3px", accentColor: color, flexShrink: 0 }}
+                      />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                          <span style={{ fontSize: "11px", color: isDone ? "#555" : "#ddd", textDecoration: isDone ? "line-through" : "none" }}>
+                            {item.name}
+                          </span>
+                          <span style={{ fontSize: "9px", padding: "1px 5px", borderRadius: "3px", background: meta.bg, color: meta.col, flexShrink: 0 }}>
+                            {meta.label}
+                          </span>
+                        </div>
+                        {item.note && (
+                          <div style={{ fontSize: "9px", color: isDone ? "#444" : "#666", marginTop: "2px" }}>
+                            {item.note}
+                          </div>
+                        )}
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      <button
+        onClick={() => { if (window.confirm("チェックをすべてリセットしますか？")) setChecked({}); }}
+        style={{
+          width: "100%", background: "transparent", border: "1px solid #2a2a4a",
+          borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px",
+          cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px", marginTop: "4px",
+        }}
+      >
+        チェックをリセット
+      </button>
+
+      <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", letterSpacing: "1px", marginTop: "10px" }}>
+        FR/LG 準拠 · チェックはブラウザに保存
+      </div>
+    </div>
+  );
+}
+
 function EVTracker() {
   const [party,     setParty]    = useState(DEFAULT_PARTY);
   const [allEVs,    setAllEVs]   = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
@@ -2629,6 +2812,11 @@ function EVTracker() {
           <IVChecker color={mon.color} />
           <EVGuide color={mon.color} />
         </div>
+
+        {/* ===== 冒険カラム ===== */}
+        <div className={activeTab === "boken" ? "" : "col-hidden"}>
+          <AdventureTab color={mon.color} />
+        </div>
       </div>
 
       {/* Bottom nav（モバイルのみ） */}
@@ -2638,6 +2826,9 @@ function EVTracker() {
         </button>
         <button onClick={() => setActiveTab("chosa")} style={{ color: activeTab === "chosa" ? mon.color : "#555", borderTopColor: activeTab === "chosa" ? mon.color : "transparent" }}>
           📊 データ
+        </button>
+        <button onClick={() => setActiveTab("boken")} style={{ color: activeTab === "boken" ? mon.color : "#555", borderTopColor: activeTab === "boken" ? mon.color : "transparent" }}>
+          🗺 冒険
         </button>
       </nav>
     </div>
