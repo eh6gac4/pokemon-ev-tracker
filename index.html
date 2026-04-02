@@ -263,6 +263,94 @@ const EV_GUIDE = [
   ]},
 ];
 
+// FR/LG アイテムチェックリスト
+const ITEM_DATA = [
+  { area: "マサラタウン", items: [
+    { id: "ma01", name: "ランニングシューズ",              type: "gift",   note: "お母さんから（旅立ち時）" },
+    { id: "ma02", name: "タウンマップ",                    type: "gift",   note: "ライバルの家でグリーン（リーフ）から" },
+  ]},
+  { area: "1番道路・2番道路", items: [
+    { id: "r001", name: "ポーション",                      type: "field",  note: "1番道路 草むら北" },
+    { id: "r002", name: "ひでんマシン05 フラッシュ",       type: "hm",     note: "2番道路ゲート（木を切った先）でオーキド助手から（図鑑10匹以上）" },
+  ]},
+  { area: "ニビシティ", items: [
+    { id: "ni01", name: "わざマシン39 岩雪崩",             type: "tm",     note: "タケシ撃破後にもらえる" },
+    { id: "ni02", name: "ふしぎなあめ",                    type: "hidden", note: "ニビはくぶつかん裏（アイテムファインダー）" },
+  ]},
+  { area: "おつきみやま", items: [
+    { id: "oz01", name: "ムーンのいし",                    type: "hidden", note: "B2F（アイテムファインダーで発見）" },
+    { id: "oz02", name: "かいのかせき / ひみつのコハク",   type: "field",  note: "B2Fで片方選択（グレンじまの研究所で復元）" },
+    { id: "oz03", name: "わざマシン70 ひかりのかべ",       type: "field",  note: "おつきみやま B2F" },
+  ]},
+  { area: "ハナダシティ", items: [
+    { id: "ha01", name: "わざマシン03 水のはどう",         type: "tm",     note: "カスミ撃破後にもらえる" },
+  ]},
+  { area: "SSアン（クチバシティ）", items: [
+    { id: "ss01", name: "ひでんマシン01 切り裂く",         type: "hm",     note: "B1F 船長の部屋（肩もみ後）" },
+  ]},
+  { area: "クチバシティ", items: [
+    { id: "ku01", name: "わざマシン34 でんきショック",     type: "tm",     note: "マチス撃破後にもらえる" },
+    { id: "ku02", name: "バイク券",                        type: "gift",   note: "クチバ ポケモンファンクラブ会長から（話を聞くだけ）" },
+  ]},
+  { area: "12〜15番道路", items: [
+    { id: "r12a", name: "スーパーきのこ",                  type: "hidden", note: "12番道路（アイテムファインダー）" },
+    { id: "r12b", name: "わざマシン09 ぶんまわす",         type: "field",  note: "12番道路 南の釣り人付近" },
+  ]},
+  { area: "16番道路・ネムリのもり", items: [
+    { id: "r16a", name: "ひでんマシン02 空を飛ぶ",         type: "hm",     note: "木を切った先の建物のNPCから" },
+    { id: "r16b", name: "のこりかす",                      type: "field",  note: "カビゴン（12番道路）を撃破/捕獲後に入手可（要確認）" },
+  ]},
+  { area: "タマムシシティ", items: [
+    { id: "ta01", name: "わざマシン19 ギガドレイン",       type: "tm",     note: "エリカ撃破後にもらえる" },
+    { id: "ta02", name: "シルフスコープ",                  type: "gift",   note: "ゲームコーナー地下ロケット団アジトでサカキ撃破後" },
+    { id: "ta03", name: "わざマシン12 むしのさざめき",     type: "tm",     note: "ゲームコーナー 2500コイン" },
+    { id: "ta04", name: "わざマシン23 アイアンテール",     type: "tm",     note: "ゲームコーナー 4000コイン" },
+    { id: "ta05", name: "わざマシン02 ドラゴンのいぶき",   type: "tm",     note: "ゲームコーナー 4500コイン" },
+    { id: "ta06", name: "わざマシン04 かみなりパンチ",     type: "tm",     note: "ゲームコーナー 5500コイン" },
+    { id: "ta07", name: "わざマシン29 サイコキネシス",     type: "field",  note: "タマムシデパート 4F（4500円）" },
+    { id: "ta08", name: "わざマシン11 にほんばれ",         type: "field",  note: "タマムシデパート 4F（4500円）" },
+    { id: "ta09", name: "わざマシン15 はかいこうせん",     type: "field",  note: "タマムシデパート 4F（7500円）" },
+  ]},
+  { area: "ラベンダータウン", items: [
+    { id: "la01", name: "ポケモンのふえ",                  type: "gift",   note: "ポケモンタワー頂上でフジ老人を救出後" },
+  ]},
+  { area: "ヤマブキシティ", items: [
+    { id: "ya01", name: "マスターボール",                  type: "gift",   note: "シルフカンパニー11Fでサカキ撃破後、社長から" },
+    { id: "ya02", name: "ラプラス",                        type: "gift",   note: "シルフカンパニー7Fの男性社員から（制覇後）" },
+    { id: "ya03", name: "わざマシン04 めいそう",           type: "tm",     note: "ナツメ撃破後にもらえる" },
+    { id: "ya04", name: "わざマシン46 どろぼう",           type: "field",  note: "ヤマブキシルフカンパニー（落ちているアイテム）" },
+  ]},
+  { area: "セキチクシティ・サファリゾーン", items: [
+    { id: "se01", name: "わざマシン27 おんがえし",         type: "tm",     note: "キョウ撃破後にもらえる" },
+    { id: "se02", name: "ひでんマシン03 なみのり",         type: "hm",     note: "サファリゾーン 秘密の家" },
+    { id: "se03", name: "きんのいれば（金歯）",            type: "field",  note: "サファリゾーン 東エリア（かいりき入手のために必要）" },
+    { id: "se04", name: "ひでんマシン04 かいりき",         type: "hm",     note: "サファリゾーン管理人へきんのいればを渡す" },
+  ]},
+  { area: "グレンじま・グレンシティ", items: [
+    { id: "gr01", name: "わざマシン38 だいもんじ",         type: "tm",     note: "カツラ撃破後にもらえる" },
+    { id: "gr02", name: "ファイヤー",                      type: "field",  note: "グレンじま 洞窟奥（1匹のみ）" },
+    { id: "gr03", name: "プテラ（ひみつのコハク復元）",    type: "gift",   note: "グレンじま研究所（ひみつのコハク持参）" },
+    { id: "gr04", name: "オムスター または カブトプス（化石復元）", type: "gift", note: "グレンじま研究所（かいのかせき持参）" },
+  ]},
+  { area: "トキワシティ（ジム）", items: [
+    { id: "to01", name: "わざマシン26 じしん",             type: "tm",     note: "サカキ撃破後にもらえる" },
+  ]},
+  { area: "22〜23番道路・はつでんしょ", items: [
+    { id: "r23a", name: "サンダー",                        type: "field",  note: "はつでんしょ B1F（1匹のみ）" },
+  ]},
+  { area: "チャンピオンロード", items: [
+    { id: "ch01", name: "ひでんマシン06 岩登り",           type: "hm",     note: "チャンピオンロード内（落ちているアイテム）" },
+    { id: "ch02", name: "ふしぎなあめ",                    type: "field",  note: "チャンピオンロード内" },
+  ]},
+  { area: "ハナダの洞窟（クリア後）", items: [
+    { id: "ce01", name: "フリーザー",                      type: "field",  note: "ハナダの洞窟 B4F（1匹のみ）" },
+    { id: "ce02", name: "ミュウツー",                      type: "field",  note: "ハナダの洞窟 最深部（1匹のみ）" },
+  ]},
+  { area: "7の島（クリア後）", items: [
+    { id: "sv01", name: "ひでんマシン07 滝登り",           type: "hm",     note: "7の島" },
+  ]},
+];
+
 const LOCATION_DATA = [
   // ─── マサラタウン → トキワシティ ───
   { name: "1番道路", ver: "", pokemon: [
@@ -550,64 +638,91 @@ const LOCATION_DATA = [
   ]},
 ];
 
-// FR/LG フィールドアイテム・もらいものチェックリスト
-// type: "field"=拾う / "gift"=もらう / "gym"=ジム制覇
+// FR/LG フィールドアイテム・もらいものチェックリスト（Bulbapedia確認済み）
+// type: "field"=拾う / "gift"=もらう / "gym"=ジム制覇 / "hidden"=隠し（ダウジングマシン）
 const FIELD_ITEMS = [
   { area: "マサラタウン", items: [
-    { id:"m01", name:"タウンマップ", type:"gift", note:"自宅2F・姉からもらう" },
+    { id:"m01", name:"タウンマップ", type:"gift", note:"自宅2F・姉デイジーからもらう" },
   ]},
-  { area: "ルート2", items: [
-    { id:"r2_01", name:"ひでんマシン05（フラッシュ）", type:"gift", note:"ルート2南の建物・オーキドの助手（ポケモンを10匹以上図鑑登録）" },
+  { area: "2番道路（東ゲート）", items: [
+    { id:"r2_01", name:"ひでんマシン05（フラッシュ）", type:"gift", note:"2番道路東ゲート内・オーキドの助手（ポケモンを10種類以上捕まえた後）" },
   ]},
-  { area: "ニビシティ", items: [
-    { id:"nv01", name:"わざマシン39（いわおとし）", type:"gym",   note:"ニビジム・タケシを倒す" },
-    { id:"nv02", name:"むかしのこはく", type:"gift",              note:"ニビのはくぶつかん・地下にいる科学者から（プテラ復元）" },
+  { area: "ニビシティ・ニビのはくぶつかん", items: [
+    { id:"nv01", name:"わざマシン39（いわおとし）", type:"gym",  note:"ニビジム・タケシを倒す" },
+    { id:"nv02", name:"むかしのこはく", type:"gift",             note:"ニビのはくぶつかん・制限区域の科学者（きりさく必要）→ グレンタウン化石博士でプテラに復元" },
   ]},
   { area: "おつきみやま", items: [
-    { id:"ot01", name:"めざましいし", type:"field", note:"B1F・アイテムボール" },
-    { id:"ot02", name:"こうらのかせき または ドームのかせき", type:"gift", note:"B2F・ロケット団員から（どちらか1つ選択）→ ハナダシティ・グレンタウン化石博士に持参でポケモン復元" },
+    { id:"ot01", name:"わざマシン09（タネマシンガン）", type:"field",    note:"おつきみやま1F・アイテムボール" },
+    { id:"ot02", name:"めざましいし", type:"field",                       note:"おつきみやまB2F・アイテムボール" },
+    { id:"ot03", name:"わざマシン46（どろぼう）", type:"field",          note:"おつきみやまB2F・アイテムボール" },
+    { id:"ot04", name:"こうらのかせき または ドームのかせき", type:"gift", note:"おつきみやまB2F・ロケット団員から（どちらか1つ選択）→ グレンタウン化石博士でオムナイト/カブトに復元" },
   ]},
-  { area: "ハナダシティ", items: [
-    { id:"hd01", name:"SSアンのチケット", type:"gift", note:"ビルの家・ビルから（ポケモン変身解除の手伝い後）" },
-    { id:"hd02", name:"わざマシン03（みずのはどう）", type:"gym", note:"ハナダジム・カスミを倒す" },
+  { area: "ハナダシティ周辺", items: [
+    { id:"hd01", name:"わざマシン28（あなをほる）", type:"gift", note:"ハナダシティ・ロケット団員を倒した後にもらう" },
+    { id:"hd02", name:"SSアンのチケット", type:"gift",           note:"ルート25・ビルの家 ビルから（ポケモン変身解除の手伝い後）" },
+    { id:"hd03", name:"わざマシン03（みずのはどう）", type:"gym", note:"ハナダジム・カスミを倒す" },
   ]},
   { area: "クチバシティ・SSアン", items: [
-    { id:"ss01", name:"ひでんマシン01（きりさく）", type:"gift",  note:"SSアン船長の部屋・背中をなでてあげる" },
-    { id:"ss02", name:"わざマシン28（あなをほる）", type:"field", note:"SSアン船内・アイテムボール" },
-    { id:"kb01", name:"わざマシン34（でんきショック）", type:"gym", note:"クチバジム・マチスを倒す" },
+    { id:"ss01", name:"ひでんマシン01（きりさく）", type:"gift",       note:"SSアン・船長の部屋で背中をなでてあげる" },
+    { id:"ss02", name:"わざマシン44（ねむる）", type:"field",           note:"SSアンB1F・アイテムボール" },
+    { id:"ss03", name:"わざマシン31（ブリックブレイク）", type:"field", note:"SSアン1F客室・アイテムボール" },
+    { id:"kb01", name:"わざマシン34（でんきショック）", type:"gym",     note:"クチバジム・マチスを倒す" },
+    { id:"kb02", name:"Vs.シーカー", type:"gift",                       note:"クチバポケモンセンター・女性エーストレーナーから（SSアン乗船後）" },
+    { id:"kb03", name:"ふるいつりざお", type:"gift",                    note:"クチバシティ・北西の釣り人の家" },
   ]},
-  { area: "ラベンダータウン・ポケモンタワー", items: [
-    { id:"rv01", name:"ポケフルート", type:"gift", note:"ポケモンタワー7F・フジ老人を救出後にもらう（カビゴン起こしに必須）" },
+  { area: "ルート9", items: [
+    { id:"r9_01", name:"わざマシン40（つばめがえし）", type:"field", note:"9番道路南西・アイテムボール" },
+  ]},
+  { area: "ラベンダータウン・ルート12", items: [
+    { id:"rv01", name:"ポケフルート", type:"gift",              note:"ポケモンタワー7F・フジ老人を救出後にもらう（カビゴン起こしに必須）" },
+    { id:"rv02", name:"わざマシン27（おんがえし）", type:"gift", note:"ラベンダータウン〜ルート12のゲート2F・女性からもらう" },
+    { id:"rv03", name:"スーパーロッド", type:"gift",            note:"ルート12・釣り師の家の老釣り人からもらう" },
   ]},
   { area: "タマムシシティ・ロケット団アジト", items: [
-    { id:"tm01", name:"ひでんマシン02（そらをとぶ）", type:"gift", note:"16番道路西・自転車専用道路の女の子（きりさく必要）" },
-    { id:"tm02", name:"わざマシン19（ギガドレイン）", type:"gym",  note:"タマムシジム・エリカを倒す" },
-    { id:"tm03", name:"シルフのスコープ", type:"gift",             note:"タマムシゲームコーナー地下ロケット団アジト・ジョバンニを倒す（ポケモンタワー進行に必須）" },
+    { id:"tm01", name:"ひでんマシン02（そらをとぶ）", type:"gift",  note:"16番道路西・自転車専用道路の女の子（きりさく必要）" },
+    { id:"tm02", name:"わざマシン19（ギガドレイン）", type:"gym",   note:"タマムシジム・エリカを倒す" },
+    { id:"tm03", name:"わざマシン16（ひかりのかべ）", type:"gift",  note:"タマムシデパート屋上・女の子に「みずたまり」を渡す" },
+    { id:"tm04", name:"わざマシン20（まもる）", type:"gift",        note:"タマムシデパート屋上・女の子に「サイダー」を渡す" },
+    { id:"tm05", name:"わざマシン33（リフレクト）", type:"gift",    note:"タマムシデパート屋上・女の子に「レモネード」を渡す" },
+    { id:"tm06", name:"シルフのスコープ", type:"gift",              note:"タマムシゲームコーナー地下ロケット団アジトB4F・ジョバンニを倒す（ポケモンタワー進行に必須）" },
+  ]},
+  { area: "ルート15（東ゲート）", items: [
+    { id:"r15_01", name:"けいけんわけ", type:"gift", note:"ルート15東ゲート2F・オーキドの助手（ポケモンを50種類以上捕まえた後）" },
   ]},
   { area: "ヤマブキシティ・シルフカンパニー", items: [
-    { id:"yk01", name:"ラプラス", type:"gift",             note:"シルフカンパニー7F・社員からもらう（シルフカンパニー解放後）" },
-    { id:"yk02", name:"わざマシン（サブリナ）", type:"gym", note:"ヤマブキジム・サブリナを倒す" },
+    { id:"yk01", name:"わざマシン29（サイコキネシス）", type:"gift", note:"ヤマブキシティ・サイキッカーのおじいさんの家" },
+    { id:"yk02", name:"わざマシン04（めいそう）", type:"gym",        note:"ヤマブキジム・サブリナを倒す" },
+    { id:"yk03", name:"ラプラス", type:"gift",                       note:"シルフカンパニー7F・社員からもらう" },
+    { id:"yk04", name:"マスターボール", type:"gift",                 note:"シルフカンパニー11F・社長からもらう（ジョバンニ撃破後）" },
+    { id:"yk05", name:"ヒットモンリー または ヒットモンチャン", type:"gift", note:"ヤマブキ格闘道場・ルイを倒した後どちらかを選択" },
   ]},
   { area: "セキチクシティ・サファリゾーン", items: [
     { id:"sc01", name:"わざマシン（キョウ）", type:"gym",          note:"セキチクジム・キョウを倒す" },
-    { id:"sc02", name:"きんのいれば", type:"field",                note:"サファリゾーン奥エリア・アイテムボール（なみのり・かいりき必要）" },
-    { id:"sc03", name:"ひでんマシン03（なみのり）", type:"field",  note:"サファリゾーン奥・秘密の家" },
-    { id:"sc04", name:"ひでんマシン04（かいりき）", type:"gift",   note:"セキチクシティ・ポケモンサファリの園長（きんのいれば返却後）" },
+    { id:"sc02", name:"ひでんマシン03（なみのり）", type:"field",  note:"サファリゾーン奥・秘密の家（サファリゾーン最奥まで到達）" },
+    { id:"sc03", name:"きんのいれば", type:"field",                note:"サファリゾーン奥エリア・アイテムボール" },
+    { id:"sc04", name:"ひでんマシン04（かいりき）", type:"gift",   note:"セキチクシティ・サファリゾーンの管理人（きんのいれば返却後）" },
+    { id:"sc05", name:"グッドロッド", type:"gift",                 note:"セキチクシティ・南東の家の釣り人からもらう" },
   ]},
-  { area: "グレンタウン", items: [
-    { id:"gl01", name:"わざマシン（カツラ）", type:"gym", note:"グレンジム・カツラを倒す" },
+  { area: "グレンタウン・ポケモン屋敷", items: [
+    { id:"gl01", name:"わざマシン38（だいもじ）", type:"gym",  note:"グレンジム・カツラを倒す" },
+    { id:"gl02", name:"ひみつのカギ", type:"field",            note:"ポケモン屋敷B1F・アイテムボール（グレンジム入場に必須）" },
+  ]},
+  { area: "はつでんしょ（パワープラント）", items: [
+    { id:"pp01", name:"わざマシン17（まもる）", type:"field",   note:"はつでんしょ内・アイテムボール" },
+    { id:"pp02", name:"わざマシン25（かみなり）", type:"field", note:"はつでんしょ内・アイテムボール" },
   ]},
   { area: "トキワシティ（8番目のジム）", items: [
-    { id:"tw01", name:"わざマシン（サカキ）", type:"gym", note:"トキワジム・サカキを倒す（8つ目のバッジ）" },
+    { id:"tw01", name:"わざマシン26（じしん）", type:"gym",    note:"トキワジム・サカキを倒す（8つ目のバッジ）" },
+    { id:"tw02", name:"きょうせいギプス", type:"hidden",       note:"トキワジム内・サカキがいた場所（ダウジングマシン使用）" },
   ]},
   { area: "チャンピオンロード", items: [
-    { id:"cr01", name:"わざマシン26（じしん）", type:"field", note:"チャンピオンロード・アイテムボール（かいりき必要）" },
+    { id:"cr01", name:"わざマシン02（ドラゴンクロー）", type:"field", note:"チャンピオンロード1F・アイテムボール" },
   ]},
-  { area: "島1（きのこじま）", items: [
-    { id:"i1_01", name:"ひでんマシン06（いわくだき）", type:"gift", note:"ホットスパ・温泉にいる人からもらう" },
+  { area: "島1（きのこじま）・エンブスパ", items: [
+    { id:"i1_01", name:"ひでんマシン06（いわくだき）", type:"gift", note:"エンブスパ（温泉）・老人からもらう" },
   ]},
-  { area: "島4（たんすいじま）", items: [
-    { id:"i4_01", name:"ひでんマシン07（たきのぼり）", type:"gift", note:"こおりのぬけみち・奥にいる人からもらう" },
+  { area: "島4（たんすいじま）・こおりのぬけみち", items: [
+    { id:"i4_01", name:"ひでんマシン07（たきのぼり）", type:"field", note:"こおりのぬけみち・B1Fから南の崖上へアクセスしてアイテムボールを入手" },
   ]},
 ];
 
@@ -2483,9 +2598,10 @@ function AdventureTab({ color }) {
   const totalChecked = FIELD_ITEMS.reduce((s, a) => s + a.items.filter(i => checked[i.id]).length, 0);
 
   const TYPE_META = {
-    field: { label: "拾う",   bg: "#1a3a1a", col: "#7fff7f" },
-    gift:  { label: "もらう", bg: "#1a2a3a", col: "#5ecde5" },
-    gym:   { label: "ジム",   bg: "#3a1a2a", col: "#e880a0" },
+    field:  { label: "拾う",   bg: "#1a3a1a", col: "#7fff7f" },
+    gift:   { label: "もらう", bg: "#1a2a3a", col: "#5ecde5" },
+    gym:    { label: "ジム",   bg: "#3a1a2a", col: "#e880a0" },
+    hidden: { label: "隠し",   bg: "#2a2a1a", col: "#f5d020" },
   };
 
   return (
@@ -2587,32 +2703,136 @@ function AdventureTab({ color }) {
   );
 }
 
+function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
+  const [filter,    setFilter]    = useState("all");
+  const [openAreas, setOpenAreas] = useState({});
+
+  const TYPE_ICON  = { gift: "🎁", tm: "💿", hm: "🔑", field: "📦", hidden: "🔍" };
+  const FILTERS = [
+    { key: "all",    label: "すべて" },
+    { key: "gift",   label: "🎁 もらえる" },
+    { key: "hm",     label: "🔑 HM" },
+    { key: "tm",     label: "💿 TM" },
+    { key: "field",  label: "📦 落ちている" },
+    { key: "hidden", label: "🔍 隠し" },
+  ];
+
+  const allItems     = ITEM_DATA.flatMap(a => a.items);
+  const total        = allItems.length;
+  const checkedCount = allItems.filter(i => checkedItems[i.id]).length;
+
+  const filteredData = ITEM_DATA
+    .map(a => ({ ...a, items: filter === "all" ? a.items : a.items.filter(i => i.type === filter) }))
+    .filter(a => a.items.length > 0);
+
+  const toggleArea = (name) => setOpenAreas(prev => ({ ...prev, [name]: prev[name] === false }));
+
+  return (
+    <div style={{ marginBottom: "10px" }}>
+      {/* 進捗バー */}
+      <div className="card" style={{ padding: "10px 14px", marginBottom: "10px", borderColor: color + "33" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "5px" }}>
+          <span style={{ color }}>アイテム入手状況</span>
+          <span>{checkedCount}/{total}　残り<span style={{ color: (total - checkedCount) === 0 ? "#7fff7f" : "#aaa" }}>{total - checkedCount}</span></span>
+        </div>
+        <div className="bar-bg" style={{ height: "7px" }}>
+          <div className="bar-fill" style={{ height: "100%", width: `${total > 0 ? (checkedCount / total) * 100 : 0}%`, background: checkedCount >= total ? "#7fff7f" : `linear-gradient(90deg, ${color}88, ${color})`, borderRadius: "4px" }} />
+        </div>
+      </div>
+
+      {/* フィルター */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "10px", alignItems: "center" }}>
+        {FILTERS.map(f => (
+          <button key={f.key} onClick={() => setFilter(f.key)}
+            style={{
+              background: filter === f.key ? color + "22" : "transparent",
+              border: `1px solid ${filter === f.key ? color + "88" : "#3a3a5a"}`,
+              borderRadius: "6px", color: filter === f.key ? color : "#555",
+              fontSize: "10px", padding: "4px 8px", cursor: "pointer", fontFamily: "inherit",
+            }}
+          >{f.label}</button>
+        ))}
+        <button onClick={onReset}
+          style={{
+            background: "transparent", border: "1px solid #ff444444",
+            borderRadius: "6px", color: "#ff6666",
+            fontSize: "10px", padding: "4px 8px", cursor: "pointer", fontFamily: "inherit", marginLeft: "auto",
+          }}
+        >リセット</button>
+      </div>
+
+      {/* エリア別リスト */}
+      {filteredData.map(areaData => {
+        const areaChecked = areaData.items.filter(i => checkedItems[i.id]).length;
+        const isOpen      = openAreas[areaData.area] !== false;
+        const allDone     = areaChecked === areaData.items.length;
+        return (
+          <div key={areaData.area} style={{ marginBottom: "6px" }}>
+            <button onClick={() => toggleArea(areaData.area)} className="panel-toggle"
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left", color: allDone ? "#7fff7f" : "#aaa" }}
+            >
+              <span style={{ fontSize: "11px" }}>{isOpen ? "▼" : "▶"} {areaData.area}</span>
+              <span style={{ fontSize: "9px", color: allDone ? "#7fff7f" : "#555", flexShrink: 0, marginLeft: "8px" }}>{areaChecked}/{areaData.items.length}</span>
+            </button>
+            {isOpen && (
+              <div className="panel-body" style={{ borderColor: "#2a2a4a", padding: "4px 8px" }}>
+                {areaData.items.map((item, idx) => (
+                  <label key={item.id}
+                    style={{ display: "flex", alignItems: "flex-start", gap: "8px", padding: "6px 2px", cursor: "pointer", borderBottom: idx < areaData.items.length - 1 ? "1px solid #1a2a3a" : "none" }}
+                  >
+                    <input type="checkbox" checked={!!checkedItems[item.id]} onChange={() => onToggle(item.id)}
+                      style={{ marginTop: "2px", accentColor: color, cursor: "pointer", flexShrink: 0 }} />
+                    <span style={{ fontSize: "10px", flexShrink: 0, opacity: 0.6 }}>{TYPE_ICON[item.type]}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: "11px", color: checkedItems[item.id] ? "#444" : "#e8e8e8", textDecoration: checkedItems[item.id] ? "line-through" : "none" }}>
+                        {item.name}
+                      </div>
+                      {item.note && (
+                        <div style={{ fontSize: "9px", color: "#555", marginTop: "1px" }}>{item.note}</div>
+                      )}
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", marginTop: "10px", letterSpacing: "1px" }}>
+        FR/LG · アイテムリスト（内容は随時要確認）
+      </div>
+    </div>
+  );
+}
+
 function EVTracker() {
   const [party,     setParty]    = useState(DEFAULT_PARTY);
   const [allEVs,    setAllEVs]   = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
   const [allMoves,  setAllMoves] = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, ["","","",""]])));
   const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
-  const [loaded,    setLoaded]   = useState(false);
-  const [macho,     setMacho]    = useState(false);
-  const [activeTab, setActiveTab] = useState("ikusei");
-  const [adding,    setAdding]   = useState(false);
-  const [newName,   setNewName]  = useState("");
-  const [newIcon,   setNewIcon]  = useState("🐣");
-  const [newColor,  setNewColor] = useState(COLORS[0]);
-  const [newDexId,  setNewDexId] = useState(null);
+  const [loaded,       setLoaded]       = useState(false);
+  const [macho,        setMacho]        = useState(false);
+  const [activeTab,    setActiveTab]    = useState("ikusei");
+  const [adding,       setAdding]       = useState(false);
+  const [newName,      setNewName]      = useState("");
+  const [newIcon,      setNewIcon]      = useState("🐣");
+  const [newColor,     setNewColor]     = useState(COLORS[0]);
+  const [newDexId,     setNewDexId]     = useState(null);
+  const [checkedItems, setCheckedItems] = useState({});
 
   useEffect(() => {
     fetch("/api/data")
       .then(r => r.json())
       .then(saved => {
-        if (saved.party)     setParty(saved.party.map(p => {
+        if (saved.party)        setParty(saved.party.map(p => {
           if (p.dexId != null) return p;
           const idx = POKEMON_DATA.findIndex(pd => pd[1] === p.name);
           return { ...p, dexId: idx >= 0 ? idx : null };
         }));
-        if (saved.allEVs)    setAllEVs(saved.allEVs);
-        if (saved.allMoves)  setAllMoves(saved.allMoves);
-        if (saved.selected)  setSelected(saved.selected);
+        if (saved.allEVs)       setAllEVs(saved.allEVs);
+        if (saved.allMoves)     setAllMoves(saved.allMoves);
+        if (saved.selected)     setSelected(saved.selected);
+        if (saved.checkedItems) setCheckedItems(saved.checkedItems);
       })
       .catch(() => {})
       .finally(() => setLoaded(true));
@@ -2623,9 +2843,12 @@ function EVTracker() {
     fetch("/api/data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ party, allEVs, allMoves, selected }),
+      body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems }),
     }).catch(() => {});
-  }, [party, allEVs, allMoves, selected, loaded]);
+  }, [party, allEVs, allMoves, selected, checkedItems, loaded]);
+
+  const toggleItem = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
+  const resetItems = () => setCheckedItems({});
 
   const mon       = party.find(p => p.name === selected) || party[0];
   const evs       = allEVs[selected] || initEVs();
