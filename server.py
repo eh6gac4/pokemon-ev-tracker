@@ -62,34 +62,34 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
+    def _serve_static(self, path: str):
+        raw = path.split("?")[0]
+        if raw in ("/", ""):
+            raw = "/index.html"
+        file_path = STATIC_DIR / raw.lstrip("/")
+        if not file_path.is_file():
+            self.send_json(404, {"error": "not found"})
+            return
+        mime = {
+            ".html": "text/html; charset=utf-8",
+            ".js":   "application/javascript",
+            ".css":  "text/css",
+            ".json": "application/json",
+        }.get(file_path.suffix, "application/octet-stream")
+        body = file_path.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", mime)
+        self.send_header("Content-Length", str(len(body)))
+        cache = "no-store" if file_path.suffix in (".png", ".ico") else "no-cache"
+        self.send_header("Cache-Control", cache)
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_GET(self):
         if self.path == "/api/data":
             self.send_json(200, load_data())
         else:
-            # 静的ファイルを返す
-            path = self.path.split("?")[0]
-            if path == "/" or path == "":
-                path = "/index.html"
-            file_path = STATIC_DIR / path.lstrip("/")
-            if file_path.is_file():
-                mime = {
-                    ".html": "text/html; charset=utf-8",
-                    ".js":   "application/javascript",
-                    ".css":  "text/css",
-                    ".json": "application/json",
-                }.get(file_path.suffix, "application/octet-stream")
-                body = file_path.read_bytes()
-                self.send_response(200)
-                self.send_header("Content-Type", mime)
-                self.send_header("Content-Length", str(len(body)))
-                if file_path.suffix in (".png", ".ico"):
-                    self.send_header("Cache-Control", "no-store")
-                else:
-                    self.send_header("Cache-Control", "no-cache")
-                self.end_headers()
-                self.wfile.write(body)
-            else:
-                self.send_json(404, {"error": "not found"})
+            self._serve_static(self.path)
 
     def do_POST(self):
         if self.path == "/api/data":

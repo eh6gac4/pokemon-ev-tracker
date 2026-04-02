@@ -197,6 +197,28 @@ class TestHTTPServer(unittest.TestCase):
             urllib.request.urlopen(req)
         self.assertEqual(ctx.exception.code, 404)
 
+    def test_post_empty_body_returns_400(self):
+        req = urllib.request.Request(
+            self.url("/api/data"),
+            data=b"",
+            headers={"Content-Type": "application/json", "Content-Length": "0"},
+            method="POST",
+        )
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            urllib.request.urlopen(req)
+        self.assertEqual(ctx.exception.code, 400)
+
+    def test_put_method_returns_501(self):
+        req = urllib.request.Request(
+            self.url("/api/data"),
+            data=b"{}",
+            headers={"Content-Type": "application/json"},
+            method="PUT",
+        )
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            urllib.request.urlopen(req)
+        self.assertEqual(ctx.exception.code, 501)
+
     def test_get_nonexistent_static_file_returns_404(self):
         with self.assertRaises(urllib.error.HTTPError) as ctx:
             urllib.request.urlopen(self.url("/does_not_exist.js"))
@@ -225,6 +247,38 @@ class TestHTTPServer(unittest.TestCase):
     def test_get_index_html_explicit(self):
         with urllib.request.urlopen(self.url("/index.html")) as res:
             self.assertEqual(res.status, 200)
+
+    def test_get_style_css_returns_200(self):
+        with urllib.request.urlopen(self.url("/style.css")) as res:
+            self.assertEqual(res.status, 200)
+
+    def test_get_style_css_content_type(self):
+        with urllib.request.urlopen(self.url("/style.css")) as res:
+            self.assertIn("text/css", res.headers.get("Content-Type", ""))
+
+    def test_html_cache_control_is_no_cache(self):
+        with urllib.request.urlopen(self.url("/index.html")) as res:
+            self.assertEqual(res.headers.get("Cache-Control"), "no-cache")
+
+    def test_delete_method_returns_501(self):
+        req = urllib.request.Request(
+            self.url("/api/data"),
+            method="DELETE",
+        )
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            urllib.request.urlopen(req)
+        self.assertEqual(ctx.exception.code, 501)
+
+    def test_patch_method_returns_501(self):
+        req = urllib.request.Request(
+            self.url("/api/data"),
+            data=b"{}",
+            headers={"Content-Type": "application/json"},
+            method="PATCH",
+        )
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            urllib.request.urlopen(req)
+        self.assertEqual(ctx.exception.code, 501)
 
 
 # ---------------------------------------------------------------------------
@@ -300,6 +354,23 @@ class TestEVRules(unittest.TestCase):
         self.assertEqual(result["def"], 6)
         self.assertEqual(sum(result.values()), self.MAX_TOTAL)
 
+    def test_stat_at_252_cannot_increase(self):
+        evs = {**self._zero_evs(), "hp": 252}
+        result = self._change(evs, "hp", 4)
+        self.assertEqual(result["hp"], 252)
+
+    def test_total_at_510_adding_any_returns_zero_gain(self):
+        evs = {**self._zero_evs(), "hp": 252, "atk": 252, "def": 6}
+        self.assertEqual(sum(evs.values()), self.MAX_TOTAL)
+        result = self._change(evs, "spa", 4)
+        self.assertEqual(result["spa"], 0)
+        self.assertEqual(sum(result.values()), self.MAX_TOTAL)
+
+    def test_boundary_251_plus1_equals_252(self):
+        evs = {**self._zero_evs(), "hp": 251}
+        result = self._change(evs, "hp", 1)
+        self.assertEqual(result["hp"], 252)
+
 
 # ---------------------------------------------------------------------------
 # 強制ギプス（倍率×2）ロジックテスト
@@ -358,6 +429,11 @@ class TestMachoBrace(unittest.TestCase):
         evs = self._change(self._zero_evs(), "hp", 4, macho=False)
         self.assertEqual(evs["hp"], 4)
 
+    def test_delta_zero_with_macho_no_change(self):
+        evs = {**self._zero_evs(), "hp": 50}
+        result = self._change(evs, "hp", 0, macho=True)
+        self.assertEqual(result["hp"], 50)
+
 
 # ---------------------------------------------------------------------------
 # ビタミン管理ロジックテスト（第3世代: EV<100のみ使用可、1本10EV）
@@ -391,6 +467,22 @@ class TestVitamins(unittest.TestCase):
 
     def test_89ev_can_use_2_vitamins(self):
         self.assertEqual(self._vl(89), 2)
+
+    def test_1ev_can_use_10_vitamins(self):
+        # ceil((100-1)/10) = ceil(9.9) = 10
+        self.assertEqual(self._vl(1), 10)
+
+    def test_50ev_can_use_5_vitamins(self):
+        # ceil((100-50)/10) = ceil(5.0) = 5
+        self.assertEqual(self._vl(50), 5)
+
+    def test_99ev_can_use_1_vitamin(self):
+        # ceil((100-99)/10) = ceil(0.1) = 1
+        self.assertEqual(self._vl(99), 1)
+
+    def test_91ev_can_use_1_vitamin(self):
+        # ceil((100-91)/10) = ceil(0.9) = 1
+        self.assertEqual(self._vl(91), 1)
 
 
 # ---------------------------------------------------------------------------
@@ -438,6 +530,106 @@ class TestMemo(unittest.TestCase):
             server.save_data({"party": [{"name": "A", "memo": "after"}],  "allEVs": {}, "selected": "A"})
             result = server.load_data()
         self.assertEqual(result["party"][0]["memo"], "after")
+
+
+# ---------------------------------------------------------------------------
+# パーティメンバー拡張フィールドのテスト（nature / dexId / allMoves）
+# ---------------------------------------------------------------------------
+
+class TestExtendedFields(unittest.TestCase):
+    """第3世代追加フィールド（性格・図鑑番号・技セット）の保存・復元テスト"""
+
+    def setUp(self):
+        fd, path = tempfile.mkstemp(suffix=".db")
+        os.close(fd)
+        self.db_path = Path(path)
+
+    def tearDown(self):
+        self.db_path.unlink(missing_ok=True)
+
+    def _full_data(self):
+        return {
+            "party": [
+                {
+                    "name":   "ゲンガー",
+                    "icon":   "👻",
+                    "color":  "#C97AE0",
+                    "memo":   "おくびょう　めがね",
+                    "nature": "おくびょう",
+                    "dexId":  93,
+                }
+            ],
+            "allEVs": {
+                "ゲンガー": {"hp": 0, "atk": 0, "def": 0, "spa": 252, "spd": 4, "spe": 252}
+            },
+            "allMoves": {
+                "ゲンガー": ["シャドーボール", "サイコキネシス", "でんじは", ""]
+            },
+            "selected": "ゲンガー",
+        }
+
+    def test_nature_field_preserved(self):
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data(self._full_data())
+            result = server.load_data()
+        self.assertEqual(result["party"][0]["nature"], "おくびょう")
+
+    def test_dex_id_field_preserved(self):
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data(self._full_data())
+            result = server.load_data()
+        self.assertEqual(result["party"][0]["dexId"], 93)
+
+    def test_all_moves_preserved(self):
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data(self._full_data())
+            result = server.load_data()
+        self.assertEqual(result["allMoves"]["ゲンガー"], ["シャドーボール", "サイコキネシス", "でんじは", ""])
+
+    def test_empty_move_slot_preserved(self):
+        """空文字列の技スロットがそのまま返ること"""
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data(self._full_data())
+            result = server.load_data()
+        self.assertEqual(result["allMoves"]["ゲンガー"][3], "")
+
+    def test_multiple_party_members(self):
+        data = {
+            "party": [
+                {"name": "ピカチュウ", "icon": "⚡", "color": "#F5D020", "memo": "", "nature": "ようき", "dexId": 24},
+                {"name": "リザードン", "icon": "🔥", "color": "#FF6B35", "memo": "", "nature": "ひかえめ", "dexId": 5},
+            ],
+            "allEVs": {
+                "ピカチュウ": {"hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 4, "spe": 252},
+                "リザードン": {"hp": 0, "atk": 0, "def": 0, "spa": 252, "spd": 4, "spe": 252},
+            },
+            "allMoves": {
+                "ピカチュウ":  ["10まんボルト", "", "", ""],
+                "リザードン": ["だいもんじ", "かえんほうしゃ", "", ""],
+            },
+            "selected": "ピカチュウ",
+        }
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data(data)
+            result = server.load_data()
+        self.assertEqual(len(result["party"]), 2)
+        self.assertEqual(result["party"][1]["nature"], "ひかえめ")
+        self.assertEqual(result["allMoves"]["リザードン"][0], "だいもんじ")
+
+    def test_update_moves_overwrites_correctly(self):
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data(self._full_data())
+            updated = self._full_data()
+            updated["allMoves"]["ゲンガー"] = ["なみのり", "", "", ""]
+            server.save_data(updated)
+            result = server.load_data()
+        self.assertEqual(result["allMoves"]["ゲンガー"][0], "なみのり")
 
 
 if __name__ == "__main__":
