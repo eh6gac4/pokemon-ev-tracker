@@ -13,6 +13,8 @@ function EVTracker() {
   const [newDexId,     setNewDexId]     = useState(null);
   const [checkedItems, setCheckedItems] = useState({});
   const [todoList,     setTodoList]     = useState([]);
+  const [renaming,     setRenaming]     = useState(false);
+  const [renameValue,  setRenameValue]  = useState("");
 
   useEffect(() => {
     fetch("/api/data")
@@ -83,6 +85,27 @@ function EVTracker() {
     setAllEVs(prev => { const n = { ...prev }; delete n[name]; return n; });
     setAllMoves(prev => { const n = { ...prev }; delete n[name]; return n; });
     if (selected === name && next.length > 0) setSelected(next[0].name);
+  };
+
+  const renameMon = (oldName, newName) => {
+    const trimmed = newName.trim();
+    if (!trimmed || trimmed === oldName) { setRenaming(false); return; }
+    if (party.find(p => p.name === trimmed)) return;
+    setParty(prev => prev.map(p => p.name === oldName ? { ...p, name: trimmed } : p));
+    setAllEVs(prev => {
+      const n = { ...prev };
+      n[trimmed] = n[oldName] || initEVs();
+      delete n[oldName];
+      return n;
+    });
+    setAllMoves(prev => {
+      const n = { ...prev };
+      n[trimmed] = n[oldName] || ["","","",""];
+      delete n[oldName];
+      return n;
+    });
+    if (selected === oldName) setSelected(trimmed);
+    setRenaming(false);
   };
 
   const addMon = () => {
@@ -218,6 +241,24 @@ function EVTracker() {
               </button>
             )}
           </div>
+
+          {renaming ? (
+            <div style={{ display: "flex", gap: "6px", marginBottom: "10px" }}>
+              <input
+                autoFocus
+                value={renameValue}
+                onChange={e => setRenameValue(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") renameMon(selected, renameValue); if (e.key === "Escape") setRenaming(false); }}
+                style={{ flex: 1, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "13px", padding: "8px 10px", fontFamily: "inherit", outline: "none" }}
+              />
+              <button onClick={() => renameMon(selected, renameValue)} style={{ background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: mon.color, fontSize: "11px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
+              <button onClick={() => setRenaming(false)} style={{ background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "8px 10px", cursor: "pointer", fontFamily: "inherit" }}>×</button>
+            </div>
+          ) : (
+            <button onClick={() => { setRenameValue(selected); setRenaming(true); }} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px", marginBottom: "10px" }}>
+              ✏️ 名前を変更
+            </button>
+          )}
 
           <EVSearch macho={macho} color={mon.color} />
           <LocationGuide color={mon.color} />
