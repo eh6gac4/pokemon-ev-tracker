@@ -48,7 +48,7 @@ function EVTracker() {
       window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
 
     const onTouchStart = (e) => {
-      if (getScrollTop() === 0) {
+      if (getScrollTop() <= 1) {
         startY = e.touches[0].clientY;
         pulling = true;
       }

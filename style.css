@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
 * { box-sizing: border-box; }
-body { margin: 0; }
+body { margin: 0; overscroll-behavior-y: none; }
 
 /* Pull-to-refresh indicator */
 #ptr-indicator {
