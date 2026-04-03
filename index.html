@@ -269,17 +269,17 @@ const ITEM_DATA = [
     { id: "ma01", name: "タウンマップ",                    type: "gift",   note: "ライバルの家でグリーン（リーフ）から" },
   ]},
   { area: "1番道路・2番道路", items: [
-    { id: "r001", name: "ポーション",                      type: "field",  note: "1番道路 草むら北" },
+    { id: "r001", name: "きずぐすり",                      type: "field",  note: "1番道路 草むら北" },
     { id: "r002", name: "ひでんマシン05 フラッシュ",       type: "hm",     note: "2番道路ゲート（木を切った先）でオーキド助手から（図鑑10匹以上）" },
   ]},
   { area: "ニビシティ", items: [
     { id: "ni01", name: "ランニングシューズ",               type: "gift",   note: "タケシ撃破後、ニビシティ右出口でオーキド博士の助手から" },
     { id: "ni02", name: "わざマシン39 がんせきふうじ",         type: "tm",     note: "タケシ撃破後にもらえる" },
-    { id: "ni03", name: "ふしぎなあめ",                    type: "hidden", note: "ニビはくぶつかん裏（アイテムファインダー）" },
+    { id: "ni03", name: "ふしぎなアメ",                    type: "hidden", note: "ニビはくぶつかん裏（アイテムファインダー）" },
     { id: "ni04", name: "ひみつのコハク",                  type: "gift",   note: "ニビはくぶつかん 制限区域の科学者（いあいぎり使用後）→ グレンじま研究所でプテラに復元" },
   ]},
   { area: "おつきみやま", items: [
-    { id: "oz01", name: "ムーンのいし",                    type: "hidden", note: "B2F（アイテムファインダーで発見）" },
+    { id: "oz01", name: "つきのいし",                      type: "hidden", note: "B2F（アイテムファインダーで発見）" },
     { id: "oz02", name: "かいのカセキ または こうらのカセキ", type: "field",  note: "B2Fで片方選択（グレンじまの研究所で復元）" },
     { id: "oz03", name: "わざマシン16 ひかりのかべ",       type: "field",  note: "おつきみやま B2F" },
   ]},
@@ -297,7 +297,7 @@ const ITEM_DATA = [
     { id: "r12a", name: "ちいさなキノコ",                  type: "hidden", note: "12番道路（アイテムファインダー）" },
     { id: "r12b", name: "わざマシン09 タネマシンガン",         type: "field",  note: "12番道路 南の釣り人付近" },
   ]},
-  { area: "16番道路・ネムリのもり", items: [
+  { area: "16番道路", items: [
     { id: "r16a", name: "ひでんマシン02 そらをとぶ",        type: "hm",     note: "木を切った先の建物のNPCから" },
     { id: "r16b", name: "たべのこし",                      type: "field",  note: "カビゴン（12番道路）を撃破/捕獲後に入手可（要確認）" },
   ]},
@@ -312,7 +312,7 @@ const ITEM_DATA = [
     { id: "ta08", name: "わざマシン11 にほんばれ",         type: "field",  note: "タマムシデパート 4F（4500円）" },
     { id: "ta09", name: "わざマシン15 はかいこうせん",     type: "field",  note: "タマムシデパート 4F（7500円）" },
   ]},
-  { area: "ラベンダータウン", items: [
+  { area: "シオンタウン", items: [
     { id: "la01", name: "ポケモンのふえ",                  type: "gift",   note: "ポケモンタワー頂上でフジ老人を救出後" },
   ]},
   { area: "ヤマブキシティ", items: [
@@ -331,7 +331,7 @@ const ITEM_DATA = [
     { id: "gr01", name: "わざマシン38 だいもんじ",         type: "tm",     note: "カツラ撃破後にもらえる" },
     { id: "gr02", name: "ファイヤー",                      type: "field",  note: "グレンじま 洞窟奥（1匹のみ）" },
     { id: "gr03", name: "プテラ（ひみつのコハク復元）",    type: "gift",   note: "グレンじま研究所（ひみつのコハク持参）" },
-    { id: "gr04", name: "オムスター または カブトプス（化石復元）", type: "gift", note: "グレンじま研究所（かいのかせき持参）" },
+    { id: "gr04", name: "オムスター または カブトプス（化石復元）", type: "gift", note: "グレンじま研究所（かいのカセキ または こうらのカセキを持参）" },
   ]},
   { area: "トキワシティ（ジム）", items: [
     { id: "to01", name: "わざマシン26 じしん",             type: "tm",     note: "サカキ撃破後にもらえる" },
@@ -341,7 +341,7 @@ const ITEM_DATA = [
   ]},
   { area: "チャンピオンロード", items: [
     { id: "ch01", name: "ひでんマシン06 いわくだき",         type: "hm",     note: "チャンピオンロード内（落ちているアイテム）" },
-    { id: "ch02", name: "ふしぎなあめ",                    type: "field",  note: "チャンピオンロード内" },
+    { id: "ch02", name: "ふしぎなアメ",                    type: "field",  note: "チャンピオンロード内" },
   ]},
   { area: "ハナダの洞窟（クリア後）", items: [
     { id: "ce01", name: "フリーザー",                      type: "field",  note: "ハナダの洞窟 B4F（1匹のみ）" },
@@ -428,7 +428,7 @@ const LOCATION_DATA = [
     { name: "ディグダ",   evs: { spe: 1 }, rate: "95%", best: true },
     { name: "ダグトリオ", evs: { spe: 2 }, rate: "5%" },
   ]},
-  // ─── クチバシティ東 → ラベンダータウン方面 ───
+  // ─── クチバシティ東 → シオンタウン方面 ───
   { name: "11番道路", ver: "", pokemon: [
     { name: "アーボ",     evs: { atk: 1 }, rate: "40%", ver: "FR" },
     { name: "サンド",     evs: { def: 1 }, rate: "40%", ver: "LG", best: true },
@@ -492,7 +492,7 @@ const LOCATION_DATA = [
     { name: "ケーシィ",   evs: { spa: 1 }, rate: "15%" },
     { name: "ユンゲラー", evs: { spa: 2 }, rate: "5%" },
   ]},
-  // ─── ラベンダータウン → 岩山の洞窟 ───
+  // ─── シオンタウン → 岩山の洞窟 ───
   { name: "9番道路", ver: "", pokemon: [
     { name: "コラッタ",   evs: { spe: 1 }, rate: "40%" },
     { name: "オニスズメ", evs: { spe: 1 }, rate: "35%" },
@@ -519,7 +519,7 @@ const LOCATION_DATA = [
     { name: "ワンリキー", evs: { atk: 1 }, rate: "10%" },
     { name: "イワーク",   evs: { def: 2 }, rate: "10%" },
   ]},
-  // ─── ラベンダータウン → ポケモンタワー ───
+  // ─── シオンタウン → ポケモンタワー ───
   { name: "ポケモンタワー 3F", ver: "", pokemon: [
     { name: "ゴース",   evs: { spa: 1 }, rate: "90%", best: true },
     { name: "ガラガラ", evs: { def: 2 }, rate: "9%" },
@@ -651,14 +651,14 @@ const FIELD_ITEMS = [
   { area: "ニビシティ・ニビのはくぶつかん", items: [
     { id:"nv01", name:"わざマシン39（がんせきふうじ）", type:"gym",  note:"ニビジム・タケシを倒す" },
     { id:"nv02", name:"ひみつのコハク", type:"gift",              note:"ニビのはくぶつかん・制限区域の科学者（いあいぎり必要）→ グレンじま研究所でプテラに復元" },
-    { id:"nv03", name:"ふしぎなあめ", type:"hidden",              note:"ニビのはくぶつかん裏・アイテムファインダーを使用して発見" },
+    { id:"nv03", name:"ふしぎなアメ", type:"hidden",              note:"ニビのはくぶつかん裏・アイテムファインダーを使用して発見" },
   ]},
   { area: "おつきみやま", items: [
     { id:"ot01", name:"わざマシン09（タネマシンガン）", type:"field",    note:"おつきみやま1F・アイテムボール" },
     { id:"ot02", name:"スターのかけら", type:"field",                     note:"おつきみやまB2F・アイテムボール（ロケット団員エリア東の高台）" },
     { id:"ot03", name:"わざマシン46（どろぼう）", type:"field",          note:"おつきみやまB2F・アイテムボール" },
     { id:"ot04", name:"かいのカセキ または こうらのカセキ", type:"gift", note:"おつきみやまB2F・スーパーオタクを倒した後どちらか1つ選択（かいのカセキ→オムナイト、こうらのカセキ→カブト）→ グレンじま研究所で復元" },
-    { id:"ot05", name:"ムーンのいし", type:"hidden",                      note:"おつきみやまB2F・アイテムファインダーを使用して発見" },
+    { id:"ot05", name:"つきのいし", type:"hidden",                      note:"おつきみやまB2F・アイテムファインダーを使用して発見" },
   ]},
   { area: "ハナダシティ周辺", items: [
     { id:"hd01", name:"わざマシン28（あなをほる）", type:"gift", note:"ハナダシティ・ロケット団員を倒した後にもらう" },
@@ -676,9 +676,9 @@ const FIELD_ITEMS = [
   { area: "ルート9", items: [
     { id:"r9_01", name:"わざマシン40（つばめがえし）", type:"field", note:"9番道路南西・アイテムボール" },
   ]},
-  { area: "ラベンダータウン・ルート12", items: [
-    { id:"rv01", name:"ポケフルート", type:"gift",              note:"ポケモンタワー7F・フジ老人を救出後にもらう（カビゴン起こしに必須）" },
-    { id:"rv02", name:"わざマシン27（おんがえし）", type:"gift", note:"ラベンダータウン〜ルート12のゲート2F・女性からもらう" },
+  { area: "シオンタウン・ルート12", items: [
+    { id:"rv01", name:"ポケモンのふえ", type:"gift",              note:"ポケモンタワー7F・フジ老人を救出後にもらう（カビゴン起こしに必須）" },
+    { id:"rv02", name:"わざマシン27（おんがえし）", type:"gift", note:"シオンタウン〜ルート12のゲート2F・女性からもらう" },
     { id:"rv03", name:"すごいつりざお", type:"gift",            note:"ルート12・釣り師の家の老釣り人からもらう" },
     { id:"rv04", name:"おおきなきのこ", type:"hidden",          note:"ポケモンタワー5F・チャネラーのそばでアイテムファインダーを使用" },
     { id:"rv05", name:"やすらぎのすず", type:"hidden",            note:"ポケモンタワー7F・フジ老人がいた場所でアイテムファインダー使用（救出後・シルフスコープ必要）" },
@@ -694,7 +694,7 @@ const FIELD_ITEMS = [
     { id:"tm05", name:"わざマシン33（リフレクト）", type:"gift",    note:"タマムシデパート屋上・女の子に「レモネード」を渡す" },
     { id:"tm06", name:"シルフスコープ", type:"gift",              note:"タマムシゲームコーナー地下ロケット団アジトB4F・ジョバンニを倒す（ポケモンタワー進行に必須）" },
   ]},
-  { area: "16番道路（ネムリのもり）", items: [
+  { area: "16番道路", items: [
     { id:"r16_01", name:"たべのこし", type:"hidden", note:"16番道路・カビゴンがいた場所でアイテムファインダー使用（カビゴン撃破/捕獲後）" },
   ]},
   { area: "ルート15（東ゲート）", items: [
@@ -714,7 +714,7 @@ const FIELD_ITEMS = [
     { id:"sc04", name:"ひでんマシン04（かいりき）", type:"gift",   note:"セキチクシティ・サファリゾーンの管理人（きんのいれば返却後）" },
     { id:"sc05", name:"いいつりざお", type:"gift",                 note:"セキチクシティ・南東の家の釣り人からもらう" },
   ]},
-  { area: "グレンタウン・ポケモン屋敷", items: [
+  { area: "グレンシティ・ポケモン屋敷", items: [
     { id:"gl01", name:"わざマシン38（だいもんじ）", type:"gym",  note:"グレンジム・カツラを倒す" },
     { id:"gl02", name:"ひみつのカギ", type:"field",            note:"ポケモン屋敷B1F・アイテムボール（グレンジム入場に必須）" },
   ]},
@@ -736,7 +736,7 @@ const FIELD_ITEMS = [
     { id:"i4_01", name:"ひでんマシン07（たきのぼり）", type:"field", note:"こおりのぬけみち・B1Fから南の崖上へアクセスしてアイテムボールを入手" },
   ]},
   { area: "2の島・きわのみさき（クリア後）", items: [
-    { id:"i2_01", name:"ふしぎなあめ", type:"hidden", note:"きわのみさき・Move Tutorの家の裏のコーナーでアイテムファインダーを使用" },
+    { id:"i2_01", name:"ふしぎなアメ", type:"hidden", note:"きわのみさき・わざおしえの家の裏のコーナーでアイテムファインダーを使用" },
     { id:"i2_02", name:"PPマックス", type:"hidden",   note:"きわのみさき・たきのぼり南東の陸地でアイテムファインダー使用（なみのり+たきのぼり必要）" },
   ]},
 ];
