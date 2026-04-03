@@ -65,16 +65,26 @@ python3 test_server.py
   - 英語名の音写（例：シーフォームアイランズ）も使わない
 - データ定数（`POKEMON_DATA`, `EV_YIELD` 等）の名前はそのまま維持してよい
 
-## Web検索
+## ゲームデータの調べ方
 
-ゲームデータを調べる際は**日本語ソースを優先**すること。
+ポケモン名・アイテム名・わざ名などの日本語表記は **PokéAPI** から取得すること。
 
-| 用途 | URL |
-|------|-----|
-| やっくんのポケモン図鑑（FR/LG） | https://yakkun.com/fl/ |
+```
+# ポケモン名（日本語）
+GET https://pokeapi.co/api/v2/pokemon-species/{id または 英語スラッグ}
+→ names[language=ja].name
 
-- Bulbapediaなど英語ソースではなく、上記の日本語サイトから情報を取得する
-- ポケモン名・アイテム名・地名の日本語表記の確認にも活用する
+# アイテム名（日本語）
+GET https://pokeapi.co/api/v2/item/{英語スラッグ}
+→ names[language=ja].name
+
+# わざ名（日本語）
+GET https://pokeapi.co/api/v2/move/{英語スラッグ}
+→ names[language=ja].name
+```
+
+- 言語コード `ja` → 漢字混じり、`ja-hrkt` → ひらがな/カタカナ。どちらも利用可
+- ゲームデータの場所・数値などは Bulbapedia を参照してよいが、名称は必ず PokéAPI で日本語を確認する
 
 ## よくある作業
 
