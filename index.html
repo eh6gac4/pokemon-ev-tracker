@@ -14,8 +14,19 @@
   </head>
   <body>
     <div id="root"></div>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/preact@10/dist/preact.umd.js"></script>
+    <script src="https://unpkg.com/preact@10/hooks/dist/hooks.umd.js"></script>
+    <script src="https://unpkg.com/preact@10/compat/dist/compat.umd.js"></script>
+    <script>
+      // Reactのグローバルエイリアスを設定
+      window.React = preactCompat;
+      // createRootのポリフィル（preact/compatに含まれないため）
+      window.ReactDOM = {
+        createRoot: function(container) {
+          return { render: function(el) { preact.render(el, container); } };
+        }
+      };
+    </script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="/js/data-pokemon.js"></script>
     <script src="/js/data-items.js"></script>
