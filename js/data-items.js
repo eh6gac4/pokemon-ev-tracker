@@ -25,7 +25,7 @@ const ITEM_DATA = [
   { area: "6番道路", items: [
     { id: "r06a", name: "ふしぎなアメ", type: "hidden", note: "6番道路（ダウジングマシンで発見）",                        img: "https://appmedia.jp/wp-content/uploads/2026/03/140021_6d8kl.webp" },
   ]},
-  { area: "SSアン（クチバシティ）", items: [
+  { area: "サント・アンヌごう（クチバシティ）", items: [
     { id: "ss01", name: "ひでんマシン01 いあいぎり",        type: "hm",     note: "B1F 船長の部屋（肩もみ後）" },
   ]},
   { area: "クチバシティ", items: [
@@ -423,15 +423,15 @@ const FIELD_ITEMS = [
   ]},
   { area: "ハナダシティ周辺", items: [
     { id:"hd01", name:"わざマシン28（あなをほる）", type:"gift", note:"ハナダシティ・ロケット団員を倒した後にもらう" },
-    { id:"hd02", name:"SSアンのチケット", type:"gift",           note:"ルート25・ビルの家 ビルから（ポケモン変身解除の手伝い後）" },
+    { id:"hd02", name:"サント・アンヌごうのチケット", type:"gift",           note:"ルート25・ビルの家 ビルから（ポケモン変身解除の手伝い後）" },
     { id:"hd03", name:"わざマシン03（みずのはどう）", type:"gym", note:"ハナダジム・カスミを倒す" },
   ]},
-   { area: "クチバシティ・SSアン", items: [
-    { id:"ss01", name:"ひでんマシン01（いあいぎり）", type:"gift",       note:"SSアン・船長の部屋で背中をなでてあげる" },
-    { id:"ss02", name:"わざマシン44（ねむる）", type:"field",           note:"SSアンB1F・アイテムボール" },
-    { id:"ss03", name:"わざマシン31（ブリックブレイク）", type:"field", note:"SSアン1F客室・アイテムボール" },
+   { area: "クチバシティ・サント・アンヌごう", items: [
+    { id:"ss01", name:"ひでんマシン01（いあいぎり）", type:"gift",       note:"サント・アンヌごう・船長の部屋で背中をなでてあげる" },
+    { id:"ss02", name:"わざマシン44（ねむる）", type:"field",           note:"サント・アンヌごうB1F・アイテムボール" },
+    { id:"ss03", name:"わざマシン31（ブリックブレイク）", type:"field", note:"サント・アンヌごう1F客室・アイテムボール" },
     { id:"kb01", name:"わざマシン34（でんきショック）", type:"gym",     note:"クチバジム・マチスを倒す" },
-    { id:"kb02", name:"バトルサーチャー", type:"gift",                       note:"クチバポケモンセンター・女性エーストレーナーから（SSアン乗船後）" },
+    { id:"kb02", name:"バトルサーチャー", type:"gift",                       note:"クチバポケモンセンター・女性エーストレーナーから（サント・アンヌごう乗船後）" },
     { id:"kb03", name:"ボロのつりざお", type:"gift",                    note:"クチバシティ・北西の釣り人の家" },
     { id:"kb04", name:"じてんしゃ", type:"gift",                        note:"クチバシティ・ポケモンだいすきクラブの会長に話しかけると「じてんしゃけん」をもらえる→ハナダシティの自転車屋で交換" },
   ]},
