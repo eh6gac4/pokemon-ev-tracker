@@ -18,8 +18,29 @@ function EVTracker() {
 
   // pull-to-refresh
   useEffect(() => {
+    const THRESHOLD = 80;
     let startY = 0;
     let pulling = false;
+
+    // indicator element
+    const el = document.createElement("div");
+    el.id = "ptr-indicator";
+    el.innerHTML = `<span id="ptr-icon">↓</span><span id="ptr-label">引いてリロード</span>`;
+    document.body.prepend(el);
+
+    const update = (dist) => {
+      const ratio  = Math.min(dist / THRESHOLD, 1);
+      const ready  = dist >= THRESHOLD;
+      el.style.opacity  = String(Math.min(ratio * 1.5, 1));
+      el.style.transform = `translateY(${Math.min(dist * 0.4, 40)}px)`;
+      document.getElementById("ptr-icon").style.transform  = `rotate(${ready ? 180 : ratio * 160}deg)`;
+      document.getElementById("ptr-label").textContent = ready ? "離してリロード" : "引いてリロード";
+      el.classList.toggle("ptr-ready", ready);
+    };
+    const hide = () => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(0)";
+    };
 
     const onTouchStart = (e) => {
       if (window.scrollY === 0) {
@@ -27,18 +48,35 @@ function EVTracker() {
         pulling = true;
       }
     };
+    const onTouchMove = (e) => {
+      if (!pulling) return;
+      const dist = e.touches[0].clientY - startY;
+      if (dist > 0) update(dist);
+    };
     const onTouchEnd = (e) => {
       if (!pulling) return;
-      const dist = e.changedTouches[0].clientY - startY;
-      if (dist > 80) location.reload();
       pulling = false;
+      const dist = e.changedTouches[0].clientY - startY;
+      if (dist >= THRESHOLD) {
+        el.style.opacity = "1";
+        el.style.transform = "translateY(32px)";
+        document.getElementById("ptr-icon").textContent = "↻";
+        document.getElementById("ptr-icon").style.animation = "ptr-spin 0.6s linear infinite";
+        document.getElementById("ptr-label").textContent = "リロード中…";
+        setTimeout(() => location.reload(), 600);
+      } else {
+        hide();
+      }
     };
 
     document.addEventListener("touchstart", onTouchStart, { passive: true });
+    document.addEventListener("touchmove",  onTouchMove,  { passive: true });
     document.addEventListener("touchend",   onTouchEnd,   { passive: true });
     return () => {
       document.removeEventListener("touchstart", onTouchStart);
+      document.removeEventListener("touchmove",  onTouchMove);
       document.removeEventListener("touchend",   onTouchEnd);
+      el.remove();
     };
   }, []);
 
