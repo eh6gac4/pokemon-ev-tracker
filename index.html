@@ -2703,6 +2703,74 @@ function AdventureTab({ color }) {
   );
 }
 
+function TodoList({ color, todos, onAdd, onToggle, onDelete }) {
+  const [text, setText] = useState("");
+  const submit = () => {
+    const t = text.trim();
+    if (!t) return;
+    onAdd(t);
+    setText("");
+  };
+  const doneCount = todos.filter(t => t.done).length;
+  return (
+    <div className="card" style={{ padding: "12px 14px", marginBottom: "12px", borderColor: color + "33" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+        <span style={{ fontSize: "11px", color, letterSpacing: "1px" }}>📝 やることリスト</span>
+        {todos.length > 0 && (
+          <span style={{ fontSize: "10px", color: doneCount >= todos.length ? "#7fff7f" : "#555" }}>
+            {doneCount}/{todos.length}
+          </span>
+        )}
+      </div>
+      <div style={{ display: "flex", gap: "6px", marginBottom: todos.length > 0 ? "8px" : "0" }}>
+        <input
+          value={text}
+          onChange={e => setText(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && submit()}
+          placeholder="やることを入力…"
+          style={{
+            flex: 1, background: "#0e0e1e", border: "1px solid #2a2a4a",
+            borderRadius: "6px", color: "#ddd", fontSize: "12px",
+            padding: "7px 10px", fontFamily: "inherit", outline: "none",
+          }}
+        />
+        <button onClick={submit} style={{
+          background: color + "22", border: `1px solid ${color + "55"}`,
+          borderRadius: "6px", color, fontSize: "16px", padding: "4px 12px",
+          cursor: "pointer", fontFamily: "inherit", lineHeight: 1,
+        }}>＋</button>
+      </div>
+      {todos.length === 0 && (
+        <div style={{ textAlign: "center", fontSize: "10px", color: "#2a2a4a", padding: "8px 0 2px" }}>
+          やることを追加しよう
+        </div>
+      )}
+      {todos.map((todo, idx) => (
+        <div key={todo.id} style={{
+          display: "flex", alignItems: "center", gap: "8px",
+          padding: "7px 2px",
+          borderTop: idx === 0 ? "1px solid #1a1a2e" : "none",
+          borderBottom: "1px solid #1a1a2e",
+        }}>
+          <input type="checkbox" checked={todo.done} onChange={() => onToggle(todo.id)}
+            style={{ accentColor: color, cursor: "pointer", flexShrink: 0 }} />
+          <span style={{
+            flex: 1, fontSize: "11px",
+            color: todo.done ? "#444" : "#ddd",
+            textDecoration: todo.done ? "line-through" : "none",
+            wordBreak: "break-all",
+          }}>{todo.text}</span>
+          <button onClick={() => onDelete(todo.id)} style={{
+            background: "transparent", border: "none", color: "#333",
+            cursor: "pointer", fontSize: "13px", padding: "0 2px",
+            fontFamily: "inherit", flexShrink: 0,
+          }}>✕</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
   const [filter,    setFilter]    = useState("all");
   const [openAreas, setOpenAreas] = useState({});
@@ -2819,6 +2887,7 @@ function EVTracker() {
   const [newColor,     setNewColor]     = useState(COLORS[0]);
   const [newDexId,     setNewDexId]     = useState(null);
   const [checkedItems, setCheckedItems] = useState({});
+  const [todoList,     setTodoList]     = useState([]);
 
   useEffect(() => {
     fetch("/api/data")
@@ -2833,6 +2902,7 @@ function EVTracker() {
         if (saved.allMoves)     setAllMoves(saved.allMoves);
         if (saved.selected)     setSelected(saved.selected);
         if (saved.checkedItems) setCheckedItems(saved.checkedItems);
+        if (saved.todoList)     setTodoList(saved.todoList);
       })
       .catch(() => {})
       .finally(() => setLoaded(true));
@@ -2843,12 +2913,16 @@ function EVTracker() {
     fetch("/api/data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems }),
+      body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems, todoList }),
     }).catch(() => {});
-  }, [party, allEVs, allMoves, selected, checkedItems, loaded]);
+  }, [party, allEVs, allMoves, selected, checkedItems, todoList, loaded]);
 
   const toggleItem = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
   const resetItems = () => setCheckedItems({});
+
+  const addTodo    = (text) => setTodoList(prev => [...prev, { id: Date.now().toString(), text, done: false }]);
+  const toggleTodo = (id)  => setTodoList(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  const deleteTodo = (id)  => setTodoList(prev => prev.filter(t => t.id !== id));
 
   const mon       = party.find(p => p.name === selected) || party[0];
   const evs       = allEVs[selected] || initEVs();
@@ -3038,6 +3112,7 @@ function EVTracker() {
 
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
+          <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} />
           <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
         </div>
       </div>
