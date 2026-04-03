@@ -15,6 +15,8 @@ function EVTracker() {
   const [todoList,     setTodoList]     = useState([]);
   const [renaming,     setRenaming]     = useState(false);
   const [renameValue,  setRenameValue]  = useState("");
+  const [iconEditing,  setIconEditing]  = useState(false);
+  const [iconValue,    setIconValue]    = useState("");
 
   // pull-to-refresh
   useEffect(() => {
@@ -136,6 +138,12 @@ function EVTracker() {
 
   const updateMemo   = (text) => setParty(prev => prev.map(p => p.name === selected ? { ...p, memo: text } : p));
   const updateNature = (name) => setParty(prev => prev.map(p => p.name === selected ? { ...p, nature: name } : p));
+  const updateIcon   = (icon) => {
+    const trimmed = icon.trim();
+    if (!trimmed) return;
+    setParty(prev => prev.map(p => p.name === selected ? { ...p, icon: trimmed } : p));
+    setIconEditing(false);
+  };
 
   const updateMove = (slot, move) => setAllMoves(prev => {
     const cur = prev[selected] || ["","","",""];
@@ -322,6 +330,26 @@ function EVTracker() {
           ) : (
             <button onClick={() => { setRenameValue(selected); setRenaming(true); }} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px", marginBottom: "10px" }}>
               ✏️ 名前を変更
+            </button>
+          )}
+
+          {iconEditing ? (
+            <div style={{ display: "flex", gap: "6px", marginBottom: "10px", alignItems: "center" }}>
+              <span style={{ fontSize: "11px", color: "#555", whiteSpace: "nowrap" }}>アイコン</span>
+              <input
+                autoFocus
+                value={iconValue}
+                onChange={e => setIconValue(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter" && !e.isComposing) updateIcon(iconValue); if (e.key === "Escape") setIconEditing(false); }}
+                placeholder="絵文字を入力"
+                style={{ flex: 1, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "20px", padding: "6px 10px", fontFamily: "inherit", outline: "none", textAlign: "center" }}
+              />
+              <button onClick={() => updateIcon(iconValue)} style={{ background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: mon.color, fontSize: "11px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
+              <button onClick={() => setIconEditing(false)} style={{ background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "8px 10px", cursor: "pointer", fontFamily: "inherit" }}>×</button>
+            </div>
+          ) : (
+            <button onClick={() => { setIconValue(mon.icon || ""); setIconEditing(true); }} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px", marginBottom: "10px" }}>
+              {mon.icon} アイコンを変更
             </button>
           )}
 
