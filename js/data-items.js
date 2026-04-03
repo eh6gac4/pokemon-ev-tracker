@@ -31,6 +31,7 @@ const ITEM_DATA = [
   { area: "クチバシティ", items: [
     { id: "ku01", name: "わざマシン34 でんきショック",     type: "tm",     note: "マチス撃破後にもらえる" },
     { id: "ku02", name: "ひきかえけん",                    type: "gift",   note: "クチバ ポケモンファンクラブ会長から（話を聞くだけ）" },
+    { id: "ku03", name: "バトルサーチャー",                type: "gift",   note: "クチバシティ ポケモンセンター内の女の子から" },
   ]},
   { area: "11番道路", items: [
     { id: "r11a", name: "ダウジングマシン",                type: "gift",   note: "クチバシティ側ゲート2F・オーキド博士の助手（図鑑30匹以上）" },
