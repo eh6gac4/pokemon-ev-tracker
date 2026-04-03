@@ -1265,3 +1265,45 @@ function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
   );
 }
 
+function MoveTutorPanel({ color }) {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <div style={{ marginBottom: "10px" }}>
+      <button onClick={() => setOpen(o => !o)} className="panel-toggle"
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color }}>
+        <span>📖 教え技の場所</span>
+        <span style={{ fontSize: "10px", color: "#555" }}>{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="panel-body" style={{ borderColor: color + "33", padding: "6px 8px" }}>
+          {TUTOR_LOCATIONS.map((t, i) => {
+            const md = MOVE_DATA[t.move];
+            const tc = md ? (TYPE_COLORS[md[0]] || "#555") : "#555";
+            return (
+              <div key={t.move} style={{
+                display: "flex", alignItems: "flex-start", gap: "8px", padding: "5px 2px",
+                borderBottom: i < TUTOR_LOCATIONS.length - 1 ? "1px solid #1a2a3a" : "none",
+              }}>
+                <span style={{
+                  fontSize: "9px", padding: "1px 5px", borderRadius: "3px",
+                  background: tc + "22", color: tc, border: `1px solid ${tc}44`,
+                  flexShrink: 0, marginTop: "1px", whiteSpace: "nowrap",
+                }}>{md ? md[0] : "？"}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: "11px", color: "#e8e8e8" }}>{t.move}</div>
+                  <div style={{ fontSize: "9px", color: color + "cc", marginTop: "1px" }}>{t.location}</div>
+                  <div style={{ fontSize: "9px", color: "#555", marginTop: "1px" }}>{t.note}</div>
+                </div>
+              </div>
+            );
+          })}
+          <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", marginTop: "8px", letterSpacing: "1px" }}>
+            FR/LG · すべて1回限り
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+

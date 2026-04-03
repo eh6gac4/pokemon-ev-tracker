@@ -382,6 +382,7 @@ function EVTracker() {
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
           <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} />
+          <MoveTutorPanel color={mon.color} />
           <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
         </div>
       </div>
