@@ -101,7 +101,7 @@ const ITEM_DATA = [
     { id: "ch02", name: "ふしぎなアメ", type: "field",  note: "チャンピオンロード1F（アイテムボール）",                      img: "https://appmedia.jp/wp-content/uploads/2026/03/143122_gc2q4.webp" },
   ]},
   { area: "ハナダの洞窟（クリア後）", items: [
-    { id: "ce01", name: "フリーザー",                      type: "field",  note: "ハナダの洞窟 B4F（1匹のみ）" },
+    { id: "ce01", name: "フリーザー",                      type: "field",  note: "ふたごじま B4F（1匹のみ）" },
     { id: "ce02", name: "ミュウツー",                      type: "field",  note: "ハナダの洞窟 最深部（1匹のみ）" },
   ]},
   { area: "7の島（クリア後）", items: [
