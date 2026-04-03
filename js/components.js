@@ -504,11 +504,9 @@ function PokedexPanel({ color }) {
           tmMoves.length === 0
             ? <div style={{ fontSize: "10px", color: "#333" }}>データなし</div>
             : <div style={{ maxHeight: "240px", overflowY: "auto" }}>
-                {tmMoves.map((entry, i) => {
-                  const tmLabel = (entry.match(/（([TH]M\d+)）/) || [])[1] || "";
-                  const move    = entry.replace(/（[TH]M\d+）/, "").trim();
-                  return <MoveRow key={i} move={move} prefix={{ text: tmLabel, minWidth: "36px" }} />;
-                })}
+                {tmMoves.map((id, i) => (
+                  <MoveRow key={i} move={TM_LIST[id] || id} prefix={{ text: id, minWidth: "36px" }} />
+                ))}
               </div>
         )}
 
