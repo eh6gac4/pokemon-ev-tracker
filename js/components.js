@@ -1,5 +1,12 @@
 const { useState, useEffect, useRef } = React;
 
+function tmItemName(item) {
+  if (!item.tmId) return item.name;
+  const num = item.tmId.slice(2);
+  const prefix = item.tmId.startsWith("HM") ? "ひでんマシン" : "わざマシン";
+  return `${prefix}${num} ${TM_LIST[item.tmId] || ""}`;
+}
+
 function AutoTextarea({ value, onChange, placeholder }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -841,11 +848,10 @@ function MovePicker({ moves, color, onChange, learnableMoves, learnset }) {
     });
     const sections = [
       { key: "lv",    label: "レベルアップ", items: lvUniq.map(([lvl, name]) => ({ name, badge: `Lv.${lvl}` })) },
-      { key: "tm",    label: "TM・HM",       items: tm.map(entry => {
-        const name  = entry.replace(/（[TH]M\d+）/, "").trim();
-        const badge = (entry.match(/（([TH]M\d+)）/) || [])[1] || "";
-        return { name, badge };
-      })},
+      { key: "tm",    label: "TM・HM",       items: tm.map(id => ({
+        name:  TM_LIST[id] || id,
+        badge: id,
+      }))},
       { key: "egg",   label: "遺伝技",       items: egg.map(name => ({ name, badge: null })) },
       { key: "tutor", label: "教え技",       items: tutor.map(name => ({ name, badge: null })) },
     ].filter(s => s.items.length > 0);
@@ -1003,7 +1009,7 @@ function AdventureTab({ color }) {
                       <div style={{ flex: 1 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                           <span style={{ fontSize: "11px", color: isDone ? "#555" : "#ddd", textDecoration: isDone ? "line-through" : "none" }}>
-                            {item.name}
+                            {tmItemName(item)}
                           </span>
                           <span style={{ fontSize: "9px", padding: "1px 5px", borderRadius: "3px", background: meta.bg, color: meta.col, flexShrink: 0 }}>
                             {meta.label}
@@ -1232,7 +1238,7 @@ function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
                       <span style={{ fontSize: "10px", flexShrink: 0, opacity: 0.6 }}>{TYPE_ICON[item.type]}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: "11px", color: checkedItems[item.id] ? "#444" : "#e8e8e8", textDecoration: checkedItems[item.id] ? "line-through" : "none" }}>
-                          {item.name}
+                          {tmItemName(item)}
                         </div>
                         {item.note && (
                           <div style={{ fontSize: "9px", color: "#555", marginTop: "1px" }}>{item.note}</div>
