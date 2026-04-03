@@ -16,6 +16,32 @@ function EVTracker() {
   const [renaming,     setRenaming]     = useState(false);
   const [renameValue,  setRenameValue]  = useState("");
 
+  // pull-to-refresh
+  useEffect(() => {
+    let startY = 0;
+    let pulling = false;
+
+    const onTouchStart = (e) => {
+      if (window.scrollY === 0) {
+        startY = e.touches[0].clientY;
+        pulling = true;
+      }
+    };
+    const onTouchEnd = (e) => {
+      if (!pulling) return;
+      const dist = e.changedTouches[0].clientY - startY;
+      if (dist > 80) location.reload();
+      pulling = false;
+    };
+
+    document.addEventListener("touchstart", onTouchStart, { passive: true });
+    document.addEventListener("touchend",   onTouchEnd,   { passive: true });
+    return () => {
+      document.removeEventListener("touchstart", onTouchStart);
+      document.removeEventListener("touchend",   onTouchEnd);
+    };
+  }, []);
+
   useEffect(() => {
     fetch("/api/data")
       .then(r => r.json())
