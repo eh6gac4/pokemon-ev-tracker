@@ -4,6 +4,7 @@
 標準ライブラリのみ使用（追加インストール不要）
 """
 
+import gzip
 import http.server
 import json
 import os
@@ -77,9 +78,17 @@ class Handler(http.server.BaseHTTPRequestHandler):
             ".json": "application/json",
         }.get(file_path.suffix, "application/octet-stream")
         body = file_path.read_bytes()
+        accept_enc = self.headers.get("Accept-Encoding", "")
+        if "gzip" in accept_enc and file_path.suffix in (".html", ".js", ".css", ".json"):
+            body = gzip.compress(body, compresslevel=6)
+            encoding = "gzip"
+        else:
+            encoding = None
         self.send_response(200)
         self.send_header("Content-Type", mime)
         self.send_header("Content-Length", str(len(body)))
+        if encoding:
+            self.send_header("Content-Encoding", encoding)
         cache = "no-store" if file_path.suffix in (".png", ".ico") else "no-cache"
         self.send_header("Cache-Control", cache)
         self.end_headers()
