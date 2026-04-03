@@ -1100,10 +1100,13 @@ function TodoList({ color, todos, onAdd, onToggle, onDelete }) {
             wordBreak: "break-all",
           }}>{todo.text}</span>
           <button onClick={() => onDelete(todo.id)} style={{
-            background: "transparent", border: "none", color: "#333",
+            background: "transparent", border: "none", color: "#555",
             cursor: "pointer", fontSize: "13px", padding: "0 2px",
             fontFamily: "inherit", flexShrink: 0,
-          }}>✕</button>
+          }}
+            onMouseEnter={e => e.currentTarget.style.color = "#e05555"}
+            onMouseLeave={e => e.currentTarget.style.color = "#555"}
+          >✕</button>
         </div>
       ))}
     </div>
