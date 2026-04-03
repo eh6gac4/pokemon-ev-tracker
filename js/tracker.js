@@ -44,8 +44,11 @@ function EVTracker() {
       el.style.transform = "translateY(0)";
     };
 
+    const getScrollTop = () =>
+      window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
     const onTouchStart = (e) => {
-      if (window.scrollY === 0) {
+      if (getScrollTop() === 0) {
         startY = e.touches[0].clientY;
         pulling = true;
       }
@@ -53,7 +56,14 @@ function EVTracker() {
     const onTouchMove = (e) => {
       if (!pulling) return;
       const dist = e.touches[0].clientY - startY;
-      if (dist > 0) update(dist);
+      if (dist > 0) {
+        // iOS PWAのネイティブバウンスと競合しないよう伝播を止める
+        if (e.cancelable) e.preventDefault();
+        update(dist);
+      } else {
+        pulling = false;
+        hide();
+      }
     };
     const onTouchEnd = (e) => {
       if (!pulling) return;
@@ -72,7 +82,7 @@ function EVTracker() {
     };
 
     document.addEventListener("touchstart", onTouchStart, { passive: true });
-    document.addEventListener("touchmove",  onTouchMove,  { passive: true });
+    document.addEventListener("touchmove",  onTouchMove,  { passive: false }); // iOSでpreventDefault可能にする
     document.addEventListener("touchend",   onTouchEnd,   { passive: true });
     return () => {
       document.removeEventListener("touchstart", onTouchStart);
