@@ -1042,14 +1042,26 @@ function AdventureTab({ color }) {
   );
 }
 
-function TodoList({ color, todos, onAdd, onToggle, onDelete }) {
+function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename }) {
   const [text, setText] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState("");
   const submit = () => {
     const t = text.trim();
     if (!t) return;
     onAdd(t);
     setText("");
   };
+  const startEdit = (todo) => {
+    setEditingId(todo.id);
+    setEditText(todo.text);
+  };
+  const commitEdit = (id) => {
+    const t = editText.trim();
+    if (t) onRename(id, t);
+    setEditingId(null);
+  };
+  const cancelEdit = () => setEditingId(null);
   const doneCount = todos.filter(t => t.done).length;
   return (
     <div className="card" style={{ padding: "12px 14px", marginBottom: "12px", borderColor: color + "33" }}>
@@ -1093,12 +1105,35 @@ function TodoList({ color, todos, onAdd, onToggle, onDelete }) {
         }}>
           <input type="checkbox" checked={todo.done} onChange={() => onToggle(todo.id)}
             style={{ accentColor: color, cursor: "pointer", flexShrink: 0 }} />
-          <span style={{
-            flex: 1, fontSize: "11px",
-            color: todo.done ? "#444" : "#ddd",
-            textDecoration: todo.done ? "line-through" : "none",
-            wordBreak: "break-all",
-          }}>{todo.text}</span>
+          {editingId === todo.id ? (
+            <input
+              autoFocus
+              value={editText}
+              onChange={e => setEditText(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === "Enter" && !e.isComposing) commitEdit(todo.id);
+                if (e.key === "Escape") cancelEdit();
+              }}
+              onBlur={() => commitEdit(todo.id)}
+              style={{
+                flex: 1, background: "#0e0e1e", border: `1px solid ${color}88`,
+                borderRadius: "4px", color: "#ddd", fontSize: "11px",
+                padding: "3px 6px", fontFamily: "inherit", outline: "none",
+              }}
+            />
+          ) : (
+            <span
+              onDoubleClick={() => !todo.done && startEdit(todo)}
+              title={todo.done ? "" : "ダブルクリックで編集"}
+              style={{
+                flex: 1, fontSize: "11px",
+                color: todo.done ? "#444" : "#ddd",
+                textDecoration: todo.done ? "line-through" : "none",
+                wordBreak: "break-all",
+                cursor: todo.done ? "default" : "text",
+              }}
+            >{todo.text}</span>
+          )}
           <button onClick={() => onDelete(todo.id)} style={{
             background: "transparent", border: "none", color: "#555",
             cursor: "pointer", fontSize: "13px", padding: "0 2px",

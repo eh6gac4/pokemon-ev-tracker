@@ -50,6 +50,7 @@ function EVTracker() {
   const addTodo    = (text) => setTodoList(prev => [...prev, { id: Date.now().toString(), text, done: false }]);
   const toggleTodo = (id)  => setTodoList(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
   const deleteTodo = (id)  => setTodoList(prev => prev.filter(t => t.id !== id));
+  const renameTodo = (id, text) => setTodoList(prev => prev.map(t => t.id === id ? { ...t, text } : t));
 
   const mon       = party.find(p => p.name === selected) || party[0];
   const evs       = allEVs[selected] || initEVs();
@@ -278,7 +279,7 @@ function EVTracker() {
 
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
-          <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} />
+          <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} />
           <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
         </div>
       </div>
