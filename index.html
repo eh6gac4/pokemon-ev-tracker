@@ -157,6 +157,165 @@ const POKEMON_DATA = [
 // [id, name, hp, atk, def, spa, spd, spe] のインデックス
 const PD = { hp:2, atk:3, def:4, spa:5, spd:6, spe:7 };
 
+// 進化データ（FR/LG 第1世代 151匹）
+// EVOLUTION_DATA[dexId] = { pre:[{id,cond}], next:[{id,cond}] }
+const EVOLUTION_DATA = {
+  1:{next:[{id:2,cond:"Lv.16"}]},
+  2:{pre:[{id:1,cond:"Lv.16"}],next:[{id:3,cond:"Lv.32"}]},
+  3:{pre:[{id:2,cond:"Lv.32"}]},
+  4:{next:[{id:5,cond:"Lv.16"}]},
+  5:{pre:[{id:4,cond:"Lv.16"}],next:[{id:6,cond:"Lv.36"}]},
+  6:{pre:[{id:5,cond:"Lv.36"}]},
+  7:{next:[{id:8,cond:"Lv.16"}]},
+  8:{pre:[{id:7,cond:"Lv.16"}],next:[{id:9,cond:"Lv.36"}]},
+  9:{pre:[{id:8,cond:"Lv.36"}]},
+  10:{next:[{id:11,cond:"Lv.7"}]},
+  11:{pre:[{id:10,cond:"Lv.7"}],next:[{id:12,cond:"Lv.10"}]},
+  12:{pre:[{id:11,cond:"Lv.10"}]},
+  13:{next:[{id:14,cond:"Lv.7"}]},
+  14:{pre:[{id:13,cond:"Lv.7"}],next:[{id:15,cond:"Lv.10"}]},
+  15:{pre:[{id:14,cond:"Lv.10"}]},
+  16:{next:[{id:17,cond:"Lv.18"}]},
+  17:{pre:[{id:16,cond:"Lv.18"}],next:[{id:18,cond:"Lv.36"}]},
+  18:{pre:[{id:17,cond:"Lv.36"}]},
+  19:{next:[{id:20,cond:"Lv.20"}]},
+  20:{pre:[{id:19,cond:"Lv.20"}]},
+  21:{next:[{id:22,cond:"Lv.20"}]},
+  22:{pre:[{id:21,cond:"Lv.20"}]},
+  23:{next:[{id:24,cond:"Lv.22"}]},
+  24:{pre:[{id:23,cond:"Lv.22"}]},
+  25:{next:[{id:26,cond:"かみなりのいし"}]},
+  26:{pre:[{id:25,cond:"かみなりのいし"}]},
+  27:{next:[{id:28,cond:"Lv.22"}]},
+  28:{pre:[{id:27,cond:"Lv.22"}]},
+  29:{next:[{id:30,cond:"Lv.16"}]},
+  30:{pre:[{id:29,cond:"Lv.16"}],next:[{id:31,cond:"つきのいし"}]},
+  31:{pre:[{id:30,cond:"つきのいし"}]},
+  32:{next:[{id:33,cond:"Lv.16"}]},
+  33:{pre:[{id:32,cond:"Lv.16"}],next:[{id:34,cond:"つきのいし"}]},
+  34:{pre:[{id:33,cond:"つきのいし"}]},
+  35:{next:[{id:36,cond:"つきのいし"}]},
+  36:{pre:[{id:35,cond:"つきのいし"}]},
+  37:{next:[{id:38,cond:"ほのおのいし"}]},
+  38:{pre:[{id:37,cond:"ほのおのいし"}]},
+  39:{next:[{id:40,cond:"つきのいし"}]},
+  40:{pre:[{id:39,cond:"つきのいし"}]},
+  41:{next:[{id:42,cond:"Lv.22"}]},
+  42:{pre:[{id:41,cond:"Lv.22"}]},
+  43:{next:[{id:44,cond:"Lv.21"}]},
+  44:{pre:[{id:43,cond:"Lv.21"}],next:[{id:45,cond:"はっぱのいし"}]},
+  45:{pre:[{id:44,cond:"はっぱのいし"}]},
+  46:{next:[{id:47,cond:"Lv.24"}]},
+  47:{pre:[{id:46,cond:"Lv.24"}]},
+  48:{next:[{id:49,cond:"Lv.31"}]},
+  49:{pre:[{id:48,cond:"Lv.31"}]},
+  50:{next:[{id:51,cond:"Lv.26"}]},
+  51:{pre:[{id:50,cond:"Lv.26"}]},
+  52:{next:[{id:53,cond:"Lv.28"}]},
+  53:{pre:[{id:52,cond:"Lv.28"}]},
+  54:{next:[{id:55,cond:"Lv.33"}]},
+  55:{pre:[{id:54,cond:"Lv.33"}]},
+  56:{next:[{id:57,cond:"Lv.28"}]},
+  57:{pre:[{id:56,cond:"Lv.28"}]},
+  58:{next:[{id:59,cond:"ほのおのいし"}]},
+  59:{pre:[{id:58,cond:"ほのおのいし"}]},
+  60:{next:[{id:61,cond:"Lv.25"}]},
+  61:{pre:[{id:60,cond:"Lv.25"}],next:[{id:62,cond:"みずのいし"}]},
+  62:{pre:[{id:61,cond:"みずのいし"}]},
+  63:{next:[{id:64,cond:"通信交換"}]},
+  64:{pre:[{id:63,cond:"通信交換"}],next:[{id:65,cond:"通信交換"}]},
+  65:{pre:[{id:64,cond:"通信交換"}]},
+  66:{next:[{id:67,cond:"Lv.28"}]},
+  67:{pre:[{id:66,cond:"Lv.28"}],next:[{id:68,cond:"通信交換"}]},
+  68:{pre:[{id:67,cond:"通信交換"}]},
+  69:{next:[{id:70,cond:"Lv.21"}]},
+  70:{pre:[{id:69,cond:"Lv.21"}],next:[{id:71,cond:"はっぱのいし"}]},
+  71:{pre:[{id:70,cond:"はっぱのいし"}]},
+  72:{next:[{id:73,cond:"Lv.30"}]},
+  73:{pre:[{id:72,cond:"Lv.30"}]},
+  74:{next:[{id:75,cond:"Lv.25"}]},
+  75:{pre:[{id:74,cond:"Lv.25"}],next:[{id:76,cond:"通信交換"}]},
+  76:{pre:[{id:75,cond:"通信交換"}]},
+  77:{next:[{id:78,cond:"Lv.40"}]},
+  78:{pre:[{id:77,cond:"Lv.40"}]},
+  79:{next:[{id:80,cond:"Lv.37"}]},
+  80:{pre:[{id:79,cond:"Lv.37"}]},
+  81:{next:[{id:82,cond:"Lv.30"}]},
+  82:{pre:[{id:81,cond:"Lv.30"}]},
+  84:{next:[{id:85,cond:"Lv.31"}]},
+  85:{pre:[{id:84,cond:"Lv.31"}]},
+  86:{next:[{id:87,cond:"Lv.34"}]},
+  87:{pre:[{id:86,cond:"Lv.34"}]},
+  88:{next:[{id:89,cond:"Lv.38"}]},
+  89:{pre:[{id:88,cond:"Lv.38"}]},
+  90:{next:[{id:91,cond:"みずのいし"}]},
+  91:{pre:[{id:90,cond:"みずのいし"}]},
+  92:{next:[{id:93,cond:"Lv.25"}]},
+  93:{pre:[{id:92,cond:"Lv.25"}],next:[{id:94,cond:"通信交換"}]},
+  94:{pre:[{id:93,cond:"通信交換"}]},
+  96:{next:[{id:97,cond:"Lv.26"}]},
+  97:{pre:[{id:96,cond:"Lv.26"}]},
+  98:{next:[{id:99,cond:"Lv.28"}]},
+  99:{pre:[{id:98,cond:"Lv.28"}]},
+  100:{next:[{id:101,cond:"Lv.30"}]},
+  101:{pre:[{id:100,cond:"Lv.30"}]},
+  102:{next:[{id:103,cond:"はっぱのいし"}]},
+  103:{pre:[{id:102,cond:"はっぱのいし"}]},
+  104:{next:[{id:105,cond:"Lv.28"}]},
+  105:{pre:[{id:104,cond:"Lv.28"}]},
+  109:{next:[{id:110,cond:"Lv.35"}]},
+  110:{pre:[{id:109,cond:"Lv.35"}]},
+  111:{next:[{id:112,cond:"Lv.40"}]},
+  112:{pre:[{id:111,cond:"Lv.40"}]},
+  116:{next:[{id:117,cond:"Lv.32"}]},
+  117:{pre:[{id:116,cond:"Lv.32"}]},
+  118:{next:[{id:119,cond:"Lv.33"}]},
+  119:{pre:[{id:118,cond:"Lv.33"}]},
+  120:{next:[{id:121,cond:"みずのいし"}]},
+  121:{pre:[{id:120,cond:"みずのいし"}]},
+  129:{next:[{id:130,cond:"Lv.20"}]},
+  130:{pre:[{id:129,cond:"Lv.20"}]},
+  133:{next:[{id:134,cond:"みずのいし"},{id:135,cond:"かみなりのいし"},{id:136,cond:"ほのおのいし"}]},
+  134:{pre:[{id:133,cond:"みずのいし"}]},
+  135:{pre:[{id:133,cond:"かみなりのいし"}]},
+  136:{pre:[{id:133,cond:"ほのおのいし"}]},
+  138:{next:[{id:139,cond:"Lv.40"}]},
+  139:{pre:[{id:138,cond:"Lv.40"}]},
+  140:{next:[{id:141,cond:"Lv.40"}]},
+  141:{pre:[{id:140,cond:"Lv.40"}]},
+  147:{next:[{id:148,cond:"Lv.30"}]},
+  148:{pre:[{id:147,cond:"Lv.30"}],next:[{id:149,cond:"Lv.55"}]},
+  149:{pre:[{id:148,cond:"Lv.55"}]},
+};
+
+// 進化チェーンの全経路を返す（分岐あり対応）
+// 各経路は [{type:"mon",id,name} | {type:"cond",cond}] の配列
+function getEvoPaths(dexId) {
+  // ルートまで遡る
+  let root = dexId;
+  const visited = new Set();
+  while (EVOLUTION_DATA[root] && EVOLUTION_DATA[root].pre && EVOLUTION_DATA[root].pre.length > 0) {
+    if (visited.has(root)) break;
+    visited.add(root);
+    root = EVOLUTION_DATA[root].pre[0].id;
+  }
+  // ルートから全経路をDFSで列挙
+  function dfs(id) {
+    const name = POKEMON_DATA[id - 1][1];
+    const e = EVOLUTION_DATA[id];
+    const nexts = (e && e.next) || [];
+    if (nexts.length === 0) return [[{ type: "mon", id, name }]];
+    const paths = [];
+    for (const n of nexts) {
+      for (const sub of dfs(n.id)) {
+        paths.push([{ type: "mon", id, name }, { type: "cond", cond: n.cond }, ...sub]);
+      }
+    }
+    return paths;
+  }
+  return dfs(root);
+}
+
 // 倒した時に得られるEV [hp,atk,def,spa,spd,spe]（Bulbapedia Gen III）
 const EV_YIELD = [
   [0,0,0,1,0,0],[0,0,0,1,1,0],[0,0,0,2,1,0], // 001-003
@@ -2144,6 +2303,41 @@ function PokedexPanel({ color }) {
         })}
         <div style={{ textAlign: "right", fontSize: "9px", color: "#444", marginTop: "2px" }}>合計 {total}</div>
       </div>
+
+      {/* 進化 */}
+      {(() => {
+        const paths = getEvoPaths(p[0]);
+        const hasEvo = EVOLUTION_DATA[p[0]] !== undefined;
+        return (
+          <div style={{ marginBottom: "14px" }}>
+            <div style={{ fontSize: "10px", color: "#555", marginBottom: "5px", letterSpacing: "1px" }}>進化</div>
+            {!hasEvo
+              ? <div style={{ fontSize: "10px", color: "#333" }}>進化なし</div>
+              : <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {paths.map((path, pi) => (
+                    <div key={pi} style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "2px" }}>
+                      {path.map((step, si) =>
+                        step.type === "cond"
+                          ? <span key={si} style={{ fontSize: "9px", color: "#444", padding: "0 1px" }}>→ {step.cond} →</span>
+                          : <span key={si}
+                              onClick={() => step.id !== p[0] && setMon(step.id - 1)}
+                              style={{
+                                fontSize: "11px", padding: "1px 5px", borderRadius: "4px",
+                                background: step.id === p[0] ? "#ffffff22" : "transparent",
+                                color: step.id === p[0] ? "#fff" : "#666",
+                                border: step.id === p[0] ? "1px solid #ffffff33" : "1px solid transparent",
+                                cursor: step.id !== p[0] ? "pointer" : "default",
+                              }}>
+                              {step.name}
+                            </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+            }
+          </div>
+        );
+      })()}
 
       {/* 出現場所 */}
       {(() => {
