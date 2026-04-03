@@ -150,7 +150,7 @@ function AddMonModal({ newName, newIcon, newColor, newDexId, setNewName, setNewI
       <input
         value={newName}
         onChange={e => setNewName(e.target.value)}
-        onKeyDown={e => e.key === "Enter" && onAdd()}
+        onKeyDown={e => e.key === "Enter" && !e.isComposing && onAdd()}
         placeholder="なまえ（例：ゲンガー）"
         className="input-dark"
         style={{ width: "100%", fontSize: "13px", padding: "8px 10px", marginBottom: "8px" }}
@@ -1065,7 +1065,7 @@ function TodoList({ color, todos, onAdd, onToggle, onDelete }) {
         <input
           value={text}
           onChange={e => setText(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && submit()}
+          onKeyDown={e => e.key === "Enter" && !e.isComposing && submit()}
           placeholder="やることを入力…"
           style={{
             flex: 1, background: "#0e0e1e", border: "1px solid #2a2a4a",

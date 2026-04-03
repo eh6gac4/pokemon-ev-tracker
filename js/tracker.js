@@ -248,7 +248,7 @@ function EVTracker() {
                 autoFocus
                 value={renameValue}
                 onChange={e => setRenameValue(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") renameMon(selected, renameValue); if (e.key === "Escape") setRenaming(false); }}
+                onKeyDown={e => { if (e.key === "Enter" && !e.isComposing) renameMon(selected, renameValue); if (e.key === "Escape") setRenaming(false); }}
                 style={{ flex: 1, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "13px", padding: "8px 10px", fontFamily: "inherit", outline: "none" }}
               />
               <button onClick={() => renameMon(selected, renameValue)} style={{ background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: mon.color, fontSize: "11px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
