@@ -73,9 +73,12 @@ function EVTracker() {
       if (dist >= THRESHOLD) {
         el.style.opacity = "1";
         el.style.transform = "translateY(32px)";
-        document.getElementById("ptr-icon").style.animation = "ptr-spin 0.6s linear infinite";
+        const icon = document.getElementById("ptr-icon");
+        icon.style.transition = "none";
+        icon.style.transform = "";
+        icon.style.animation = "ptr-spin 0.7s linear infinite";
         document.getElementById("ptr-label").textContent = "リロード中…";
-        setTimeout(() => location.reload(), 600);
+        setTimeout(() => location.reload(), 1400);
       } else {
         hide();
       }
