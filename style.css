@@ -18,11 +18,11 @@ body { margin: 0; overscroll-behavior-y: none; }
 }
 #ptr-indicator.ptr-ready { color: #7fff7f; }
 #ptr-icon {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: block; flex-shrink: 0;
   width: 20px; height: 20px;
-  font-size: 18px; line-height: 1;
   transition: transform 0.2s;
   transform-origin: center center;
+  transform-box: fill-box;
 }
 @keyframes ptr-spin { to { transform: rotate(360deg); } }
 

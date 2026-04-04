@@ -25,9 +25,10 @@ function EVTracker() {
     let pulling = false;
 
     // indicator element
+    const SVG_ICON = `<svg id="ptr-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;flex-shrink:0"><path d="M12 3a9 9 0 1 0 9 9"/><polyline points="21 3 21 9 15 9"/></svg>`;
     const el = document.createElement("div");
     el.id = "ptr-indicator";
-    el.innerHTML = `<span id="ptr-icon">↓</span><span id="ptr-label">引いてリロード</span>`;
+    el.innerHTML = `${SVG_ICON}<span id="ptr-label">引いてリロード</span>`;
     document.body.prepend(el);
 
     const update = (dist) => {
@@ -72,7 +73,6 @@ function EVTracker() {
       if (dist >= THRESHOLD) {
         el.style.opacity = "1";
         el.style.transform = "translateY(32px)";
-        document.getElementById("ptr-icon").textContent = "↻";
         document.getElementById("ptr-icon").style.animation = "ptr-spin 0.6s linear infinite";
         document.getElementById("ptr-label").textContent = "リロード中…";
         setTimeout(() => location.reload(), 600);
