@@ -215,7 +215,7 @@ function EVTracker() {
       <div style={{ textAlign: "center", marginBottom: "18px" }}>
         <div style={{ fontSize: "10px", letterSpacing: "4px", color: "#555", marginBottom: "2px" }}>FireRed · AUTO SAVE</div>
         <div style={{ fontSize: "20px", letterSpacing: "2px", color: mon.color, textShadow: `0 0 20px ${mon.color}66` }}>
-          努力値トラッカー
+          ポケログ
         </div>
       </div>
 
