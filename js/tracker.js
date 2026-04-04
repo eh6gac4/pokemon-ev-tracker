@@ -388,14 +388,14 @@ function EVTracker() {
 
       {/* Bottom nav（モバイルのみ） */}
       <nav className="bottom-nav">
+        <button onClick={() => setActiveTab("boken")} style={{ color: activeTab === "boken" ? mon.color : "#555", borderTopColor: activeTab === "boken" ? mon.color : "transparent" }}>
+          🗺 冒険
+        </button>
         <button onClick={() => setActiveTab("ikusei")} style={{ color: activeTab === "ikusei" ? mon.color : "#555", borderTopColor: activeTab === "ikusei" ? mon.color : "transparent" }}>
           💪 育成
         </button>
         <button onClick={() => setActiveTab("chosa")} style={{ color: activeTab === "chosa" ? mon.color : "#555", borderTopColor: activeTab === "chosa" ? mon.color : "transparent" }}>
           📊 データ
-        </button>
-        <button onClick={() => setActiveTab("boken")} style={{ color: activeTab === "boken" ? mon.color : "#555", borderTopColor: activeTab === "boken" ? mon.color : "transparent" }}>
-          🗺 冒険
         </button>
       </nav>
     </div>
