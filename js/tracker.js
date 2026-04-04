@@ -12,7 +12,6 @@ function EVTracker() {
   const [newColor,     setNewColor]     = useState(COLORS[0]);
   const [newDexId,     setNewDexId]     = useState(null);
   const [checkedItems,  setCheckedItems]  = useState({});
-  const [checkedStory,  setCheckedStory]  = useState({});
   const [captureCount,  setCaptureCount]  = useState(0);
   const [captureGoals,  setCaptureGoals]  = useState([]);
   const [todoList,      setTodoList]      = useState([]);
@@ -132,7 +131,6 @@ function EVTracker() {
         if (saved.allMoves)     setAllMoves(saved.allMoves);
         if (saved.selected)     setSelected(saved.selected);
         if (saved.checkedItems)  setCheckedItems(saved.checkedItems);
-        if (saved.checkedStory)  setCheckedStory(saved.checkedStory);
         if (saved.captureCount != null) setCaptureCount(saved.captureCount);
         if (saved.captureGoals)  setCaptureGoals(saved.captureGoals);
         if (saved.todoList)      setTodoList(saved.todoList);
@@ -146,13 +144,12 @@ function EVTracker() {
     fetch("/api/data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems, checkedStory, captureCount, captureGoals, todoList }),
+      body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList }),
     }).catch(() => {});
-  }, [party, allEVs, allMoves, selected, checkedItems, checkedStory, captureCount, captureGoals, todoList, loaded]);
+  }, [party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, loaded]);
 
   const toggleItem  = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
   const resetItems  = () => setCheckedItems({});
-  const toggleStory = (id) => setCheckedStory(prev => ({ ...prev, [id]: !prev[id] }));
   const addCaptureGoal    = (name) => setCaptureGoals(prev => [...prev, { id: Date.now().toString(), name, done: false }]);
   const toggleCaptureGoal = (id)   => setCaptureGoals(prev => prev.map(g => g.id === id ? { ...g, done: !g.done } : g));
   const deleteCaptureGoal = (id)   => setCaptureGoals(prev => prev.filter(g => g.id !== id));
@@ -415,7 +412,6 @@ function EVTracker() {
 
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
-          <StoryProgressPanel color={mon.color} checkedStory={checkedStory} onToggle={toggleStory} />
           <CapturePanel color={mon.color} captureCount={captureCount} captureGoals={captureGoals} onCountChange={setCaptureCount} onAddGoal={addCaptureGoal} onToggleGoal={toggleCaptureGoal} onDeleteGoal={deleteCaptureGoal} />
           <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} />
           <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
