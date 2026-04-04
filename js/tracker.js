@@ -18,6 +18,26 @@ function EVTracker() {
   const [iconEditing,  setIconEditing]  = useState(false);
   const [iconValue,    setIconValue]    = useState("");
 
+  // swipe to change tab
+  const TABS = ["boken", "ikusei", "chosa"];
+  const swipeX = React.useRef(null);
+  const swipeY = React.useRef(null);
+  const onSwipeStart = (e) => {
+    swipeX.current = e.touches[0].clientX;
+    swipeY.current = e.touches[0].clientY;
+  };
+  const onSwipeEnd = (e) => {
+    if (swipeX.current === null) return;
+    const dx = e.changedTouches[0].clientX - swipeX.current;
+    const dy = e.changedTouches[0].clientY - swipeY.current;
+    swipeX.current = null;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      const i = TABS.indexOf(activeTab);
+      if (dx < 0 && i < TABS.length - 1) setActiveTab(TABS[i + 1]);
+      if (dx > 0 && i > 0)               setActiveTab(TABS[i - 1]);
+    }
+  };
+
   // pull-to-refresh
   useEffect(() => {
     const THRESHOLD = 80;
@@ -214,7 +234,7 @@ function EVTracker() {
   );
 
   return (
-    <div className="app-wrap">
+    <div className="app-wrap" onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd}>
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: "18px" }}>
         <div style={{ fontSize: "10px", letterSpacing: "4px", color: "#555", marginBottom: "2px" }}>FireRed · AUTO SAVE</div>
