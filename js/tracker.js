@@ -45,7 +45,7 @@ function EVTracker() {
     let pulling = false;
 
     // indicator element
-    const SVG_ICON = `<svg id="ptr-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:block;flex-shrink:0"><circle cx="12" cy="12" r="9" stroke-dasharray="42.4 14.1"/></svg>`;
+    const SVG_ICON = `<svg id="ptr-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:block;flex-shrink:0"><circle cx="12" cy="12" r="9" stroke-dasharray="49.5 7.1"/></svg>`;
     const el = document.createElement("div");
     el.id = "ptr-indicator";
     el.innerHTML = `${SVG_ICON}<span id="ptr-label">引いてリロード</span>`;
