@@ -1286,19 +1286,17 @@ function MoveTutorPanel({ color }) {
             const tc = md ? (TYPE_COLORS[md[0]] || "#555") : "#555";
             return (
               <div key={t.move} style={{
-                display: "flex", alignItems: "flex-start", gap: "8px", padding: "5px 2px",
+                textAlign: "center", padding: "5px 2px",
                 borderBottom: i < TUTOR_LOCATIONS.length - 1 ? "1px solid #1a2a3a" : "none",
               }}>
                 <span style={{
                   fontSize: "9px", padding: "1px 5px", borderRadius: "3px",
                   background: tc + "22", color: tc, border: `1px solid ${tc}44`,
-                  flexShrink: 0, marginTop: "1px", whiteSpace: "nowrap",
+                  whiteSpace: "nowrap",
                 }}>{md ? md[0] : "？"}</span>
-                <div style={{ flex: 1, minWidth: 0, textAlign: "center" }}>
-                  <div style={{ fontSize: "11px", color: "#e8e8e8" }}>{t.move}</div>
-                  <div style={{ fontSize: "9px", color: color + "cc", marginTop: "1px" }}>{t.location}</div>
-                  <div style={{ fontSize: "9px", color: "#555", marginTop: "1px" }}>{t.note}</div>
-                </div>
+                <div style={{ fontSize: "11px", color: "#e8e8e8", marginTop: "2px" }}>{t.move}</div>
+                <div style={{ fontSize: "9px", color: color + "cc", marginTop: "1px" }}>{t.location}</div>
+                <div style={{ fontSize: "9px", color: "#555", marginTop: "1px" }}>{t.note}</div>
               </div>
             );
           })}
