@@ -12,6 +12,7 @@ function EVTracker() {
   const [newColor,     setNewColor]     = useState(COLORS[0]);
   const [newDexId,     setNewDexId]     = useState(null);
   const [checkedItems, setCheckedItems] = useState({});
+  const [checkedStory, setCheckedStory] = useState({});
   const [todoList,     setTodoList]     = useState([]);
   const [renaming,     setRenaming]     = useState(false);
   const [renameValue,  setRenameValue]  = useState("");
@@ -129,6 +130,7 @@ function EVTracker() {
         if (saved.allMoves)     setAllMoves(saved.allMoves);
         if (saved.selected)     setSelected(saved.selected);
         if (saved.checkedItems) setCheckedItems(saved.checkedItems);
+        if (saved.checkedStory) setCheckedStory(saved.checkedStory);
         if (saved.todoList)     setTodoList(saved.todoList);
       })
       .catch(() => {})
@@ -140,12 +142,13 @@ function EVTracker() {
     fetch("/api/data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems, todoList }),
+      body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems, checkedStory, todoList }),
     }).catch(() => {});
-  }, [party, allEVs, allMoves, selected, checkedItems, todoList, loaded]);
+  }, [party, allEVs, allMoves, selected, checkedItems, checkedStory, todoList, loaded]);
 
-  const toggleItem = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
-  const resetItems = () => setCheckedItems({});
+  const toggleItem  = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
+  const resetItems  = () => setCheckedItems({});
+  const toggleStory = (id) => setCheckedStory(prev => ({ ...prev, [id]: !prev[id] }));
 
   const addTodo    = (text) => setTodoList(prev => [...prev, { id: Date.now().toString(), text, done: false }]);
   const toggleTodo = (id)  => setTodoList(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
@@ -405,6 +408,7 @@ function EVTracker() {
 
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
+          <StoryProgressPanel color={mon.color} checkedStory={checkedStory} onToggle={toggleStory} />
           <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} />
           <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
         </div>
