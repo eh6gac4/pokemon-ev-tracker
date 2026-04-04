@@ -363,9 +363,6 @@ function EVTracker() {
             </button>
           )}
 
-          <EVSearch macho={macho} color={mon.color} />
-          <LocationGuide color={mon.color} />
-
           <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", letterSpacing: "1px" }}>
             GEN III · MAX 252/STAT · MAX 510/TOTAL · AUTO SAVE
           </div>
@@ -377,12 +374,14 @@ function EVTracker() {
           <PokedexPanel color={mon.color} />
           <IVChecker color={mon.color} />
           <EVGuide color={mon.color} />
+          <EVSearch macho={macho} color={mon.color} />
+          <LocationGuide color={mon.color} />
+          <MoveTutorPanel color={mon.color} />
         </div>
 
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
           <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} />
-          <MoveTutorPanel color={mon.color} />
           <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
         </div>
       </div>
