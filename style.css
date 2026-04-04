@@ -27,6 +27,7 @@ body { margin: 0; overscroll-behavior-y: none; }
   font-family: 'DotGothic16', 'Courier New', monospace;
   color: #e8e8e8;
   padding: 16px;
+  padding-top: calc(env(safe-area-inset-top) + 16px);
   padding-bottom: 72px;
 }
 .app-layout { /* mobile: single column */ }
