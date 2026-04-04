@@ -1294,7 +1294,7 @@ function MoveTutorPanel({ color }) {
                   background: tc + "22", color: tc, border: `1px solid ${tc}44`,
                   flexShrink: 0, marginTop: "1px", whiteSpace: "nowrap",
                 }}>{md ? md[0] : "？"}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ flex: 1, minWidth: 0, textAlign: "center" }}>
                   <div style={{ fontSize: "11px", color: "#e8e8e8" }}>{t.move}</div>
                   <div style={{ fontSize: "9px", color: color + "cc", marginTop: "1px" }}>{t.location}</div>
                   <div style={{ fontSize: "9px", color: "#555", marginTop: "1px" }}>{t.note}</div>
