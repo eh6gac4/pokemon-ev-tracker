@@ -89,7 +89,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         if encoding:
             self.send_header("Content-Encoding", encoding)
-        cache = "no-store" if file_path.suffix in (".png", ".ico") else "no-cache"
+        cache = "no-store"
         self.send_header("Cache-Control", cache)
         self.end_headers()
         self.wfile.write(body)

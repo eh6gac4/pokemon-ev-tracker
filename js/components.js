@@ -1294,9 +1294,9 @@ function MoveTutorPanel({ color }) {
                   background: tc + "22", color: tc, border: `1px solid ${tc}44`,
                   whiteSpace: "nowrap",
                 }}>{md ? md[0] : "？"}</span>
-                <div style={{ fontSize: "11px", color: "#e8e8e8", marginTop: "2px" }}>{t.move}</div>
-                <div style={{ fontSize: "9px", color: color + "cc", marginTop: "1px" }}>{t.location}</div>
-                <div style={{ fontSize: "9px", color: "#555", marginTop: "1px" }}>{t.note}</div>
+                <div style={{ fontSize: "11px", color: "#e8e8e8", marginTop: "2px", textAlign: "center" }}>{t.move}</div>
+                <div style={{ fontSize: "9px", color: color + "cc", marginTop: "1px", textAlign: "center" }}>{t.location}</div>
+                <div style={{ fontSize: "9px", color: "#555", marginTop: "1px", textAlign: "center" }}>{t.note}</div>
               </div>
             );
           })}
