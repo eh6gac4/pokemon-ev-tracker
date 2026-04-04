@@ -5,7 +5,7 @@ function EVTracker() {
   const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
   const [loaded,       setLoaded]       = useState(false);
   const [macho,        setMacho]        = useState(false);
-  const [activeTab,    setActiveTab]    = useState("ikusei");
+  const [activeTab,    setActiveTab]    = useState("boken");
   const [adding,       setAdding]       = useState(false);
   const [newName,      setNewName]      = useState("");
   const [newIcon,      setNewIcon]      = useState("🐣");
