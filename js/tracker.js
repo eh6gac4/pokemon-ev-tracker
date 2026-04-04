@@ -35,7 +35,7 @@ function EVTracker() {
       const ratio  = Math.min(dist / THRESHOLD, 1);
       const ready  = dist >= THRESHOLD;
       el.style.opacity  = String(Math.min(ratio * 1.5, 1));
-      el.style.transform = `translateY(${Math.min(dist * 0.4, 40)}px)`;
+      el.style.transform = `translateY(${Math.min(dist * 0.4, 56)}px)`;
       document.getElementById("ptr-icon").style.transform  = `rotate(${ready ? 180 : ratio * 160}deg)`;
       document.getElementById("ptr-label").textContent = ready ? "離してリロード" : "引いてリロード";
       el.classList.toggle("ptr-ready", ready);
@@ -72,7 +72,7 @@ function EVTracker() {
       const dist = e.changedTouches[0].clientY - startY;
       if (dist >= THRESHOLD) {
         el.style.opacity = "1";
-        el.style.transform = "translateY(32px)";
+        el.style.transform = "translateY(48px)";
         const icon = document.getElementById("ptr-icon");
         icon.style.transition = "none";
         icon.style.transform = "";

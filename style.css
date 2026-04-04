@@ -4,9 +4,9 @@ body { margin: 0; overscroll-behavior-y: none; }
 
 /* Pull-to-refresh indicator */
 #ptr-indicator {
-  position: fixed; top: -48px; left: 0; right: 0; z-index: 9999;
+  position: fixed; top: -64px; left: 0; right: 0; z-index: 9999;
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  height: 48px;
+  height: 64px;
   background: #0d0d1a;
   color: #7ec8e3;
   font-family: 'DotGothic16', monospace;
