@@ -1398,3 +1398,154 @@ function StoryProgressPanel({ color, checkedStory, onToggle }) {
   );
 }
 
+const CAPTURE_MILESTONES = [
+  { count: 10, item: "ひでんマシン05（フラッシュ）", location: "2ばんどうろゲート" },
+  { count: 20, item: "かわらずのいし",               location: "10ばんどうろポケセン" },
+  { count: 30, item: "ダウジングマシン",             location: "11ばんどうろゲート" },
+  { count: 40, item: "おまもりこばん",               location: "16ばんどうろゲート" },
+  { count: 50, item: "がくしゅうそうち",             location: "15ばんどうろゲート" },
+  { count: 60, item: "ぜんこくずかん",               location: "マサラタウン（殿堂入り後）" },
+];
+
+function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal }) {
+  const [open, setOpen]   = useState(true);
+  const [query, setQuery] = useState("");
+
+  const suggestions = query.length >= 1
+    ? POKEMON_DATA.filter(p => p[1].includes(query) && !captureGoals.some(g => g.name === p[1])).slice(0, 8)
+    : [];
+
+  const add = (name) => { onAddGoal(name); setQuery(""); };
+
+  const doneCount    = captureGoals.filter(g => g.done).length;
+  const nextIdx      = CAPTURE_MILESTONES.findIndex(m => captureCount < m.count);
+  const nextMilestone = nextIdx >= 0 ? CAPTURE_MILESTONES[nextIdx] : null;
+
+  const btnStyle = (active) => ({
+    background: active ? color + "22" : "#16213e",
+    border: `1px solid ${active ? color + "66" : "#2a2a4a"}`,
+    borderRadius: "6px", color: active ? color : "#555",
+    fontSize: "16px", padding: "2px 14px", cursor: "pointer", fontFamily: "inherit", lineHeight: "1.8",
+  });
+
+  return (
+    <Panel title="🎯 捕獲リスト" open={open} onToggle={() => setOpen(o => !o)} color={color}>
+
+      {/* カウンター */}
+      <div style={{ marginBottom: "14px" }}>
+        <div style={{ fontSize: "10px", color: "#444", marginBottom: "8px", letterSpacing: "1px" }}>捕まえた種類数</div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+          <button onClick={() => onCountChange(Math.max(0, captureCount - 1))} style={btnStyle(false)}>－</button>
+          <input
+            type="number" min="0" max="386" value={captureCount}
+            onChange={e => onCountChange(Math.max(0, Math.min(386, parseInt(e.target.value) || 0)))}
+            style={{
+              flex: 1, background: "#0d1525", border: `1px solid ${color}44`,
+              borderRadius: "6px", color: "#e8e8e8", fontSize: "20px", fontWeight: "bold",
+              padding: "4px 8px", textAlign: "center", fontFamily: "inherit", outline: "none",
+            }}
+          />
+          <button onClick={() => onCountChange(Math.min(386, captureCount + 1))} style={btnStyle(true)}>＋</button>
+        </div>
+
+        {/* マイルストーン */}
+        {CAPTURE_MILESTONES.map(m => {
+          const achieved = captureCount >= m.count;
+          const isNext   = nextMilestone === m;
+          return (
+            <div key={m.count} style={{
+              display: "flex", alignItems: "center", gap: "8px", padding: "5px 6px", marginBottom: "3px",
+              background: achieved ? color + "0f" : isNext ? "#0d1525" : "transparent",
+              border: `1px solid ${achieved ? color + "44" : isNext ? color + "22" : "#1a1a2e"}`,
+              borderRadius: "6px",
+            }}>
+              <span style={{ fontSize: "11px", minWidth: "24px", textAlign: "center", color: achieved ? "#7fff7f" : isNext ? color : "#333", fontWeight: achieved ? "bold" : "normal" }}>
+                {achieved ? "✓" : `${m.count}`}
+              </span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "11px", color: achieved ? "#aaa" : isNext ? "#e8e8e8" : "#555", textDecoration: achieved ? "line-through" : "none" }}>{m.item}</div>
+                <div style={{ fontSize: "9px", color: "#444", marginTop: "1px" }}>{m.location}</div>
+              </div>
+            </div>
+          );
+        })}
+        {nextMilestone && (
+          <div style={{ textAlign: "center", fontSize: "9px", color: color, marginTop: "6px" }}>
+            あと {nextMilestone.count - captureCount} 種類 → {nextMilestone.item}
+          </div>
+        )}
+      </div>
+
+      {/* 目標ポケモンリスト */}
+      <div style={{ borderTop: "1px solid #1a1a2e", paddingTop: "12px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+          <span style={{ fontSize: "10px", color: "#444", letterSpacing: "1px" }}>目標ポケモン</span>
+          {captureGoals.length > 0 && (
+            <span style={{ fontSize: "10px", color: doneCount >= captureGoals.length ? "#7fff7f" : "#555" }}>
+              {doneCount}/{captureGoals.length}
+            </span>
+          )}
+        </div>
+
+        {/* 検索入力 */}
+        <div style={{ position: "relative", marginBottom: captureGoals.length > 0 ? "8px" : "0" }}>
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="ポケモン名で検索して追加…"
+            style={{
+              width: "100%", background: "#0e0e1e", border: "1px solid #2a2a4a",
+              borderRadius: suggestions.length > 0 ? "6px 6px 0 0" : "6px",
+              color: "#ddd", fontSize: "12px", padding: "7px 10px",
+              fontFamily: "inherit", outline: "none", boxSizing: "border-box",
+            }}
+          />
+          {suggestions.length > 0 && (
+            <div style={{ position: "absolute", zIndex: 10, width: "100%", background: "#0d1a2e", border: "1px solid #2a2a4a", borderTop: "none", borderRadius: "0 0 6px 6px" }}>
+              {suggestions.map(p => (
+                <div key={p[0]} onMouseDown={() => add(p[1])} style={{
+                  padding: "7px 10px", cursor: "pointer", fontSize: "12px", color: "#ccc",
+                  borderBottom: "1px solid #1a2a3a",
+                }}
+                  onMouseEnter={e => e.currentTarget.style.background = color + "22"}
+                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                >
+                  {p[1]}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {captureGoals.map((goal, idx) => (
+          <div key={goal.id} style={{
+            display: "flex", alignItems: "center", gap: "8px", padding: "7px 2px",
+            borderTop: idx === 0 ? "1px solid #1a1a2e" : "none",
+            borderBottom: "1px solid #1a1a2e",
+          }}>
+            <input type="checkbox" checked={goal.done} onChange={() => onToggleGoal(goal.id)}
+              style={{ accentColor: color, cursor: "pointer", flexShrink: 0 }} />
+            <span style={{
+              flex: 1, fontSize: "11px",
+              color: goal.done ? "#444" : "#ddd",
+              textDecoration: goal.done ? "line-through" : "none",
+            }}>{goal.name}</span>
+            <button onClick={() => onDeleteGoal(goal.id)} style={{
+              background: "transparent", border: "none", color: "#555",
+              cursor: "pointer", fontSize: "13px", padding: "0 2px", fontFamily: "inherit",
+            }}
+              onMouseEnter={e => e.currentTarget.style.color = "#e05555"}
+              onMouseLeave={e => e.currentTarget.style.color = "#555"}
+            >✕</button>
+          </div>
+        ))}
+        {captureGoals.length === 0 && query.length === 0 && (
+          <div style={{ textAlign: "center", fontSize: "10px", color: "#2a2a4a", padding: "8px 0 2px" }}>
+            ポケモン名を入力して追加しよう
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
