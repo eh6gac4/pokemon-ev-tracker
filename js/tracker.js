@@ -445,13 +445,6 @@ function EVTracker() {
           <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", letterSpacing: "1px" }}>
             GEN III · MAX 252/STAT · MAX 510/TOTAL · AUTO SAVE
           </div>
-          <button
-            onClick={() => { location.href = "/?v=" + Date.now(); }}
-            title="全ファイルをキャッシュなしで再取得"
-            style={{ marginTop: "10px", width: "100%", background: "transparent", border: "1px solid #1a1a2e", borderRadius: "7px", color: "#2a2a4a", fontSize: "9px", padding: "6px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = "#3a3a5a"; e.currentTarget.style.color = "#555"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "#1a1a2e"; e.currentTarget.style.color = "#2a2a4a"; }}
-          >↺ キャッシュをクリアして再読み込み</button>
         </div>
 
         {/* ===== データカラム ===== */}
@@ -486,6 +479,9 @@ function EVTracker() {
         </button>
         <button onClick={() => setActiveTab("chosa")} style={{ color: activeTab === "chosa" ? mon.color : "#555", borderTopColor: activeTab === "chosa" ? mon.color : "transparent" }}>
           📊 データ
+        </button>
+        <button onClick={() => { location.href = "/?v=" + Date.now(); }} title="全ファイルをキャッシュなしで再取得" style={{ flex: "0 0 auto", padding: "16px 14px", color: "#2a2a4a", fontSize: "16px", borderTopColor: "transparent" }}>
+          ↺
         </button>
       </nav>
     </div>
