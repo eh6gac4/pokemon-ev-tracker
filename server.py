@@ -80,12 +80,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
         }.get(file_path.suffix, "application/octet-stream")
         raw_body = file_path.read_bytes()
         etag = f'"{hashlib.md5(raw_body).hexdigest()}"'
+        # .js/.css は no-store でキャッシュを完全に無効化、それ以外は no-cache で再検証
+        cache_control = "no-store" if file_path.suffix in (".js", ".css") else "no-cache"
 
         # ETagが一致すれば 304 を返してボディ送信をスキップ
         if self.headers.get("If-None-Match") == etag:
             self.send_response(304)
             self.send_header("ETag", etag)
-            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Cache-Control", cache_control)
             self.end_headers()
             return
 
@@ -100,7 +102,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header("Content-Type", mime)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("ETag", etag)
-        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Cache-Control", cache_control)
         if encoding:
             self.send_header("Content-Encoding", encoding)
         self.end_headers()
