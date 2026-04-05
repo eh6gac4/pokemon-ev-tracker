@@ -1451,3 +1451,203 @@ function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddG
   );
 }
 
+// ─────────────────────────────────────────
+// わざ逆引き
+// ─────────────────────────────────────────
+function MoveReversePanel({ color }) {
+  const [open, setOpen]   = useState(false);
+  const [query, setQuery] = useState("");
+  const [chosen, setChosen] = useState("");
+  const [showSug, setShowSug] = useState(false);
+
+  const suggestions = query.length >= 1
+    ? ALL_MOVES.filter(m => m.includes(query)).slice(0, 10)
+    : [];
+
+  const results = React.useMemo(() => {
+    if (!chosen) return null;
+    const list = [];
+    for (const p of POKEMON_DATA) {
+      const dexId = p[0];
+      const name  = p[1];
+      const { lv, tm, egg, tutor } = getLearnset(dexId);
+      const methods = [];
+      for (const [lvNum, moveName] of lv) {
+        if (moveName === chosen) { methods.push(`Lv${lvNum}`); break; }
+      }
+      for (const tmId of tm) {
+        if (TM_LIST[tmId] === chosen) { methods.push(tmId); break; }
+      }
+      if (egg.includes(chosen))   methods.push("遺伝");
+      if (tutor.includes(chosen)) methods.push("教え");
+      if (methods.length > 0) list.push({ dexId, name, methods });
+    }
+    return list;
+  }, [chosen]);
+
+  const select = (move) => {
+    setChosen(move);
+    setQuery(move);
+    setShowSug(false);
+  };
+
+  return (
+    <Panel title="🔍 わざ逆引き" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      <div style={{ position: "relative", marginBottom: "10px" }}>
+        <input
+          value={query}
+          onChange={e => { setQuery(e.target.value); setChosen(""); setShowSug(true); }}
+          onFocus={() => setShowSug(true)}
+          onBlur={() => setTimeout(() => setShowSug(false), 150)}
+          placeholder="わざ名を入力…"
+          style={{ width: "100%", background: "#0e0e1e", border: "1px solid #2a2a4a",
+            borderRadius: showSug && suggestions.length > 0 ? "6px 6px 0 0" : "6px",
+            color: "#ddd", fontSize: "12px", padding: "7px 10px",
+            fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
+        />
+        {showSug && suggestions.length > 0 && (
+          <div style={{ position: "absolute", zIndex: 10, width: "100%", background: "#0d1a2e",
+            border: "1px solid #2a2a4a", borderTop: "none", borderRadius: "0 0 6px 6px", maxHeight: "160px", overflowY: "auto" }}>
+            {suggestions.map(m => (
+              <div key={m} onMouseDown={() => select(m)}
+                style={{ padding: "6px 10px", cursor: "pointer", fontSize: "11px", color: "#ccc", borderBottom: "1px solid #1a2a3a" }}
+                onMouseEnter={e => e.currentTarget.style.background = color + "22"}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              >{m}</div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {chosen && results !== null && (
+        results.length === 0
+          ? <div style={{ fontSize: "10px", color: "#444", textAlign: "center", padding: "8px 0" }}>覚えるポケモンなし</div>
+          : <div>
+              <div style={{ fontSize: "9px", color: "#444", marginBottom: "6px" }}>{results.length}匹が習得</div>
+              <div style={{ maxHeight: "280px", overflowY: "auto" }}>
+                {results.map(({ dexId, name, methods }) => (
+                  <div key={dexId} style={{ display: "flex", alignItems: "center", gap: "6px",
+                    padding: "4px 2px", borderBottom: "1px solid #111" }}>
+                    <span style={{ fontSize: "9px", color: "#333", minWidth: "22px" }}>#{dexId}</span>
+                    <span style={{ fontSize: "11px", color: "#ccc", flex: 1 }}>{name}</span>
+                    <div style={{ display: "flex", gap: "3px", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                      {methods.map(m => (
+                        <span key={m} style={{
+                          fontSize: "8px", padding: "1px 4px", borderRadius: "3px",
+                          background: m.startsWith("Lv") ? color + "22" : m.startsWith("TM") || m.startsWith("HM") ? "#1a2a3a" : m === "遺伝" ? "#1a1a3a" : "#2a1a2a",
+                          color: m.startsWith("Lv") ? color : m.startsWith("TM") || m.startsWith("HM") ? "#7bb8e8" : m === "遺伝" ? "#a87ee8" : "#e87eb8",
+                          border: `1px solid ${m.startsWith("Lv") ? color + "44" : "#2a2a4a"}`,
+                        }}>{m}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+      )}
+      {!chosen && (
+        <div style={{ fontSize: "10px", color: "#2a2a4a", textAlign: "center", padding: "6px 0" }}>
+          わざ名を入力して検索
+        </div>
+      )}
+    </Panel>
+  );
+}
+
+// ─────────────────────────────────────────
+// EV稼ぎ効率ランキング
+// ─────────────────────────────────────────
+function EVRankPanel({ color }) {
+  const [open, setOpen] = useState(false);
+  const [stat, setStat] = useState("hp");
+
+  const statIdx = { hp:0, atk:1, def:2, spa:3, spd:4, spe:5 };
+
+  const ranked = React.useMemo(() => {
+    const si = statIdx[stat];
+    return POKEMON_DATA
+      .map(p => ({ dexId: p[0], name: p[1], ev: EV_YIELD[p[0] - 1][si] }))
+      .filter(e => e.ev > 0)
+      .sort((a, b) => b.ev - a.ev || a.dexId - b.dexId);
+  }, [stat]);
+
+  return (
+    <Panel title="📊 EV獲得ランキング" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "10px" }}>
+        {STATS.map(s => (
+          <button key={s.key} onClick={() => setStat(s.key)} style={{
+            fontSize: "9px", padding: "3px 7px", borderRadius: "4px", cursor: "pointer",
+            fontFamily: "inherit", border: `1px solid ${stat === s.key ? STAT_COL[s.key] : "#2a2a4a"}`,
+            background: stat === s.key ? STAT_COL[s.key] + "22" : "transparent",
+            color: stat === s.key ? STAT_COL[s.key] : "#555",
+          }}>{s.jp}</button>
+        ))}
+      </div>
+      <div style={{ fontSize: "9px", color: "#333", marginBottom: "6px" }}>{ranked.length}匹が{STATS.find(s=>s.key===stat).jp}EV付与</div>
+      <div style={{ maxHeight: "280px", overflowY: "auto" }}>
+        {ranked.map(({ dexId, name, ev }) => (
+          <div key={dexId} style={{ display: "flex", alignItems: "center", gap: "6px",
+            padding: "4px 2px", borderBottom: "1px solid #111" }}>
+            <span style={{ fontSize: "9px", color: "#333", minWidth: "22px" }}>#{dexId}</span>
+            <span style={{ fontSize: "11px", color: "#ccc", flex: 1 }}>{name}</span>
+            <span style={{ fontSize: "12px", fontWeight: "bold", color: STAT_COL[stat], minWidth: "20px", textAlign: "right" }}>+{ev}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize: "8px", color: "#333", marginTop: "4px" }}>強制ギプス装備で×2</div>
+    </Panel>
+  );
+}
+
+// ─────────────────────────────────────────
+// 種族値ランキング
+// ─────────────────────────────────────────
+function StatRankPanel({ color }) {
+  const [open, setOpen] = useState(false);
+  const [stat, setStat] = useState("hp");
+
+  const ALL_STATS = [{ key: "total", jp: "合計" }, ...STATS];
+
+  const ranked = React.useMemo(() => {
+    return POKEMON_DATA.map(p => {
+      const total = STATS.reduce((a, s) => a + p[PD[s.key]], 0);
+      return { dexId: p[0], name: p[1], val: stat === "total" ? total : p[PD[stat]], total };
+    }).sort((a, b) => b.val - a.val || a.dexId - b.dexId);
+  }, [stat]);
+
+  const maxVal = ranked[0]?.val || 1;
+  const statColor = stat === "total" ? "#aaaaff" : STAT_COL[stat];
+
+  return (
+    <Panel title="🏆 種族値ランキング" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "10px" }}>
+        {ALL_STATS.map(s => (
+          <button key={s.key} onClick={() => setStat(s.key)} style={{
+            fontSize: "9px", padding: "3px 7px", borderRadius: "4px", cursor: "pointer",
+            fontFamily: "inherit", border: `1px solid ${stat === s.key ? (s.key === "total" ? "#aaaaff" : STAT_COL[s.key]) : "#2a2a4a"}`,
+            background: stat === s.key ? (s.key === "total" ? "#aaaaff22" : STAT_COL[s.key] + "22") : "transparent",
+            color: stat === s.key ? (s.key === "total" ? "#aaaaff" : STAT_COL[s.key]) : "#555",
+          }}>{s.jp}</button>
+        ))}
+      </div>
+      <div style={{ maxHeight: "320px", overflowY: "auto" }}>
+        {ranked.map(({ dexId, name, val }, rank) => (
+          <div key={dexId} style={{ display: "flex", alignItems: "center", gap: "5px",
+            padding: "3px 2px", borderBottom: "1px solid #0d0d1a" }}>
+            <span style={{ fontSize: "9px", color: rank < 3 ? statColor : "#2a2a4a", minWidth: "16px", textAlign: "right" }}>
+              {rank + 1}
+            </span>
+            <span style={{ fontSize: "10px", color: "#999", minWidth: "22px" }}>#{dexId}</span>
+            <span style={{ fontSize: "11px", color: "#ccc", minWidth: "72px" }}>{name}</span>
+            <div style={{ flex: 1, background: "#0d0d1a", borderRadius: "2px", height: "5px", overflow: "hidden" }}>
+              <div style={{ width: `${val / maxVal * 100}%`, height: "100%", background: statColor, borderRadius: "2px" }} />
+            </div>
+            <span style={{ fontSize: "11px", fontWeight: "bold", minWidth: "28px", textAlign: "right",
+              color: rank === 0 ? statColor : val >= maxVal * 0.85 ? "#ccc" : "#555" }}>{val}</span>
+          </div>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+

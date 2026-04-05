@@ -408,6 +408,9 @@ function EVTracker() {
           <EVSearch macho={macho} color={mon.color} />
           <LocationGuide color={mon.color} />
           <MoveTutorPanel color={mon.color} />
+          <MoveReversePanel color={mon.color} />
+          <EVRankPanel color={mon.color} />
+          <StatRankPanel color={mon.color} />
         </div>
 
         {/* ===== 冒険カラム ===== */}
