@@ -452,6 +452,7 @@ function EVTracker() {
           <LocationGuide color={mon.color} />
           <IVChecker color={mon.color} />
           <EVGuide color={mon.color} />
+          <AbilitySearch color={mon.color} />
           <EVSearch macho={macho} color={mon.color} />
           <MoveTutorPanel color={mon.color} />
           <MoveReversePanel color={mon.color} />

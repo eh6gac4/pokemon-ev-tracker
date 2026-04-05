@@ -1820,3 +1820,56 @@ function PartyPickerModal({ roster, activeParty, onSelect, onClose, color }) {
     </div>
   );
 }
+
+function AbilitySearch({ color }) {
+  const [open,  setOpen]  = useState(false);
+  const [query, setQuery] = useState("");
+
+  // 特性名 → ポケモン一覧のマップを作成
+  const abilityMap = React.useMemo(() => {
+    const map = {};
+    ABILITY_DATA.forEach((abs, i) => {
+      abs.forEach(ab => {
+        if (!map[ab]) map[ab] = [];
+        map[ab].push(POKEMON_DATA[i]);
+      });
+    });
+    return map;
+  }, []);
+
+  const allAbilities = Object.keys(abilityMap).sort();
+
+  const filtered = query.trim()
+    ? allAbilities.filter(ab => ab.includes(query.trim()))
+    : allAbilities;
+
+  return (
+    <Panel title="🔎 特性の逆引き" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      <input
+        value={query} onChange={e => setQuery(e.target.value)}
+        placeholder="特性名で検索…"
+        className="input-dark"
+        style={{ width: "100%", marginBottom: "8px" }}
+      />
+      <div style={{ maxHeight: "320px", overflowY: "auto" }}>
+        {filtered.length === 0 && (
+          <div style={{ color: "#444", fontSize: "11px", textAlign: "center", padding: "12px 0" }}>該当なし</div>
+        )}
+        {filtered.map(ab => (
+          <div key={ab} style={{ marginBottom: "10px" }}>
+            <div style={{ fontSize: "11px", color: color, fontWeight: "bold", marginBottom: "3px", borderBottom: "1px solid #1a1a2e", paddingBottom: "2px" }}>
+              {ab}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+              {abilityMap[ab].map(p => (
+                <span key={p[0]} style={{ fontSize: "10px", color: "#aaa", background: "#1a1a2e", borderRadius: "3px", padding: "1px 5px" }}>
+                  {p[1]}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Panel>
+  );
+}
