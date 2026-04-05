@@ -422,18 +422,19 @@ function EVTracker() {
           )}
 
           {iconEditing ? (
-            <div style={{ display: "flex", gap: "6px", marginBottom: "10px", alignItems: "center" }}>
-              <span style={{ fontSize: "11px", color: "#555", whiteSpace: "nowrap" }}>アイコン</span>
+            <div style={{ marginBottom: "10px" }}>
               <input
                 autoFocus
                 value={iconValue}
                 onChange={e => setIconValue(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.isComposing) updateIcon(iconValue); if (e.key === "Escape") setIconEditing(false); }}
                 placeholder="絵文字を入力"
-                style={{ flex: 1, minWidth: 0, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "20px", padding: "6px 10px", fontFamily: "inherit", outline: "none", textAlign: "center" }}
+                style={{ width: "100%", background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "20px", padding: "6px 10px", fontFamily: "inherit", outline: "none", textAlign: "center", boxSizing: "border-box" }}
               />
-              <button onClick={() => updateIcon(iconValue)} style={{ flexShrink: 0, background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: mon.color, fontSize: "11px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
-              <button onClick={() => setIconEditing(false)} style={{ flexShrink: 0, background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "8px 10px", cursor: "pointer", fontFamily: "inherit" }}>×</button>
+              <div style={{ display: "flex", gap: "6px", marginTop: "6px" }}>
+                <button onClick={() => updateIcon(iconValue)} style={{ flex: 1, background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: mon.color, fontSize: "11px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
+                <button onClick={() => setIconEditing(false)} style={{ background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "8px 10px", cursor: "pointer", fontFamily: "inherit" }}>×</button>
+              </div>
             </div>
           ) : (
             <button onClick={() => { setIconValue(mon.icon || ""); setIconEditing(true); }} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px", marginBottom: "10px" }}>
