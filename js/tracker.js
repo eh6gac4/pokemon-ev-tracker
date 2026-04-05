@@ -410,7 +410,7 @@ function EVTracker() {
                 value={renameValue}
                 onChange={e => setRenameValue(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.isComposing) renameMon(selected, renameValue); if (e.key === "Escape") setRenaming(false); }}
-                style={{ flex: 1, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "13px", padding: "8px 10px", fontFamily: "inherit", outline: "none" }}
+                style={{ flex: 1, minWidth: 0, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "13px", padding: "8px 10px", fontFamily: "inherit", outline: "none" }}
               />
               <button onClick={() => renameMon(selected, renameValue)} style={{ background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: mon.color, fontSize: "11px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
               <button onClick={() => setRenaming(false)} style={{ background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "8px 10px", cursor: "pointer", fontFamily: "inherit" }}>×</button>
@@ -430,7 +430,7 @@ function EVTracker() {
                 onChange={e => setIconValue(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.isComposing) updateIcon(iconValue); if (e.key === "Escape") setIconEditing(false); }}
                 placeholder="絵文字を入力"
-                style={{ flex: 1, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "20px", padding: "6px 10px", fontFamily: "inherit", outline: "none", textAlign: "center" }}
+                style={{ flex: 1, minWidth: 0, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "20px", padding: "6px 10px", fontFamily: "inherit", outline: "none", textAlign: "center" }}
               />
               <button onClick={() => updateIcon(iconValue)} style={{ background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: mon.color, fontSize: "11px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
               <button onClick={() => setIconEditing(false)} style={{ background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "8px 10px", cursor: "pointer", fontFamily: "inherit" }}>×</button>
