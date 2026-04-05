@@ -1729,3 +1729,94 @@ function StatRankPanel({ color }) {
   );
 }
 
+
+// ===== パーティ管理 =====
+function PartySlots({ slots, roster, color, onSlotSelect, onSlotClear, onEmptySlotClick }) {
+  const filled = slots.filter(Boolean).length;
+  return (
+    <div className="card" style={{ padding: "10px 12px", marginBottom: "16px", borderColor: color + "44" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+        <span style={{ fontSize: "10px", color: "#555", letterSpacing: "1px" }}>現在のパーティ</span>
+        <span style={{ fontSize: "9px", color: filled === 6 ? color : "#444" }}>{filled}/6</span>
+      </div>
+      <div style={{ display: "flex", gap: "5px" }}>
+        {[0,1,2,3,4,5].map(i => {
+          const name = slots[i] || null;
+          const mon = name ? roster.find(p => p.name === name) : null;
+          return (
+            <div key={i} style={{ flex: 1, minWidth: 0, position: "relative" }}>
+              <button
+                onClick={() => mon ? onSlotSelect(mon.name) : onEmptySlotClick(i)}
+                style={{
+                  width: "100%", background: mon ? `${mon.color}22` : "#0d0d1a",
+                  border: `1px solid ${mon ? mon.color + "66" : "#2a2a4a"}`,
+                  borderRadius: "8px", padding: "6px 2px 5px", cursor: "pointer",
+                  textAlign: "center", minHeight: "52px", display: "flex",
+                  flexDirection: "column", alignItems: "center", justifyContent: "center",
+                }}
+              >
+                {mon ? (
+                  <>
+                    <div style={{ fontSize: "18px", lineHeight: 1 }}>{mon.icon}</div>
+                    <div style={{ fontSize: "7px", color: mon.color, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", width: "100%", padding: "0 2px", marginTop: "3px" }}>{mon.name}</div>
+                  </>
+                ) : (
+                  <div style={{ fontSize: "16px", color: "#2a2a4a", lineHeight: 1 }}>＋</div>
+                )}
+              </button>
+              {mon && (
+                <button
+                  onClick={e => { e.stopPropagation(); onSlotClear(i); }}
+                  style={{
+                    position: "absolute", top: "-5px", right: "-5px",
+                    width: "16px", height: "16px", background: "#1a1a2e",
+                    border: "1px solid #3a3a5a", borderRadius: "50%",
+                    color: "#888", fontSize: "9px", cursor: "pointer",
+                    padding: 0, lineHeight: 1, fontFamily: "inherit",
+                  }}
+                >×</button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PartyPickerModal({ roster, activeParty, onSelect, onClose, color }) {
+  const available = roster.filter(p => !activeParty.includes(p.name));
+  return (
+    <div
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 200, display: "flex", alignItems: "flex-end" }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div style={{ width: "100%", background: "#1a1a2e", borderRadius: "16px 16px 0 0", padding: "16px 16px 24px", maxHeight: "65vh", overflowY: "auto" }}>
+        <div style={{ fontSize: "10px", color: "#555", marginBottom: "12px", letterSpacing: "2px", textAlign: "center" }}>パーティに入れるポケモンを選択</div>
+        {available.length === 0 ? (
+          <div style={{ textAlign: "center", color: "#555", fontSize: "11px", padding: "20px" }}>育成中のポケモンは全員パーティに入っています</div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "12px" }}>
+            {available.map(p => (
+              <button
+                key={p.name}
+                onClick={() => onSelect(p.name)}
+                style={{
+                  background: `${p.color}22`, border: `1px solid ${p.color}55`,
+                  borderRadius: "10px", padding: "10px 6px", cursor: "pointer", textAlign: "center",
+                }}
+              >
+                <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
+                <div style={{ fontSize: "10px", color: p.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+              </button>
+            ))}
+          </div>
+        )}
+        <button
+          onClick={onClose}
+          style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "8px", color: "#555", padding: "11px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px" }}
+        >キャンセル</button>
+      </div>
+    </div>
+  );
+}

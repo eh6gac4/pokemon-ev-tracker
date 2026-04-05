@@ -19,6 +19,8 @@ function EVTracker() {
   const [renameValue,  setRenameValue]  = useState("");
   const [iconEditing,  setIconEditing]  = useState(false);
   const [iconValue,    setIconValue]    = useState("");
+  const [activeParty,  setActiveParty]  = useState([null,null,null,null,null,null]);
+  const [partyPickSlot, setPartyPickSlot] = useState(null);
 
   // swipe to change tab
   const TABS = ["boken", "ikusei", "chosa"];
@@ -134,6 +136,10 @@ function EVTracker() {
         if (saved.captureCount != null) setCaptureCount(saved.captureCount);
         if (saved.captureGoals)  setCaptureGoals(saved.captureGoals);
         if (saved.todoList)      setTodoList(saved.todoList);
+        if (saved.activeParty) {
+          const ap = saved.activeParty;
+          setActiveParty([...ap, null, null, null, null, null, null].slice(0, 6));
+        }
       })
       .catch(() => {})
       .finally(() => setLoaded(true));
@@ -144,9 +150,9 @@ function EVTracker() {
     fetch("/api/data", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList }),
+      body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty }),
     }).catch(() => {});
-  }, [party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, loaded]);
+  }, [party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, loaded]);
 
   const toggleItem  = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
   const resetItems  = () => setCheckedItems({});
@@ -158,6 +164,18 @@ function EVTracker() {
   const toggleTodo = (id)  => setTodoList(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
   const deleteTodo = (id)  => setTodoList(prev => prev.filter(t => t.id !== id));
   const renameTodo = (id, text) => setTodoList(prev => prev.map(t => t.id === id ? { ...t, text } : t));
+
+  const setPartySlot = (slot, name) => {
+    setActiveParty(prev => {
+      const next = [...prev];
+      // 既に他のスロットにいれば外す
+      for (let i = 0; i < 6; i++) if (next[i] === name && i !== slot) next[i] = null;
+      next[slot] = name;
+      return next;
+    });
+    setPartyPickSlot(null);
+  };
+  const clearPartySlot = (slot) => setActiveParty(prev => { const n = [...prev]; n[slot] = null; return n; });
 
   const mon       = party.find(p => p.name === selected) || party[0];
   const evs       = allEVs[selected] || initEVs();
@@ -200,6 +218,7 @@ function EVTracker() {
     setAllEVs(prev => { const n = { ...prev }; delete n[name]; return n; });
     setAllMoves(prev => { const n = { ...prev }; delete n[name]; return n; });
     if (selected === name && next.length > 0) setSelected(next[0].name);
+    setActiveParty(prev => prev.map(n => n === name ? null : n));
   };
 
   const renameMon = (oldName, newName) => {
@@ -220,6 +239,7 @@ function EVTracker() {
       return n;
     });
     if (selected === oldName) setSelected(trimmed);
+    setActiveParty(prev => prev.map(n => n === oldName ? trimmed : n));
     setRenaming(false);
   };
 
@@ -255,11 +275,32 @@ function EVTracker() {
         {/* ===== 育成カラム ===== */}
         <div className={activeTab === "ikusei" ? "" : "col-hidden"}>
 
-          {/* Party grid */}
+          {/* 現在のパーティ */}
+          <PartySlots
+            slots={activeParty}
+            roster={party}
+            color={mon.color}
+            onSlotSelect={name => setSelected(name)}
+            onSlotClear={clearPartySlot}
+            onEmptySlotClick={slot => setPartyPickSlot(slot)}
+          />
+          {partyPickSlot !== null && (
+            <PartyPickerModal
+              roster={party}
+              activeParty={activeParty}
+              color={mon.color}
+              onSelect={name => setPartySlot(partyPickSlot, name)}
+              onClose={() => setPartyPickSlot(null)}
+            />
+          )}
+
+          {/* 育成リスト */}
+          <div style={{ fontSize: "10px", color: "#444", letterSpacing: "1px", marginBottom: "6px" }}>育成リスト</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "7px", marginBottom: "16px" }}>
             {party.map(p => {
               const t        = Object.values(allEVs[p.name] || initEVs()).reduce((a, b) => a + b, 0);
               const isActive = selected === p.name;
+              const inParty  = activeParty.includes(p.name);
               return (
                 <button
                   key={p.name}
@@ -270,8 +311,10 @@ function EVTracker() {
                     background: isActive ? `${p.color}22` : "#16213e",
                     border: `2px solid ${isActive ? p.color : "#2a2a4a"}`,
                     borderRadius: "10px", padding: "10px 6px 8px",
+                    position: "relative",
                   }}
                 >
+                  {inParty && <div style={{ position: "absolute", top: "4px", right: "5px", fontSize: "7px", color: p.color, lineHeight: 1 }}>▲</div>}
                   <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
                   <div style={{ fontSize: "10px", color: isActive ? p.color : "#aaa", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
                   <div style={{ fontSize: "9px", color: t >= MAX_TOTAL ? "#7fff7f" : "#555", marginTop: "2px" }}>{t}/{MAX_TOTAL}</div>
