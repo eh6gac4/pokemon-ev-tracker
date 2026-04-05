@@ -426,8 +426,8 @@ function EVTracker() {
 
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
-          <CapturePanel color={mon.color} captureCount={captureCount} captureGoals={captureGoals} onCountChange={setCaptureCount} onAddGoal={addCaptureGoal} onToggleGoal={toggleCaptureGoal} onDeleteGoal={deleteCaptureGoal} />
           <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} />
+          <CapturePanel color={mon.color} captureCount={captureCount} captureGoals={captureGoals} onCountChange={setCaptureCount} onAddGoal={addCaptureGoal} onToggleGoal={toggleCaptureGoal} onDeleteGoal={deleteCaptureGoal} />
           <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
         </div>
       </div>

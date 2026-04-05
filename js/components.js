@@ -1388,7 +1388,7 @@ const CAPTURE_MILESTONES = [
 ];
 
 function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal }) {
-  const [open, setOpen]   = useState(true);
+  const [open, setOpen]   = useState(false);
   const [query, setQuery] = useState("");
 
   const suggestions = query.length >= 1
