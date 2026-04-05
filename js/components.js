@@ -785,6 +785,84 @@ function NaturePicker({ value, color, onChange }) {
   );
 }
 
+// ─── item picker ─────────────────────────────────────────────────────────────
+
+function ItemPicker({ value, color, onChange }) {
+  const [open,  setOpen]  = useState(false);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef(null);
+
+  const filtered = query.trim()
+    ? HOLD_ITEMS.filter(it => it.name.includes(query.trim()) || it.cat.includes(query.trim()))
+    : HOLD_ITEMS;
+
+  const select = (name) => {
+    onChange(name);
+    setOpen(false);
+    setQuery("");
+  };
+
+  const current = HOLD_ITEMS.find(it => it.name === value) || null;
+
+  return (
+    <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: color + "22" }}>
+      <div style={{ fontSize: "10px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>持ち物</div>
+      <button
+        onClick={() => { setOpen(v => !v); if (!open) setTimeout(() => inputRef.current?.focus(), 30); setQuery(""); }}
+        style={{
+          width: "100%", textAlign: "left", fontFamily: "inherit",
+          background: open ? color + "22" : "#16213e",
+          border: `1px solid ${open ? color : "#2a2a4a"}`,
+          borderRadius: open ? "6px 6px 0 0" : "6px",
+          padding: "7px 10px", cursor: "pointer",
+          color: current ? "#e8e8e8" : "#444", fontSize: "12px",
+        }}
+      >
+        {current ? (
+          <>
+            <span style={{ color: color, marginRight: "6px" }}>{current.name}</span>
+            <span style={{ fontSize: "10px", color: "#888" }}>{current.note}</span>
+          </>
+        ) : "── 未設定 ──"}
+      </button>
+      {open && (
+        <div style={{ background: "#0d1b2a", border: `1px solid ${color}44`, borderTop: "none", borderRadius: "0 0 6px 6px", padding: "6px" }}>
+          <div style={{ display: "flex", gap: "4px", marginBottom: "4px" }}>
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="アイテム名・カテゴリで検索…"
+              style={{ flex: 1, background: "#16213e", border: `1px solid ${color}44`, borderRadius: "4px", padding: "5px 8px", color: "#e8e8e8", fontFamily: "inherit", fontSize: "11px", outline: "none" }}
+            />
+            {value && (
+              <button onClick={() => select("")} style={{ background: "transparent", border: "1px solid #ff444466", borderRadius: "4px", color: "#ff6666", fontSize: "10px", padding: "5px 8px", cursor: "pointer", fontFamily: "inherit" }}>
+                クリア
+              </button>
+            )}
+          </div>
+          <div style={{ maxHeight: "160px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
+            {filtered.map(it => (
+              <button key={it.name} onClick={() => select(it.name)}
+                style={{
+                  textAlign: "left", background: it.name === value ? color + "33" : "transparent",
+                  border: "none", borderRadius: "3px", padding: "4px 8px",
+                  color: it.name === value ? color : "#aaa", fontSize: "11px", cursor: "pointer", fontFamily: "inherit",
+                  display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px",
+                }}
+              >
+                <span style={{ whiteSpace: "nowrap" }}>{it.name}</span>
+                <span style={{ fontSize: "10px", color: "#555", textAlign: "right" }}>{it.note}</span>
+              </button>
+            ))}
+            {filtered.length === 0 && <div style={{ color: "#444", fontSize: "11px", padding: "4px 8px" }}>該当なし</div>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── main component ──────────────────────────────────────────────────────────
 
 function MovePicker({ moves, color, onChange, learnableMoves, learnset }) {

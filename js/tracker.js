@@ -179,6 +179,7 @@ function EVTracker() {
 
   const updateMemo   = (text) => setParty(prev => prev.map(p => p.name === selected ? { ...p, memo: text } : p));
   const updateNature = (name) => setParty(prev => prev.map(p => p.name === selected ? { ...p, nature: name } : p));
+  const updateItem   = (name) => setParty(prev => prev.map(p => p.name === selected ? { ...p, item: name } : p));
   const updateIcon   = (icon) => {
     const trimmed = icon.trim();
     if (!trimmed) return;
@@ -339,10 +340,13 @@ function EVTracker() {
           {/* 性格 */}
           <NaturePicker value={mon.nature || ""} color={mon.color} onChange={updateNature} />
 
+          {/* 持ち物 */}
+          <ItemPicker value={mon.item || ""} color={mon.color} onChange={updateItem} />
+
           {/* メモ */}
           <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: mon.color + "22" }}>
-            <div style={{ fontSize: "10px", color: "#555", marginBottom: "6px", letterSpacing: "1px" }}>メモ（持ち物など）</div>
-            <AutoTextarea value={mon.memo || ""} onChange={updateMemo} placeholder="例：ようき　こだわりスカーフ　…" />
+            <div style={{ fontSize: "10px", color: "#555", marginBottom: "6px", letterSpacing: "1px" }}>メモ</div>
+            <AutoTextarea value={mon.memo || ""} onChange={updateMemo} placeholder="自由メモ…" />
           </div>
 
           <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
