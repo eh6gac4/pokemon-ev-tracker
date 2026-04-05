@@ -20,9 +20,8 @@ function AutoTextarea({ value, onChange, placeholder }) {
       value={value}
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
-      rows={3}
       className="input-dark"
-      style={{ width: "100%", lineHeight: "1.5", fontSize: "11px", padding: "7px 10px", background: "#0d0d1a", border: "1px solid #2a2a4a" }}
+      style={{ width: "100%", lineHeight: "1.5", fontSize: "11px", padding: "7px 10px", background: "#0d0d1a", border: "1px solid #2a2a4a", minHeight: "65px" }}
     />
   );
 }
