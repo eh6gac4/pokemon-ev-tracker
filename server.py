@@ -80,8 +80,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         }.get(file_path.suffix, "application/octet-stream")
         raw_body = file_path.read_bytes()
         etag = f'"{hashlib.md5(raw_body).hexdigest()}"'
-        # .js/.css は no-store でキャッシュを完全に無効化、それ以外は no-cache で再検証
-        cache_control = "no-store" if file_path.suffix in (".js", ".css") else "no-cache"
+        # データファイル（大・変更少）は no-cache+ETag で304再利用、ロジック系は no-store
+        no_store_files = {"tracker.js", "components.js", "style.css"}
+        cache_control = "no-store" if file_path.name in no_store_files else "no-cache"
 
         # ETagが一致すれば 304 を返してボディ送信をスキップ
         if self.headers.get("If-None-Match") == etag:
