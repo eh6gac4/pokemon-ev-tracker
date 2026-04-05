@@ -408,12 +408,12 @@ function EVTracker() {
 
         {/* ===== データカラム ===== */}
         <div className={activeTab === "chosa" ? "" : "col-hidden"}>
-          <TypeChart color={mon.color} />
           <PokedexPanel color={mon.color} />
+          <TypeChart color={mon.color} />
+          <LocationGuide color={mon.color} />
           <IVChecker color={mon.color} />
           <EVGuide color={mon.color} />
           <EVSearch macho={macho} color={mon.color} />
-          <LocationGuide color={mon.color} />
           <MoveTutorPanel color={mon.color} />
           <MoveReversePanel color={mon.color} />
           <EVRankPanel color={mon.color} />

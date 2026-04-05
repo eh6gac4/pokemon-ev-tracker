@@ -1270,7 +1270,7 @@ function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
 }
 
 function MoveTutorPanel({ color }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <Panel title="📖 教え技の場所" open={open} onToggle={() => setOpen(o => !o)} color={color}>
