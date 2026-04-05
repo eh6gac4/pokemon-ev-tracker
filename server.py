@@ -5,6 +5,7 @@
 """
 
 import gzip
+import hashlib
 import http.server
 import json
 import os
@@ -77,20 +78,31 @@ class Handler(http.server.BaseHTTPRequestHandler):
             ".css":  "text/css",
             ".json": "application/json",
         }.get(file_path.suffix, "application/octet-stream")
-        body = file_path.read_bytes()
+        raw_body = file_path.read_bytes()
+        etag = f'"{hashlib.md5(raw_body).hexdigest()}"'
+
+        # ETagが一致すれば 304 を返してボディ送信をスキップ
+        if self.headers.get("If-None-Match") == etag:
+            self.send_response(304)
+            self.send_header("ETag", etag)
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            return
+
         accept_enc = self.headers.get("Accept-Encoding", "")
         if "gzip" in accept_enc and file_path.suffix in (".html", ".js", ".css", ".json"):
-            body = gzip.compress(body, compresslevel=6)
+            body = gzip.compress(raw_body, compresslevel=6)
             encoding = "gzip"
         else:
+            body = raw_body
             encoding = None
         self.send_response(200)
         self.send_header("Content-Type", mime)
         self.send_header("Content-Length", str(len(body)))
+        self.send_header("ETag", etag)
+        self.send_header("Cache-Control", "no-cache")
         if encoding:
             self.send_header("Content-Encoding", encoding)
-        cache = "no-store"
-        self.send_header("Cache-Control", cache)
         self.end_headers()
         self.wfile.write(body)
 

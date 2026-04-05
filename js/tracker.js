@@ -397,6 +397,13 @@ function EVTracker() {
           <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", letterSpacing: "1px" }}>
             GEN III · MAX 252/STAT · MAX 510/TOTAL · AUTO SAVE
           </div>
+          <button
+            onClick={() => location.reload()}
+            title="データファイルを再取得して再起動"
+            style={{ marginTop: "10px", width: "100%", background: "transparent", border: "1px solid #1a1a2e", borderRadius: "7px", color: "#2a2a4a", fontSize: "9px", padding: "6px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px" }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "#3a3a5a"; e.currentTarget.style.color = "#555"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "#1a1a2e"; e.currentTarget.style.color = "#2a2a4a"; }}
+          >↺ キャッシュをクリアして再読み込み</button>
         </div>
 
         {/* ===== データカラム ===== */}
