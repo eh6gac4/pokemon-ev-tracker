@@ -367,33 +367,33 @@ const EV_YIELD = [
 // EV稼ぎガイド（FR/LG）
 const EV_GUIDE = [
   { stat: "hp",  jp: "ＨＰ", spots: [
-    { name: "マリル",     ev: 2, note: "廃虚の谷なみのり 100%（FR）★ ※島4解放後" },
-    { name: "プリン",     ev: 2, note: "おつきみやま周辺・3番道路 10%" },
-    { name: "ヤドン",     ev: 1, note: "22番道路ほかなみのり 100%（LG）★" },
+    { name: "マリル",     ev: 2, level: "Lv15",    note: "廃虚の谷 草むら 10%（LG）★ ※島4-6解放後" },
+    { name: "プリン",     ev: 2, level: "Lv3-7",   note: "おつきみやま周辺・3番道路 10%" },
+    { name: "ヤドン",     ev: 1, level: "Lv20-40", note: "22番道路ほかなみのり 100%（LG）★" },
   ]},
   { stat: "atk", jp: "こうげき", spots: [
-    { name: "パラス",     ev: 1, note: "おつきみやまB1F 100%★" },
-    { name: "マンキー",   ev: 1, note: "22番道路 45%（FR）" },
-    { name: "オコリザル", ev: 2, note: "チャンピオンロード（FR）10%" },
+    { name: "パラス",     ev: 1, level: "Lv5-10",  note: "おつきみやまB1F 100%★" },
+    { name: "マンキー",   ev: 1, level: "Lv2-5",   note: "22番道路 45%（FR）" },
+    { name: "オコリザル", ev: 2, level: "Lv42",    note: "チャンピオンロード（FR）10%" },
   ]},
   { stat: "def", jp: "ぼうぎょ", spots: [
-    { name: "モンジャラ", ev: 1, note: "21番道路 100%★" },
-    { name: "サンド",     ev: 1, note: "4〜11番道路 25〜40%（LG）" },
-    { name: "イシツブテ", ev: 1, note: "おつきみやま / 岩山の洞窟 35%" },
+    { name: "モンジャラ", ev: 1, level: "Lv17-28", note: "21番道路 100%★" },
+    { name: "サンド",     ev: 1, level: "Lv11-17", note: "4〜11番道路 25〜40%（LG）" },
+    { name: "イシツブテ", ev: 1, level: "Lv7-10",  note: "おつきみやま / 岩山の洞窟 35%" },
   ]},
   { stat: "spa", jp: "とくこう", spots: [
-    { name: "ゴース",     ev: 1, note: "ポケモンタワー3〜6F 85〜90%★" },
-    { name: "ゴースト",   ev: 2, note: "ポケモンタワー7F 15%" },
-    { name: "コダック",   ev: 1, note: "各所なみのり 100%（FR）★" },
+    { name: "ゴース",     ev: 1, level: "Lv13-19", note: "ポケモンタワー3〜6F 85〜90%★" },
+    { name: "ゴースト",   ev: 2, level: "Lv23-25", note: "ポケモンタワー7F 15%" },
+    { name: "コダック",   ev: 1, level: "Lv20-40", note: "各所なみのり 100%（FR）★" },
   ]},
   { stat: "spd", jp: "とくぼう", spots: [
-    { name: "メノクラゲ", ev: 1, note: "なみのり全般 100%★（20〜21番道路ほか）" },
-    { name: "ドククラゲ", ev: 2, note: "なみのり中に低確率で混在" },
-    { name: "コンパン",   ev: 1, note: "12〜15番道路 30%（草むら）" },
+    { name: "メノクラゲ", ev: 1, level: "Lv5-40",  note: "なみのり全般 100%★（20〜21番道路ほか）" },
+    { name: "ドククラゲ", ev: 2, level: "Lv30-40", note: "なみのり中に低確率で混在" },
+    { name: "コンパン",   ev: 1, level: "Lv24-26", note: "12〜15番道路 30%（草むら）" },
   ]},
   { stat: "spe", jp: "すばやさ", spots: [
-    { name: "ディグダ",   ev: 1, note: "ディグダのあな 95%★" },
-    { name: "ダグトリオ", ev: 2, note: "ディグダのあな 5%" },
-    { name: "コラッタ",   ev: 1, note: "1番道路 50% / 22番道路 45%" },
+    { name: "ディグダ",   ev: 1, level: "Lv15-22", note: "ディグダのあな 95%★" },
+    { name: "ダグトリオ", ev: 2, level: "Lv29-31", note: "ディグダのあな 5%" },
+    { name: "コラッタ",   ev: 1, level: "Lv2-4",   note: "1番道路 50% / 22番道路 45%" },
   ]},
 ];

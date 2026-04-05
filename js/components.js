@@ -543,6 +543,7 @@ function EVGuide({ color }) {
             <div key={s.name} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "10px", marginBottom: "3px", paddingLeft: "4px" }}>
               <span style={{ color: "#ccc", minWidth: "72px" }}>{s.name}</span>
               <span style={{ color: "#7fff7f", minWidth: "24px", textAlign: "right" }}>+{s.ev}</span>
+              <span style={{ color: "#8888cc", minWidth: "52px" }}>{s.level}</span>
               <span style={{ color: "#444" }}>{s.note}</span>
             </div>
           ))}
