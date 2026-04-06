@@ -1,130 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FIELD_ITEMS, ITEM_DATA } from './data-items.js';
+import { ITEM_DATA } from './data-items.js';
 import { POKEMON_DATA } from './data-pokemon.js';
 import { Panel, tmItemName } from './components-base.jsx';
-
-export function AdventureTab({ color }) {
-  const [checked,   setChecked]   = useState(() => {
-    try { return JSON.parse(localStorage.getItem("ev-adventure") || "{}"); }
-    catch { return {}; }
-  });
-  const [collapsed, setCollapsed] = useState({});
-
-  useEffect(() => {
-    localStorage.setItem("ev-adventure", JSON.stringify(checked));
-  }, [checked]);
-
-  const toggle      = (id) => setChecked(prev => ({ ...prev, [id]: !prev[id] }));
-  const toggleArea  = (area) => setCollapsed(prev => ({ ...prev, [area]: !prev[area] }));
-
-  const totalItems   = FIELD_ITEMS.reduce((s, a) => s + a.items.length, 0);
-  const totalChecked = FIELD_ITEMS.reduce((s, a) => s + a.items.filter(i => checked[i.id]).length, 0);
-
-  const TYPE_META = {
-    field:  { label: "拾う",   bg: "#1a3a1a", col: "#7fff7f" },
-    gift:   { label: "もらう", bg: "#1a2a3a", col: "#5ecde5" },
-    gym:    { label: "ジム",   bg: "#3a1a2a", col: "#e880a0" },
-    hidden: { label: "隠し",   bg: "#2a2a1a", col: "#f5d020" },
-  };
-
-  return (
-    <div>
-      {/* 全体進捗 */}
-      <div className="card" style={{ padding: "10px 14px", marginBottom: "12px", borderColor: color + "33" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "6px" }}>
-          <span style={{ color }}>アイテムチェック</span>
-          <span style={{ color: totalChecked >= totalItems ? "#7fff7f" : "#aaa" }}>{totalChecked} / {totalItems}</span>
-        </div>
-        <div className="bar-bg" style={{ height: "6px" }}>
-          <div className="bar-fill" style={{
-            height: "100%", borderRadius: "4px",
-            width: `${totalItems ? (totalChecked / totalItems) * 100 : 0}%`,
-            background: totalChecked >= totalItems ? "#7fff7f" : `linear-gradient(90deg, ${color}88, ${color})`,
-          }} />
-        </div>
-      </div>
-
-      {/* エリアごとリスト */}
-      {FIELD_ITEMS.map(({ area, items }) => {
-        const areaChecked = items.filter(i => checked[i.id]).length;
-        const allDone     = areaChecked === items.length;
-        const isOpen      = !collapsed[area];
-        return (
-          <div key={area} className="card" style={{ padding: 0, marginBottom: "8px", borderColor: allDone ? color + "55" : "#2a2a4a" }}>
-            <button
-              onClick={() => toggleArea(area)}
-              style={{
-                width: "100%", background: "transparent", border: "none", cursor: "pointer",
-                padding: "9px 12px", display: "flex", justifyContent: "space-between", alignItems: "center",
-                fontFamily: "inherit",
-              }}
-            >
-              <span style={{ fontSize: "11px", color: allDone ? color : "#ccc" }}>
-                {isOpen ? "▼" : "▶"} {area}
-              </span>
-              <span style={{ fontSize: "10px", color: allDone ? color : "#555" }}>
-                {areaChecked}/{items.length}
-              </span>
-            </button>
-
-            {isOpen && (
-              <div style={{ borderTop: "1px solid #2a2a4a" }}>
-                {items.map(item => {
-                  const meta  = TYPE_META[item.type] || TYPE_META.gift;
-                  const isDone = !!checked[item.id];
-                  return (
-                    <label key={item.id} style={{
-                      display: "flex", alignItems: "flex-start", gap: "8px",
-                      padding: "7px 12px", cursor: "pointer",
-                      background: isDone ? "#ffffff06" : "transparent",
-                      borderBottom: "1px solid #1a1a2e",
-                    }}>
-                      <input
-                        type="checkbox" checked={isDone}
-                        onChange={() => toggle(item.id)}
-                        style={{ marginTop: "3px", accentColor: color, flexShrink: 0 }}
-                      />
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                          <span style={{ fontSize: "11px", color: isDone ? "#555" : "#ddd", textDecoration: isDone ? "line-through" : "none" }}>
-                            {tmItemName(item)}
-                          </span>
-                          <span style={{ fontSize: "9px", padding: "1px 5px", borderRadius: "3px", background: meta.bg, color: meta.col, flexShrink: 0 }}>
-                            {meta.label}
-                          </span>
-                        </div>
-                        {item.note && (
-                          <div style={{ fontSize: "9px", color: isDone ? "#444" : "#666", marginTop: "2px" }}>
-                            {item.note}
-                          </div>
-                        )}
-                      </div>
-                    </label>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      })}
-
-      <button
-        onClick={() => { if (window.confirm("チェックをすべてリセットしますか？")) setChecked({}); }}
-        style={{
-          width: "100%", background: "transparent", border: "1px solid #2a2a4a",
-          borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px",
-          cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px", marginTop: "4px",
-        }}
-      >
-        チェックをリセット
-      </button>
-
-      <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", letterSpacing: "1px", marginTop: "10px" }}>
-        FR/LG 準拠 · チェックはブラウザに保存
-      </div>
-    </div>
-  );
-}
 
 export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder }) {
   const [text, setText] = useState("");
@@ -297,12 +174,13 @@ export function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
   const [openAreas, setOpenAreas] = useState({});
   const [openImgs,  setOpenImgs]  = useState({});
 
-  const TYPE_ICON  = { gift: "🎁", tm: "💿", hm: "🔑", field: "📦", hidden: "🔍" };
+  const TYPE_ICON  = { gift: "🎁", tm: "💿", hm: "🔑", field: "📦", hidden: "🔍", gym: "🏆" };
   const FILTERS = [
     { key: "all",    label: "すべて" },
     { key: "gift",   label: "🎁 もらえる" },
     { key: "hm",     label: "🔑 HM" },
     { key: "tm",     label: "💿 TM" },
+    { key: "gym",    label: "🏆 ジム" },
     { key: "field",  label: "📦 落ちている" },
     { key: "hidden", label: "🔍 隠し" },
   ];
