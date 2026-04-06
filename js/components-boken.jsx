@@ -1,4 +1,8 @@
-function AdventureTab({ color }) {
+import React, { useState, useEffect, useRef } from 'react';
+import { FIELD_ITEMS, ITEM_DATA } from './data-items.js';
+import { Panel, tmItemName } from './components-base.jsx';
+
+export function AdventureTab({ color }) {
   const [checked,   setChecked]   = useState(() => {
     try { return JSON.parse(localStorage.getItem("ev-adventure") || "{}"); }
     catch { return {}; }
@@ -121,7 +125,7 @@ function AdventureTab({ color }) {
   );
 }
 
-function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder }) {
+export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder }) {
   const [text, setText] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
@@ -287,7 +291,7 @@ function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder
   );
 }
 
-function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
+export function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
   const [filter,    setFilter]    = useState("all");
   const [openAreas, setOpenAreas] = useState({});
   const [openImgs,  setOpenImgs]  = useState({});
@@ -413,7 +417,7 @@ const CAPTURE_MILESTONES = [
   { count: 60, item: "ぜんこくずかん",               location: "マサラタウン（殿堂入り後）" },
 ];
 
-function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal }) {
+export function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal }) {
   const [open, setOpen]   = useState(false);
   const [query, setQuery] = useState("");
 

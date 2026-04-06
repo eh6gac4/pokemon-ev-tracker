@@ -1,4 +1,14 @@
-function EVTracker() {
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  DEFAULT_PARTY, STATS, MAX_STAT, MAX_TOTAL, initEVs, COLORS, POKEMON_DATA
+} from './data-pokemon.js';
+import { getLearnableMoves, getLearnset, ALL_MOVES } from './data-moves.js';
+import { AutoTextarea, StatRow, Panel } from './components-base.jsx';
+import { AddMonModal, NaturePicker, ItemPicker, MovePicker, PartySlots, PartyPickerModal } from './components-ikusei.jsx';
+import { IVChecker, EVSearch, EVGuide, PokedexPanel, TypeChart, LocationGuide, MoveTutorPanel, MoveReversePanel, EVRankPanel, StatRankPanel, AbilitySearch } from './components-chosa.jsx';
+import { TodoList, CapturePanel, AdventurePanel } from './components-boken.jsx';
+
+export default function EVTracker() {
   const [party,     setParty]    = useState(DEFAULT_PARTY);
   const [allEVs,    setAllEVs]   = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
   const [allMoves,  setAllMoves] = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, ["","","",""]])));
@@ -504,6 +514,3 @@ function EVTracker() {
     </div>
   );
 }
-
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<EVTracker />);

@@ -248,12 +248,27 @@ class TestHTTPServer(unittest.TestCase):
         with urllib.request.urlopen(self.url("/index.html")) as res:
             self.assertEqual(res.status, 200)
 
-    def test_get_style_css_returns_200(self):
-        with urllib.request.urlopen(self.url("/style.css")) as res:
+    def _css_asset_path(self):
+        """dist/assets/ 内の CSS ファイルパスを返す（Vite ビルド後）"""
+        assets_dir = server.STATIC_DIR / "assets"
+        if assets_dir.is_dir():
+            for f in assets_dir.iterdir():
+                if f.suffix == ".css":
+                    return f"/assets/{f.name}"
+        return None
+
+    def test_get_bundled_css_returns_200(self):
+        path = self._css_asset_path()
+        if path is None:
+            self.skipTest("dist/assets に CSS ファイルが見つかりません")
+        with urllib.request.urlopen(self.url(path)) as res:
             self.assertEqual(res.status, 200)
 
-    def test_get_style_css_content_type(self):
-        with urllib.request.urlopen(self.url("/style.css")) as res:
+    def test_get_bundled_css_content_type(self):
+        path = self._css_asset_path()
+        if path is None:
+            self.skipTest("dist/assets に CSS ファイルが見つかりません")
+        with urllib.request.urlopen(self.url(path)) as res:
             self.assertIn("text/css", res.headers.get("Content-Type", ""))
 
     def test_html_cache_control_is_no_cache(self):

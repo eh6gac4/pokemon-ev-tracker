@@ -1,4 +1,10 @@
-function IVChecker({ color }) {
+import React, { useState, useMemo } from 'react';
+import { POKEMON_DATA, EV_YIELD, NATURES, ABILITY_DATA, STAT_JP, STAT_COL, EV_GUIDE, MAX_STAT, MAX_TOTAL, getEvoPaths } from './data-pokemon.js';
+import { ALL_MOVES, getLearnset, getLearnableMoves, TM_LIST, MOVE_DATA, TYPE_COLORS, TUTOR_LOCATIONS } from './data-moves.js';
+import { HOLD_ITEMS, LOCATION_DATA } from './data-items.js';
+import { Panel, PokemonSearch, MoveRow, VerBadge, tmItemName } from './components-base.jsx';
+
+export function IVChecker({ color }) {
   const [open,   setOpen]   = useState(false);
   const [mon,    setMon]    = useState(0);
   const [lvStr,  setLvStr]  = useState("50");
@@ -104,7 +110,7 @@ function IVChecker({ color }) {
   );
 }
 
-function EVSearch({ macho, color }) {
+export function EVSearch({ macho, color }) {
   const [open,   setOpen]   = useState(false);
   const [query,  setQuery]  = useState("");
   const [filter, setFilter] = useState(null);
@@ -163,7 +169,7 @@ function EVSearch({ macho, color }) {
 
 // わざ一行表示（PokedexPanel の各タブで共用）
 
-function PokedexPanel({ color }) {
+export function PokedexPanel({ color }) {
   const [open, setOpen]       = useState(false);
   const [mon,  setMon]        = useState(0);
   const [moveTab, setMoveTab]     = useState("lv");
@@ -323,7 +329,7 @@ function PokedexPanel({ color }) {
   );
 }
 
-function EVGuide({ color }) {
+export function EVGuide({ color }) {
   const [open, setOpen] = useState(false);
   return (
     <Panel title="📖 EV稼ぎガイド（FR/LG）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
@@ -345,7 +351,7 @@ function EVGuide({ color }) {
   );
 }
 
-function TypeChart({ color }) {
+export function TypeChart({ color }) {
   const [open, setOpen] = useState(false);
 
   const TYPES = ["ノーマル","ほのお","みず","でんき","くさ","こおり","かくとう","どく","じめん","ひこう","エスパー","むし","いわ","ゴースト","りゅう","あく","はがね"];
@@ -425,7 +431,7 @@ function TypeChart({ color }) {
   );
 }
 
-function LocationGuide({ color }) {
+export function LocationGuide({ color }) {
   const [open, setOpen] = useState(false);
   const [ver, setVer] = useState("all");
 
@@ -482,7 +488,7 @@ function LocationGuide({ color }) {
 
 // ─── nature picker ───────────────────────────────────────────────────────────
 
-function MoveTutorPanel({ color }) {
+export function MoveTutorPanel({ color }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -513,7 +519,7 @@ function MoveTutorPanel({ color }) {
   );
 }
 
-function MoveReversePanel({ color }) {
+export function MoveReversePanel({ color }) {
   const [open, setOpen]   = useState(false);
   const [query, setQuery] = useState("");
   const [chosen, setChosen] = useState("");
@@ -617,7 +623,7 @@ function MoveReversePanel({ color }) {
 // EV稼ぎ効率ランキング
 // ─────────────────────────────────────────
 
-function EVRankPanel({ color }) {
+export function EVRankPanel({ color }) {
   const [open, setOpen] = useState(false);
   const [stat, setStat] = useState("hp");
 
@@ -663,7 +669,7 @@ function EVRankPanel({ color }) {
 // 種族値ランキング
 // ─────────────────────────────────────────
 
-function StatRankPanel({ color }) {
+export function StatRankPanel({ color }) {
   const [open, setOpen] = useState(false);
   const [stat, setStat] = useState("hp");
 
@@ -715,7 +721,7 @@ function StatRankPanel({ color }) {
 
 // ===== パーティ管理 =====
 
-function AbilitySearch({ color }) {
+export function AbilitySearch({ color }) {
   const [open,  setOpen]  = useState(false);
   const [query, setQuery] = useState("");
 

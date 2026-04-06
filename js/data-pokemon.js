@@ -1,4 +1,4 @@
-const DEFAULT_PARTY = [
+export const DEFAULT_PARTY = [
   { name: "リザードン", icon: "🔥", color: "#FF6B35", memo: "", nature: "", dexId: 5   },
   { name: "ガラガラ",   icon: "💀", color: "#A0A0A0", memo: "", nature: "", dexId: 104 },
   { name: "ギャラドス", icon: "🌊", color: "#4A90D9", memo: "", nature: "", dexId: 129 },
@@ -7,7 +7,7 @@ const DEFAULT_PARTY = [
   { name: "ルージュラ", icon: "💋", color: "#E880A0", memo: "", nature: "", dexId: 123 },
 ];
 
-const STATS = [
+export const STATS = [
   { key: "hp",  jp: "ＨＰ" },
   { key: "atk", jp: "こうげき" },
   { key: "def", jp: "ぼうぎょ" },
@@ -16,20 +16,20 @@ const STATS = [
   { key: "spe", jp: "すばやさ" },
 ];
 
-const STAT_JP  = Object.fromEntries(STATS.map(s => [s.key, s.jp]));
-const STAT_COL = { hp:"#7fff7f", atk:"#ff6b6b", def:"#f5a623", spa:"#4a90d9", spd:"#7ed321", spe:"#e880a0" };
+export const STAT_JP  = Object.fromEntries(STATS.map(s => [s.key, s.jp]));
+export const STAT_COL = { hp:"#7fff7f", atk:"#ff6b6b", def:"#f5a623", spa:"#4a90d9", spd:"#7ed321", spe:"#e880a0" };
 
-const COLORS = ["#FF6B35","#4A90D9","#7DBE8A","#F5D020","#E880A0","#A0A0A0","#C97AE0","#FF8FAB","#5ECDE5","#F4A261"];
-const ICONS  = ["🔥","💧","🌿","⚡","🧊","🌊","💀","😴","💋","🦅","🐉","👊","🌙","☀️","🌀","🪨","🎭","🤖","🐭","🐣"];
+export const COLORS = ["#FF6B35","#4A90D9","#7DBE8A","#F5D020","#E880A0","#A0A0A0","#C97AE0","#FF8FAB","#5ECDE5","#F4A261"];
+export const ICONS  = ["🔥","💧","🌿","⚡","🧊","🌊","💀","😴","💋","🦅","🐉","👊","🌙","☀️","🌀","🪨","🎭","🤖","🐭","🐣"];
 
-const MAX_STAT  = 252;
-const MAX_TOTAL = 510;
-const VITAMIN_CAP = 100;
+export const MAX_STAT  = 252;
+export const MAX_TOTAL = 510;
+export const VITAMIN_CAP = 100;
 
-const initEVs = () => Object.fromEntries(STATS.map(s => [s.key, 0]));
-const vitaminLeft = (ev) => ev < VITAMIN_CAP ? Math.ceil((VITAMIN_CAP - ev) / 10) : 0;
+export const initEVs = () => Object.fromEntries(STATS.map(s => [s.key, 0]));
+export const vitaminLeft = (ev) => ev < VITAMIN_CAP ? Math.ceil((VITAMIN_CAP - ev) / 10) : 0;
 
-const NATURES = [
+export const NATURES = [
   { name:"がんばりや", up:null,  dn:null  },
   { name:"さみしがり", up:"atk", dn:"def" },
   { name:"ゆうかん",   up:"atk", dn:"spe" },
@@ -58,7 +58,7 @@ const NATURES = [
 ];
 
 // カントー151匹の種族値 [id, 日本語名, HP, こうげき, ぼうぎょ, とくこう, とくぼう, すばやさ]
-const POKEMON_DATA = [
+export const POKEMON_DATA = [
   [1,"フシギダネ",45,49,49,65,65,45],[2,"フシギソウ",60,62,63,80,80,60],[3,"フシギバナ",80,82,83,100,100,80],
   [4,"ヒトカゲ",39,52,43,60,50,65],[5,"リザード",58,64,58,80,65,80],[6,"リザードン",78,84,78,109,85,100],
   [7,"ゼニガメ",44,48,65,50,64,43],[8,"カメール",59,63,80,65,80,58],[9,"カメックス",79,83,100,85,105,78],
@@ -131,11 +131,11 @@ const POKEMON_DATA = [
   [150,"ミュウツー",106,110,90,154,90,130],[151,"ミュウ",100,100,100,100,100,100],
 ];
 // [id, name, hp, atk, def, spa, spd, spe] のインデックス
-const PD = { hp:2, atk:3, def:4, spa:5, spd:6, spe:7 };
+export const PD = { hp:2, atk:3, def:4, spa:5, spd:6, spe:7 };
 
 // 進化データ（FR/LG 第1世代 151匹）
 // EVOLUTION_DATA[dexId] = { pre:[{id,cond}], next:[{id,cond}] }
-const EVOLUTION_DATA = {
+export const EVOLUTION_DATA = {
   1:{next:[{id:2,cond:"Lv.16"}]},
   2:{pre:[{id:1,cond:"Lv.16"}],next:[{id:3,cond:"Lv.32"}]},
   3:{pre:[{id:2,cond:"Lv.32"}]},
@@ -266,7 +266,7 @@ const EVOLUTION_DATA = {
 
 // 進化チェーンの全経路を返す（分岐あり対応）
 // 各経路は [{type:"mon",id,name} | {type:"cond",cond}] の配列
-function getEvoPaths(dexId) {
+export function getEvoPaths(dexId) {
   // ルートまで遡る
   let root = dexId;
   const visited = new Set();
@@ -293,7 +293,7 @@ function getEvoPaths(dexId) {
 }
 
 // 倒した時に得られるEV [hp,atk,def,spa,spd,spe]（Bulbapedia Gen III）
-const EV_YIELD = [
+export const EV_YIELD = [
   [0,0,0,1,0,0],[0,0,0,1,1,0],[0,0,0,2,1,0], // 001-003
   [0,0,0,0,0,1],[0,0,0,1,0,1],[0,0,0,3,0,0], // 004-006
   [0,0,1,0,0,0],[0,0,1,0,1,0],[0,0,0,0,3,0], // 007-009
@@ -365,7 +365,7 @@ const EV_YIELD = [
 ];
 
 // EV稼ぎガイド（FR/LG）
-const EV_GUIDE = [
+export const EV_GUIDE = [
   { stat: "hp",  jp: "ＨＰ", spots: [
     { name: "マリル",     ev: 2, level: "Lv15",    note: "廃虚の谷 草むら 10%（LG）★ ※島4-6解放後" },
     { name: "プリン",     ev: 2, level: "Lv3-7",   note: "おつきみやま周辺・3番道路 10%" },
@@ -398,7 +398,7 @@ const EV_GUIDE = [
   ]},
 ];
 
-const ABILITY_DATA = [
+export const ABILITY_DATA = [
   ["しんりょく"],
   ["しんりょく"],
   ["しんりょく"],

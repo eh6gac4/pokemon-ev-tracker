@@ -1,13 +1,15 @@
-const { useState, useEffect, useRef } = React;
+import React, { useState, useEffect, useRef } from 'react';
+import { MAX_STAT, vitaminLeft, POKEMON_DATA } from './data-pokemon.js';
+import { TM_LIST } from './data-moves.js';
 
-function tmItemName(item) {
+export function tmItemName(item) {
   if (!item.tmId) return item.name;
   const num = item.tmId.slice(2);
   const prefix = item.tmId.startsWith("HM") ? "ひでんマシン" : "わざマシン";
   return `${prefix}${num} ${TM_LIST[item.tmId] || ""}`;
 }
 
-function AutoTextarea({ value, onChange, placeholder }) {
+export function AutoTextarea({ value, onChange, placeholder }) {
   const ref = useRef(null);
   useEffect(() => {
     if (!ref.current) return;
@@ -26,7 +28,7 @@ function AutoTextarea({ value, onChange, placeholder }) {
   );
 }
 
-function Panel({ title, open, onToggle, color, children }) {
+export function Panel({ title, open, onToggle, color, children }) {
   return (
     <div style={{ marginBottom: "10px" }}>
       <button
@@ -50,7 +52,7 @@ function Panel({ title, open, onToggle, color, children }) {
   );
 }
 
-function StatRow({ stat, val, color, macho, onChange }) {
+export function StatRow({ stat, val, color, macho, onChange }) {
   const isMaxed = val >= MAX_STAT;
   const vLeft   = vitaminLeft(val);
   const steps = macho ? [[-1,"－"],[1,"＋2"],[2,"＋4"],[3,"＋6"]] : [[-1,"－"],[1,"＋1"],[2,"＋2"],[3,"＋3"]];
@@ -90,7 +92,7 @@ function StatRow({ stat, val, color, macho, onChange }) {
 
 // 共通ポケモン検索コンポーネント（AddMonModal・IVChecker・PokedexPanel で共用）
 
-function PokemonSearch({ value, onSelect, color, placeholder = "ポケモン名・番号で検索…", maxHeight = "200px" }) {
+export function PokemonSearch({ value, onSelect, color, placeholder = "ポケモン名・番号で検索…", maxHeight = "200px" }) {
   const [query, setQuery] = useState("");
   const [open,  setOpen]  = useState(false);
 
@@ -134,7 +136,7 @@ function PokemonSearch({ value, onSelect, color, placeholder = "ポケモン名�
   );
 }
 
-function MoveRow({ move, prefix = null }) {
+export function MoveRow({ move, prefix = null }) {
   const md = MOVE_DATA[move];
   const tc = md ? (TYPE_COLORS[md[0]] || "#555") : null;
   return (
@@ -160,7 +162,7 @@ function MoveRow({ move, prefix = null }) {
   );
 }
 
-function VerBadge({ v }) {
+export function VerBadge({ v }) {
   if (!v) return null;
   const isFR = v === "FR";
   return (

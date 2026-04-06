@@ -11,31 +11,9 @@
     <meta name="apple-mobile-web-app-title" content="ポケログ">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a2e">
-    <link rel="stylesheet" href="/style.css">
   </head>
   <body>
     <div id="root"></div>
-    <script src="https://unpkg.com/preact@10/dist/preact.umd.js"></script>
-    <script src="https://unpkg.com/preact@10/hooks/dist/hooks.umd.js"></script>
-    <script src="https://unpkg.com/preact@10/compat/dist/compat.umd.js"></script>
-    <script>
-      // Reactのグローバルエイリアスを設定
-      window.React = preactCompat;
-      // createRootのポリフィル（preact/compatに含まれないため）
-      window.ReactDOM = {
-        createRoot: function(container) {
-          return { render: function(el) { preact.render(el, container); } };
-        }
-      };
-    </script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="/js/data-pokemon.js"></script>
-    <script src="/js/data-moves.js"></script>
-    <script src="/js/data-items.js"></script>
-    <script type="text/babel" src="/js/components-base.js"></script>
-    <script type="text/babel" src="/js/components-ikusei.js"></script>
-    <script type="text/babel" src="/js/components-chosa.js"></script>
-    <script type="text/babel" src="/js/components-boken.js"></script>
-    <script type="text/babel" src="/js/tracker.js"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

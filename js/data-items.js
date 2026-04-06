@@ -1,4 +1,4 @@
-const ITEM_DATA = [
+export const ITEM_DATA = [
   { area: "マサラタウン", items: [
     { id: "ma01", name: "タウンマップ",                    type: "gift",   note: "ライバルの家でグリーン（リーフ）から" },
   ]},
@@ -115,7 +115,7 @@ const ITEM_DATA = [
 ];
 
 // ─── 持ち物リスト（FR/LG Gen III） ───────────────────────────────────────────
-const HOLD_ITEMS = [
+export const HOLD_ITEMS = [
   // バトル
   { name: "こだわりハチマキ", cat: "バトル",     note: "物理攻撃×1.5（技固定）" },
   { name: "たべのこし",       cat: "バトル",     note: "毎ターンHP 1/16回復" },
@@ -163,7 +163,7 @@ const HOLD_ITEMS = [
   { name: "やすらぎのすず",   cat: "その他",     note: "なつき度が上がりやすい" },
 ];
 
-const LOCATION_DATA = [
+export const LOCATION_DATA = [
   // ─── マサラタウン → トキワシティ ───
   { name: "1番道路", ver: "", pokemon: [
     { name: "ポッポ",     evs: { spe: 1 }, rate: "50%" },
@@ -452,7 +452,7 @@ const LOCATION_DATA = [
 
 // FR/LG フィールドアイテム・もらいものチェックリスト（Bulbapedia確認済み）
 // type: "field"=拾う / "gift"=もらう / "gym"=ジム制覇 / "hidden"=隠し（ダウジングマシン）
-const FIELD_ITEMS = [
+export const FIELD_ITEMS = [
   { area: "マサラタウン", items: [
     { id:"m01", name:"タウンマップ", type:"gift", note:"自宅2F・姉デイジーからもらう" },
   ]},

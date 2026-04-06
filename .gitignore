@@ -10,3 +10,4 @@ node_modules/
 
 # Local environment (contains paths/secrets)
 .env
+dist/

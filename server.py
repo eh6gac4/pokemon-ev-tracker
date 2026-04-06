@@ -15,7 +15,8 @@ from pathlib import Path
 
 PORT = int(os.environ.get("PORT", 8080))
 DB_PATH = Path(os.environ.get("DB_PATH", Path(__file__).parent / "ev_data.db"))
-STATIC_DIR = Path(__file__).parent
+_dist = Path(__file__).parent / "dist"
+STATIC_DIR = _dist if _dist.is_dir() else Path(__file__).parent
 
 
 def init_db():

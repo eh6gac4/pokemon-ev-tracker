@@ -1,4 +1,4 @@
-const LEARNSET = [
+export const LEARNSET = [
   null,
   [[1,"たいあたり"],[4,"なきごえ"],[7,"やどりぎのタネ"],[10,"つるのムチ"],[15,"どくのこな"],[15,"ねむりごな"],[20,"はっぱカッター"],[25,"あまいかおり"],[32,"せいちょう"],[39,"こうごうせい"],[46,"ソーラービーム"]],
   [[1,"なきごえ"],[1,"やどりぎのタネ"],[1,"たいあたり"],[4,"なきごえ"],[7,"やどりぎのタネ"],[10,"つるのムチ"],[15,"どくのこな"],[15,"ねむりごな"],[22,"はっぱカッター"],[29,"あまいかおり"],[38,"せいちょう"],[47,"こうごうせい"],[56,"ソーラービーム"]],
@@ -153,7 +153,7 @@ const LEARNSET = [
   [[1,"はたく"],[10,"へんしん"],[20,"メガトンパンチ"],[30,"ゆびをふる"],[40,"サイコキネシス"],[50,"げんしのちから"]],
 ];
 
-const TM_LIST = {
+export const TM_LIST = {
   "TM01": "きあいパンチ",   "TM02": "ドラゴンクロー", "TM03": "みずのはどう",
   "TM04": "めいそう",       "TM05": "ほえる",         "TM06": "どくどく",
   "TM07": "あられ",         "TM08": "ビルドアップ",   "TM09": "タネマシンガン",
@@ -177,7 +177,7 @@ const TM_LIST = {
 };
 
 // FR/LG わざマシン・ひでんマシン習得わざ（TM/HM番号付き、PokéAPI確認済み）
-const TM_MOVES = [
+export const TM_MOVES = [
 null,  // 0-indexed placeholder
   ["TM06", "TM09", "TM10", "TM11", "TM17", "TM19", "TM21", "TM22", "TM27", "TM32", "TM36", "TM42", "TM43", "TM44", "TM45", "HM01", "HM04", "HM05", "HM06"],  // フシギダネ
   ["TM06", "TM09", "TM10", "TM11", "TM17", "TM19", "TM21", "TM22", "TM27", "TM32", "TM36", "TM42", "TM43", "TM44", "TM45", "HM01", "HM04", "HM05", "HM06"],  // フシギソウ
@@ -334,7 +334,7 @@ null,  // 0-indexed placeholder
 
 // FR/LG 遺伝技（タマゴわざ）
 // 進化形や伝説ポケモンなど遺伝技がないポケモンは空配列 []
-const EGG_MOVES = [
+export const EGG_MOVES = [
 null,  // 0-indexed placeholder
   ["あまえる", "のろい", "くさぶえ", "ひかりのかべ", "マジカルリーフ", "はなびらのまい", "しんぴのまもり", "ロケットずつき"],  // フシギダネ
   [],  // フシギソウ
@@ -490,17 +490,17 @@ null,  // 0-indexed placeholder
 ];
 
 // 教え技パターン定数
-const TP_NONE    = [];
-const TP_DREAM   = ["ゆめくい"];
-const TP_BODY    = ["のしかかり", "ゆめくい"];
-const TP_BODY_CTR = ["のしかかり", "カウンター", "ゆめくい"];
-const TP_BODY_CTR_MP = ["のしかかり", "カウンター", "メガトンパンチ", "ゆめくい"];
-const TP_FULL    = ["のしかかり", "カウンター", "メガトンパンチ", "メガトンキック", "ゆめくい"];
-const TP_NO_CTR  = ["のしかかり", "メガトンパンチ", "メガトンキック", "ゆめくい"];
-const TP_CHAN    = ["のしかかり", "カウンター", "メガトンパンチ", "メガトンキック", "ゆめくい", "タマゴうみ"];
+export const TP_NONE    = [];
+export const TP_DREAM   = ["ゆめくい"];
+export const TP_BODY    = ["のしかかり", "ゆめくい"];
+export const TP_BODY_CTR = ["のしかかり", "カウンター", "ゆめくい"];
+export const TP_BODY_CTR_MP = ["のしかかり", "カウンター", "メガトンパンチ", "ゆめくい"];
+export const TP_FULL    = ["のしかかり", "カウンター", "メガトンパンチ", "メガトンキック", "ゆめくい"];
+export const TP_NO_CTR  = ["のしかかり", "メガトンパンチ", "メガトンキック", "ゆめくい"];
+export const TP_CHAN    = ["のしかかり", "カウンター", "メガトンパンチ", "メガトンキック", "ゆめくい", "タマゴうみ"];
 
 // FR/LG 教え技（一回限り）（Bulbapedia Gen III準拠）
-const TUTOR_MOVES = [
+export const TUTOR_MOVES = [
 null,  // 0-indexed placeholder
   TP_FULL,  // フシギダネ
   TP_FULL,  // フシギソウ
@@ -656,7 +656,7 @@ null,  // 0-indexed placeholder
 ];
 
 // 技データをポケモン図鑑IDで取得するユーティリティ
-function getLearnset(dexId) {
+export function getLearnset(dexId) {
   return {
     lv:    LEARNSET[dexId]    || [],
     tm:    TM_MOVES[dexId]    || [],
@@ -666,7 +666,7 @@ function getLearnset(dexId) {
 }
 
 // 習得可能な全技（重複なし・五十音順）
-function getLearnableMoves(dexId) {
+export function getLearnableMoves(dexId) {
   const { lv, tm, egg, tutor } = getLearnset(dexId);
   return [...new Set([
     ...lv.map(([, m]) => m),
@@ -677,7 +677,7 @@ function getLearnableMoves(dexId) {
 }
 
 // 全技一覧（レベルアップ・TM/HM・遺伝技・教え技から収集、重複なし・五十音順）
-const ALL_MOVES = [...new Set([
+export const ALL_MOVES = [...new Set([
   ...LEARNSET.filter(Boolean).flat().map(([, name]) => name),
   ...TM_MOVES.filter(Boolean).flat().map(id => TM_LIST[id]).filter(Boolean),
   ...EGG_MOVES.filter(Boolean).flat(),
@@ -685,7 +685,7 @@ const ALL_MOVES = [...new Set([
 ])].sort((a, b) => a.localeCompare(b, "ja"));
 
 // タイプ色（Gen III準拠）
-const TYPE_COLORS = {
+export const TYPE_COLORS = {
   "ノーマル": "#A8A878", "ほのお": "#F08030", "みず": "#6890F0", "でんき": "#F8D030",
   "くさ": "#78C850", "こおり": "#98D8D8", "かくとう": "#C03028", "どく": "#A040A0",
   "じめん": "#E0C068", "ひこう": "#A890F0", "エスパー": "#F85888", "むし": "#A8B820",
@@ -693,7 +693,7 @@ const TYPE_COLORS = {
 };
 
 // わざデータ [タイプ, 威力(null=変動/なし), 命中率(null=必中/変動), PP]（FR/LG Gen III準拠）
-const MOVE_DATA = {
+export const MOVE_DATA = {
   "あくび": ["ノーマル", null, 100, 10],
   "あくまのキッス": ["ノーマル", null, 75, 10],
   "あくむ": ["ゴースト", null, 100, 15],
@@ -1016,7 +1016,7 @@ const MOVE_DATA = {
 };
 
 // FR/LG 教え技NPCの場所一覧（game8.jp + yakkun.com 準拠）
-const TUTOR_LOCATIONS = [
+export const TUTOR_LOCATIONS = [
   { move: "ちきゅうなげ",   location: "ニビシティ",         note: "かがくはくぶつかんの隣の民家" },
   { move: "メガトンパンチ", location: "4番道路",            note: "おつきみやまを抜けた先のからておう（左）" },
   { move: "メガトンキック", location: "4番道路",            note: "おつきみやまを抜けた先のからておう（右）" },

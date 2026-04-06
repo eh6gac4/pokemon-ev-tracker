@@ -1,4 +1,10 @@
-function AddMonModal({ newName, newIcon, newColor, newDexId, setNewName, setNewIcon, setNewColor, setNewDexId, onAdd, onCancel, borderColor }) {
+import React, { useState, useRef } from 'react';
+import { POKEMON_DATA, COLORS, ICONS, NATURES, MAX_STAT, MAX_TOTAL } from './data-pokemon.js';
+import { TM_LIST, ALL_MOVES, getLearnset, getLearnableMoves } from './data-moves.js';
+import { ITEM_DATA } from './data-items.js';
+import { Panel, PokemonSearch, AutoTextarea, tmItemName } from './components-base.jsx';
+
+export function AddMonModal({ newName, newIcon, newColor, newDexId, setNewName, setNewIcon, setNewColor, setNewDexId, onAdd, onCancel, borderColor }) {
 
   return (
     <div className="card" style={{ padding: "14px", marginBottom: "14px", borderColor: borderColor + "55", borderRadius: "12px" }}>
@@ -50,7 +56,7 @@ const natLabel = (n) => n.up
   ? `${n.name}（↑${STAT_JP[n.up]} / ↓${STAT_JP[n.dn]}）`
   : `${n.name}（補正なし）`;
 
-function NaturePicker({ value, color, onChange }) {
+export function NaturePicker({ value, color, onChange }) {
   const [open,  setOpen]  = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef(null);
@@ -132,7 +138,7 @@ function NaturePicker({ value, color, onChange }) {
 
 // ─── item picker ─────────────────────────────────────────────────────────────
 
-function ItemPicker({ value, color, onChange }) {
+export function ItemPicker({ value, color, onChange }) {
   const [open,  setOpen]  = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef(null);
@@ -210,7 +216,7 @@ function ItemPicker({ value, color, onChange }) {
 
 // ─── main component ──────────────────────────────────────────────────────────
 
-function MovePicker({ moves, color, onChange, learnableMoves, learnset }) {
+export function MovePicker({ moves, color, onChange, learnableMoves, learnset }) {
   const [activeSlot, setActiveSlot] = useState(null);
   const [query, setQuery]           = useState("");
   const inputRef = useRef(null);
@@ -346,7 +352,7 @@ function MovePicker({ moves, color, onChange, learnableMoves, learnset }) {
   );
 }
 
-function PartySlots({ slots, roster, color, onSlotSelect, onSlotClear, onEmptySlotClick }) {
+export function PartySlots({ slots, roster, color, onSlotSelect, onSlotClear, onEmptySlotClick }) {
   const filled = slots.filter(Boolean).length;
   return (
     <div className="card" style={{ padding: "10px 12px", marginBottom: "16px", borderColor: color + "44" }}>
@@ -399,7 +405,7 @@ function PartySlots({ slots, roster, color, onSlotSelect, onSlotClear, onEmptySl
   );
 }
 
-function PartyPickerModal({ roster, activeParty, onSelect, onClose, color }) {
+export function PartyPickerModal({ roster, activeParty, onSelect, onClose, color }) {
   const available = roster.filter(p => !activeParty.includes(p.name));
   return (
     <div
