@@ -93,6 +93,7 @@ export const ITEM_DATA = [
   ]},
   { area: "トキワシティ（ジム）", items: [
     { id: "to01", tmId: "TM26",             type: "tm",     note: "サカキ撃破後にもらえる" },
+    { id: "to02", name: "きょうせいギプス", type: "hidden", note: "トキワジム内・サカキがいた場所でダウジングマシン使用" },
   ]},
   { area: "22〜23番道路・はつでんしょ", items: [
     { id: "r23a", name: "サンダー",                        type: "field",  note: "はつでんしょ B1F（1匹のみ）" },
