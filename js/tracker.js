@@ -160,10 +160,19 @@ function EVTracker() {
   const toggleCaptureGoal = (id)   => setCaptureGoals(prev => prev.map(g => g.id === id ? { ...g, done: !g.done } : g));
   const deleteCaptureGoal = (id)   => setCaptureGoals(prev => prev.filter(g => g.id !== id));
 
-  const addTodo    = (text) => setTodoList(prev => [{ id: Date.now().toString(), text, done: false }, ...prev]);
-  const toggleTodo = (id)  => setTodoList(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
-  const deleteTodo = (id)  => setTodoList(prev => prev.filter(t => t.id !== id));
-  const renameTodo = (id, text) => setTodoList(prev => prev.map(t => t.id === id ? { ...t, text } : t));
+  const addTodo      = (text) => setTodoList(prev => [{ id: Date.now().toString(), text, done: false }, ...prev]);
+  const toggleTodo   = (id)  => setTodoList(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  const deleteTodo   = (id)  => setTodoList(prev => prev.filter(t => t.id !== id));
+  const renameTodo   = (id, text) => setTodoList(prev => prev.map(t => t.id === id ? { ...t, text } : t));
+  const reorderTodo  = (fromId, toId) => setTodoList(prev => {
+    const from = prev.findIndex(t => t.id === fromId);
+    const to   = prev.findIndex(t => t.id === toId);
+    if (from === -1 || to === -1 || from === to) return prev;
+    const next = [...prev];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    return next;
+  });
 
   const setPartySlot = (slot, name) => {
     setActiveParty(prev => {
@@ -462,7 +471,7 @@ function EVTracker() {
 
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
-          <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} />
+          <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} onReorder={reorderTodo} />
           <CapturePanel color={mon.color} captureCount={captureCount} captureGoals={captureGoals} onCountChange={setCaptureCount} onAddGoal={addCaptureGoal} onToggleGoal={toggleCaptureGoal} onDeleteGoal={deleteCaptureGoal} />
           <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
         </div>
