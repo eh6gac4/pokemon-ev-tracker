@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FIELD_ITEMS, ITEM_DATA } from './data-items.js';
+import { POKEMON_DATA } from './data-pokemon.js';
 import { Panel, tmItemName } from './components-base.jsx';
 
 export function AdventureTab({ color }) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MAX_STAT, vitaminLeft, POKEMON_DATA } from './data-pokemon.js';
-import { TM_LIST } from './data-moves.js';
+import { TM_LIST, MOVE_DATA, TYPE_COLORS } from './data-moves.js';
 
 export function tmItemName(item) {
   if (!item.tmId) return item.name;

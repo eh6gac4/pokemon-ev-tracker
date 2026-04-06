@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { POKEMON_DATA, COLORS, ICONS, NATURES, MAX_STAT, MAX_TOTAL, STAT_JP } from './data-pokemon.js';
-import { TM_LIST, ALL_MOVES, getLearnset, getLearnableMoves } from './data-moves.js';
-import { ITEM_DATA } from './data-items.js';
+import { TM_LIST, ALL_MOVES, getLearnset, getLearnableMoves, MOVE_DATA, TYPE_COLORS } from './data-moves.js';
+import { ITEM_DATA, HOLD_ITEMS } from './data-items.js';
 import { Panel, PokemonSearch, AutoTextarea, tmItemName } from './components-base.jsx';
 
 export function AddMonModal({ newName, newIcon, newColor, newDexId, setNewName, setNewIcon, setNewColor, setNewDexId, onAdd, onCancel, borderColor }) {
