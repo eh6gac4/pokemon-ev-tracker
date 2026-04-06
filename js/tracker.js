@@ -160,7 +160,7 @@ function EVTracker() {
   const toggleCaptureGoal = (id)   => setCaptureGoals(prev => prev.map(g => g.id === id ? { ...g, done: !g.done } : g));
   const deleteCaptureGoal = (id)   => setCaptureGoals(prev => prev.filter(g => g.id !== id));
 
-  const addTodo    = (text) => setTodoList(prev => [...prev, { id: Date.now().toString(), text, done: false }]);
+  const addTodo    = (text) => setTodoList(prev => [{ id: Date.now().toString(), text, done: false }, ...prev]);
   const toggleTodo = (id)  => setTodoList(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
   const deleteTodo = (id)  => setTodoList(prev => prev.filter(t => t.id !== id));
   const renameTodo = (id, text) => setTodoList(prev => prev.map(t => t.id === id ? { ...t, text } : t));
