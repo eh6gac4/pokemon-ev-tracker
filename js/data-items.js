@@ -333,22 +333,22 @@ const LOCATION_DATA = [
   // ─── シオンタウン → ポケモンタワー ───
   { name: "ポケモンタワー 3F", ver: "", pokemon: [
     { name: "ゴース",   evs: { spa: 1 }, rate: "90%", best: true },
-    { name: "ガラガラ", evs: { def: 2 }, rate: "9%" },
+    { name: "カラカラ", evs: { hp: 1 },  rate: "9%" },
     { name: "ゴースト", evs: { spa: 2 }, rate: "1%" },
   ]},
   { name: "ポケモンタワー 4〜5F", ver: "", pokemon: [
     { name: "ゴース",   evs: { spa: 1 }, rate: "86%", best: true },
-    { name: "ガラガラ", evs: { def: 2 }, rate: "9%" },
+    { name: "カラカラ", evs: { hp: 1 },  rate: "9%" },
     { name: "ゴースト", evs: { spa: 2 }, rate: "5%" },
   ]},
   { name: "ポケモンタワー 6F", ver: "", pokemon: [
     { name: "ゴース",   evs: { spa: 1 }, rate: "85%", best: true },
-    { name: "ガラガラ", evs: { def: 2 }, rate: "9%" },
+    { name: "カラカラ", evs: { hp: 1 },  rate: "9%" },
     { name: "ゴースト", evs: { spa: 2 }, rate: "6%" },
   ]},
   { name: "ポケモンタワー 7F", ver: "", pokemon: [
     { name: "ゴース",   evs: { spa: 1 }, rate: "75%" },
-    { name: "ガラガラ", evs: { def: 2 }, rate: "10%" },
+    { name: "カラカラ", evs: { hp: 1 },  rate: "10%" },
     { name: "ゴースト", evs: { spa: 2 }, rate: "15%" },
   ]},
   // ─── セキチクシティ方面（サイクリングロード） ───
@@ -428,8 +428,8 @@ const LOCATION_DATA = [
     { name: "ズバット",   evs: { spe: 1 }, rate: "10%" },
     { name: "ガラガラ",   evs: { def: 2 }, rate: "5%" },
     { name: "ゴーリキー", evs: { atk: 2 }, rate: "5%" },
-    { name: "アーボック", evs: { atk: 2 }, rate: "5%" },
-    { name: "サンドパン", evs: { def: 2 }, rate: "5%" },
+    { name: "アーボック", evs: { atk: 2 }, rate: "5%", ver: "FR" },
+    { name: "サンドパン", evs: { def: 2 }, rate: "5%", ver: "LG" },
     { name: "ゴルバット", evs: { spe: 2 }, rate: "5%" },
   ]},
   { name: "チャンピオンロード 2F", ver: "", pokemon: [
@@ -439,8 +439,8 @@ const LOCATION_DATA = [
     { name: "オコリザル", evs: { atk: 2 }, rate: "10%" },
     { name: "ズバット",   evs: { spe: 1 }, rate: "10%" },
     { name: "ゴーリキー", evs: { atk: 2 }, rate: "5%" },
-    { name: "アーボック", evs: { atk: 2 }, rate: "5%" },
-    { name: "サンドパン", evs: { def: 2 }, rate: "5%" },
+    { name: "アーボック", evs: { atk: 2 }, rate: "5%", ver: "FR" },
+    { name: "サンドパン", evs: { def: 2 }, rate: "5%", ver: "LG" },
     { name: "ガラガラ",   evs: { def: 2 }, rate: "5%" },
     { name: "ゴルバット", evs: { spe: 2 }, rate: "5%" },
   ]},
