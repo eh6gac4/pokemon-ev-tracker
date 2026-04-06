@@ -81,7 +81,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
         raw_body = file_path.read_bytes()
         etag = f'"{hashlib.md5(raw_body).hexdigest()}"'
         # データファイル（大・変更少）は no-cache+ETag で304再利用、ロジック系は no-store
-        no_store_files = {"tracker.js", "components.js", "style.css"}
+        no_store_files = {
+            "tracker.js", "components-base.js", "components-ikusei.js",
+            "components-chosa.js", "components-boken.js", "style.css",
+        }
         cache_control = "no-store" if file_path.name in no_store_files else "no-cache"
 
         # ETagが一致すれば 304 を返してボディ送信をスキップ
