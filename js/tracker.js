@@ -494,7 +494,7 @@ function EVTracker() {
         <button onClick={() => setActiveTab("chosa")} style={{ color: activeTab === "chosa" ? mon.color : "#555", borderTopColor: activeTab === "chosa" ? mon.color : "transparent" }}>
           📊 データ
         </button>
-        <button onClick={() => { location.href = "/?v=" + Date.now(); }} title="全ファイルをキャッシュなしで再取得" style={{ flex: "0 0 auto", padding: "16px 14px", color: "#2a2a4a", fontSize: "16px", borderTopColor: "transparent" }}>
+        <button onClick={() => { location.reload(true); }} title="全ファイルをキャッシュなしで再取得" style={{ flex: "0 0 auto", padding: "16px 14px", color: "#2a2a4a", fontSize: "16px", borderTopColor: "transparent" }}>
           ↺
         </button>
       </nav>
