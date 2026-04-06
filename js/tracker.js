@@ -153,11 +153,14 @@ function EVTracker() {
 
   useEffect(() => {
     if (!loaded) return;
-    fetch("/api/data", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty }),
-    }).catch(() => {});
+    const timer = setTimeout(() => {
+      fetch("/api/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty }),
+      }).catch(() => {});
+    }, 800);
+    return () => clearTimeout(timer);
   }, [party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, loaded]);
 
   const toggleItem  = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
