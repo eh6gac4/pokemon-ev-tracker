@@ -109,7 +109,7 @@ function EVTracker() {
         icon.style.transform = "";
         icon.style.animation = "ptr-spin 1.2s linear infinite";
         document.getElementById("ptr-label").textContent = "リロード中…";
-        setTimeout(() => location.reload(), 1400);
+        setTimeout(() => location.reload(true), 1400);
       } else {
         hide();
       }
