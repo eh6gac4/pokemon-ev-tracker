@@ -3,6 +3,7 @@ import { POKEMON_DATA, EV_YIELD, NATURES, ABILITY_DATA, STAT_JP, STAT_COL, EV_GU
 import { ALL_MOVES, getLearnset, getLearnableMoves, TM_LIST, MOVE_DATA, TYPE_COLORS, TUTOR_LOCATIONS } from './data-moves.js';
 import { HOLD_ITEMS, LOCATION_DATA } from './data-items.js';
 import { Panel, PokemonSearch, MoveRow, VerBadge, tmItemName } from './components-base.jsx';
+import { natLabel } from './components-ikusei.jsx';
 
 export function IVChecker({ color }) {
   const [open,   setOpen]   = useState(false);

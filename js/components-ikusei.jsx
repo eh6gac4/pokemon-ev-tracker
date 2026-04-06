@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { POKEMON_DATA, COLORS, ICONS, NATURES, MAX_STAT, MAX_TOTAL } from './data-pokemon.js';
+import { POKEMON_DATA, COLORS, ICONS, NATURES, MAX_STAT, MAX_TOTAL, STAT_JP } from './data-pokemon.js';
 import { TM_LIST, ALL_MOVES, getLearnset, getLearnableMoves } from './data-moves.js';
 import { ITEM_DATA } from './data-items.js';
 import { Panel, PokemonSearch, AutoTextarea, tmItemName } from './components-base.jsx';
@@ -52,7 +52,7 @@ export function AddMonModal({ newName, newIcon, newColor, newDexId, setNewName, 
   );
 }
 
-const natLabel = (n) => n.up
+export const natLabel = (n) => n.up
   ? `${n.name}（↑${STAT_JP[n.up]} / ↓${STAT_JP[n.dn]}）`
   : `${n.name}（補正なし）`;
 
