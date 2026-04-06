@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { POKEMON_DATA, EV_YIELD, NATURES, ABILITY_DATA, STAT_JP, STAT_COL, EV_GUIDE, MAX_STAT, MAX_TOTAL, getEvoPaths } from './data-pokemon.js';
+import { POKEMON_DATA, EV_YIELD, NATURES, ABILITY_DATA, STAT_JP, STAT_COL, EV_GUIDE, MAX_STAT, MAX_TOTAL, getEvoPaths, STATS, PD, EVOLUTION_DATA } from './data-pokemon.js';
 import { ALL_MOVES, getLearnset, getLearnableMoves, TM_LIST, MOVE_DATA, TYPE_COLORS, TUTOR_LOCATIONS } from './data-moves.js';
 import { HOLD_ITEMS, LOCATION_DATA } from './data-items.js';
 import { Panel, PokemonSearch, MoveRow, VerBadge, tmItemName } from './components-base.jsx';
