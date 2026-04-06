@@ -180,7 +180,10 @@ export default function EVTracker() {
   const deleteCaptureGoal = (id)   => setCaptureGoals(prev => prev.filter(g => g.id !== id));
 
   const addTodo      = (text) => setTodoList(prev => [{ id: Date.now().toString(), text, done: false }, ...prev]);
-  const toggleTodo   = (id)  => setTodoList(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  const toggleTodo   = (id)  => setTodoList(prev => {
+    const next = prev.map(t => t.id === id ? { ...t, done: !t.done } : t);
+    return [...next.filter(t => !t.done), ...next.filter(t => t.done)];
+  });
   const deleteTodo   = (id)  => setTodoList(prev => prev.filter(t => t.id !== id));
   const renameTodo   = (id, text) => setTodoList(prev => prev.map(t => t.id === id ? { ...t, text } : t));
   const reorderTodo  = (fromId, toId) => setTodoList(prev => {
