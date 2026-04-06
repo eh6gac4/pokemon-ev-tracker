@@ -134,7 +134,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     init_db()
-    server = http.server.HTTPServer(("0.0.0.0", PORT), Handler)
+    server = http.server.ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"サーバー起動: http://localhost:{PORT}")
     print(f"LAN内からは: http://<このPCのIP>:{PORT}")
     print("停止: Ctrl+C")
