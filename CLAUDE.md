@@ -2,22 +2,22 @@
 
 ## プロジェクト概要
 
-ポケモン努力値（EV）トラッカー。単一HTMLファイル（React/CDN）＋ Pythonバックエンド（標準ライブラリのみ）の構成。Docker Composeで常時起動。
+ポケモン努力値（EV）トラッカー。React 18（Vite ビルド）＋ Pythonバックエンド（標準ライブラリのみ）の構成。Docker Composeで常時起動。
 
 ## 技術構成
 
 | レイヤー | 技術 |
 |----------|------|
-| フロントエンド | React 18（CDN + Babel standalone） |
+| フロントエンド | React 18（Vite ビルド、`js/` 以下の JSX ファイル群） |
 | バックエンド | Python 3.11 標準ライブラリ（`http.server`, `sqlite3`） |
 | DB | SQLite（`./data/ev_data.db`） |
-| 実行環境 | Docker Compose |
+| 実行環境 | Docker Compose（マルチステージビルド: node:24 → python:3.11） |
 
 ## 重要な設計上の制約
 
-- **Node.jsなし・pipなし** → フロントはビルド不要のCDN構成、バックエンドは外部パッケージ不使用
-- `src/` と `package.json`, `vite.config.js` は**未使用**（Node.js環境が整えばVite化可能な状態で残してある）
-- `ev_data.db`（ルート直下）はローカルテスト時の残骸。本番データは `data/ev_data.db`
+- **pipなし** → バックエンドは外部パッケージ不使用（Python標準ライブラリのみ）
+- フロントエンドは Vite でビルド（`npm run build` → `dist/`）。Dockerfile がビルドを担うので手動実行は不要
+- `src/main.jsx` はエントリポイント。コンポーネント本体は `js/` 以下
 
 ## API
 
@@ -29,8 +29,9 @@
 保存形式：
 ```json
 {
-  "party":    [ { "name": "...", "icon": "...", "color": "...", "memo": "..." } ],
+  "party":    [ { "name": "...", "icon": "...", "color": "...", "memo": "...", "nature": "...", "dexId": 1 } ],
   "allEVs":   { "ポケモン名": { "hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0 } },
+  "allMoves": { "ポケモン名": ["わざ1", "わざ2", "わざ3", "わざ4"] },
   "selected": "ポケモン名"
 }
 ```
@@ -41,14 +42,15 @@
 - 全ステータスの合計最大値: 510
 - これらの制約はフロントエンド（`change()`関数）で強制している
 
-## フロントエンドの主要データ定数
+## フロントエンドの主要ファイル
 
-| 定数 | 内容 |
-|------|------|
-| `POKEMON_DATA` | カントー151匹の種族値 `[id, 日本語名, hp, atk, def, spa, spd, spe]` |
-| `EV_YIELD` | 151匹のEV yield `[hp, atk, def, spa, spd, spe]`（0-indexed、Bulbapedia Gen III） |
-| `NATURES` | 25性格の日本語名・上昇・下降ステータス（Bulbapediaで確認済み） |
-| `EV_GUIDE` | FR/LG向けEV稼ぎスポット一覧 |
+| ファイル | 内容 |
+|--------|------|
+| `js/tracker.jsx` | ルートコンポーネント。状態管理・自動保存・タブ切替・スワイプ |
+| `js/components-base.jsx` | 共通UI: `AutoTextarea`, `StatRow`, `Panel`, `PokemonSearch`, `MoveRow`, `VerBadge` |
+| `js/components-ikusei.jsx` | 育成タブ: EV管理・技セット・アイテム・パーティ管理 |
+| `js/components-chosa.jsx` | 調査タブ: IVチェッカー・EVサーチ・EV稼ぎガイド・図鑑・タイプ表 |
+| `js/components-boken.jsx` | 冒険タブ: ToDoリスト・捕獲記録 |
 
 ## テスト
 

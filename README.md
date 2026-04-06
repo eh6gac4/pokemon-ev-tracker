@@ -56,10 +56,24 @@ ports:
 
 ```
 .
-├── index.html          # フロントエンド（React 18 / CDN + Babel）
+├── index.html          # Vite エントリHTML（<div id="root">のみ）
+├── src/
+│   └── main.jsx        # React マウントエントリポイント
+├── js/                 # React コンポーネント・データ定数
+│   ├── tracker.jsx         # ルートコンポーネント（状態管理・タブ切替）
+│   ├── components-base.jsx # 共通UI（Panel・StatRow・PokemonSearch 等）
+│   ├── components-ikusei.jsx # 育成タブ（EV管理・技・アイテム）
+│   ├── components-chosa.jsx  # 調査タブ（IVチェッカー・図鑑・タイプ表等）
+│   ├── components-boken.jsx  # 冒険タブ（ToDo・捕獲）
+│   ├── data-pokemon.js   # 種族値・EV yield・性格定数
+│   ├── data-items.js     # アイテムデータ
+│   └── data-moves.js     # 技データ・タイプ色
+├── style.css           # グローバルスタイル
+├── public/             # 静的アセット（アイコン・manifest.json）
+├── dist/               # Vite ビルド出力（git管理外）
 ├── server.py           # バックエンド（Python標準ライブラリのみ）
 ├── test_server.py      # テストスイート（python3 test_server.py で実行）
-├── Dockerfile
+├── Dockerfile          # マルチステージ（node:24 build → python:3.11 serve）
 ├── docker-compose.yml
 └── data/
     └── ev_data.db      # データ（SQLite、.gitignore対象）

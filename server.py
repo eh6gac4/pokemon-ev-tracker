@@ -74,19 +74,22 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send_json(404, {"error": "not found"})
             return
         mime = {
-            ".html": "text/html; charset=utf-8",
-            ".js":   "application/javascript",
-            ".css":  "text/css",
-            ".json": "application/json",
+            ".html":        "text/html; charset=utf-8",
+            ".js":          "application/javascript",
+            ".css":         "text/css",
+            ".json":        "application/json",
+            ".webmanifest": "application/manifest+json",
+            ".png":         "image/png",
+            ".svg":         "image/svg+xml",
+            ".ico":         "image/x-icon",
+            ".woff2":       "font/woff2",
+            ".woff":        "font/woff",
         }.get(file_path.suffix, "application/octet-stream")
         raw_body = file_path.read_bytes()
         etag = f'"{hashlib.md5(raw_body).hexdigest()}"'
-        # データファイル（大・変更少）は no-cache+ETag で304再利用、ロジック系は no-store
-        no_store_files = {
-            "tracker.js", "components-base.js", "components-ikusei.js",
-            "components-chosa.js", "components-boken.js", "style.css",
-        }
-        cache_control = "no-store" if file_path.name in no_store_files else "no-cache"
+        # Vite がハッシュを付与するアセット（dist/assets/*）は長期キャッシュ可
+        is_hashed_asset = file_path.parent == STATIC_DIR / "assets"
+        cache_control = "public, max-age=31536000, immutable" if is_hashed_asset else "no-cache"
 
         # ETagが一致すれば 304 を返してボディ送信をスキップ
         if self.headers.get("If-None-Match") == etag:

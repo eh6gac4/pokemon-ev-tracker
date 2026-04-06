@@ -248,28 +248,52 @@ class TestHTTPServer(unittest.TestCase):
         with urllib.request.urlopen(self.url("/index.html")) as res:
             self.assertEqual(res.status, 200)
 
-    def _css_asset_path(self):
-        """dist/assets/ 内の CSS ファイルパスを返す（Vite ビルド後）"""
+    def _asset_path(self, suffix):
+        """dist/assets/ 内の指定拡張子のファイルパスを返す（Vite ビルド後）"""
         assets_dir = server.STATIC_DIR / "assets"
         if assets_dir.is_dir():
             for f in assets_dir.iterdir():
-                if f.suffix == ".css":
+                if f.suffix == suffix:
                     return f"/assets/{f.name}"
         return None
 
     def test_get_bundled_css_returns_200(self):
-        path = self._css_asset_path()
+        path = self._asset_path(".css")
         if path is None:
             self.skipTest("dist/assets に CSS ファイルが見つかりません")
         with urllib.request.urlopen(self.url(path)) as res:
             self.assertEqual(res.status, 200)
 
     def test_get_bundled_css_content_type(self):
-        path = self._css_asset_path()
+        path = self._asset_path(".css")
         if path is None:
             self.skipTest("dist/assets に CSS ファイルが見つかりません")
         with urllib.request.urlopen(self.url(path)) as res:
             self.assertIn("text/css", res.headers.get("Content-Type", ""))
+
+    def test_get_bundled_js_returns_200(self):
+        path = self._asset_path(".js")
+        if path is None:
+            self.skipTest("dist/assets に JS ファイルが見つかりません")
+        with urllib.request.urlopen(self.url(path)) as res:
+            self.assertEqual(res.status, 200)
+
+    def test_get_bundled_js_content_type(self):
+        path = self._asset_path(".js")
+        if path is None:
+            self.skipTest("dist/assets に JS ファイルが見つかりません")
+        with urllib.request.urlopen(self.url(path)) as res:
+            self.assertIn("javascript", res.headers.get("Content-Type", ""))
+
+    def test_vite_assets_cache_control_is_immutable(self):
+        """Vite ハッシュ付きアセットは長期キャッシュ（immutable）であること"""
+        path = self._asset_path(".js")
+        if path is None:
+            self.skipTest("dist/assets に JS ファイルが見つかりません")
+        with urllib.request.urlopen(self.url(path)) as res:
+            cc = res.headers.get("Cache-Control", "")
+        self.assertIn("immutable", cc)
+        self.assertIn("max-age=31536000", cc)
 
     def test_html_cache_control_is_no_cache(self):
         with urllib.request.urlopen(self.url("/index.html")) as res:
