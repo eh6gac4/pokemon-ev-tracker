@@ -1130,6 +1130,7 @@ function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder
   const [editText, setEditText] = useState("");
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
+  const draggingIdRef = React.useRef(null);
   const submit = () => {
     const t = text.trim();
     if (!t) return;
@@ -1148,24 +1149,47 @@ function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder
   const cancelEdit = () => setEditingId(null);
   const doneCount = todos.filter(t => t.done).length;
 
-  const handleDragStart = (e, id) => {
+  // pointer events で PC・スマホ両対応のドラッグを実現
+  // ドラッグ中の要素に pointer-events:none を設定し、
+  // elementFromPoint で下にある要素を取得できるようにする
+  const handlePointerDown = (e, id) => {
+    e.preventDefault();
+    draggingIdRef.current = id;
     setDraggingId(id);
-    e.dataTransfer.effectAllowed = "move";
-  };
-  const handleDragOver = (e, id) => {
-    e.preventDefault();
-    if (id !== draggingId) setDragOverId(id);
-  };
-  const handleDrop = (e, id) => {
-    e.preventDefault();
-    if (draggingId && id !== draggingId) onReorder(draggingId, id);
-    setDraggingId(null);
     setDragOverId(null);
+
+    const getOverId = (x, y) => {
+      const el = document.elementFromPoint(x, y);
+      return el?.closest("[data-todo-id]")?.getAttribute("data-todo-id") || null;
+    };
+
+    const onMove = (e) => {
+      const x = e.clientX ?? e.touches?.[0]?.clientX;
+      const y = e.clientY ?? e.touches?.[0]?.clientY;
+      if (x == null) return;
+      setDragOverId(getOverId(x, y));
+    };
+
+    const onUp = (e) => {
+      const x = e.clientX ?? e.changedTouches?.[0]?.clientX;
+      const y = e.clientY ?? e.changedTouches?.[0]?.clientY;
+      if (x != null) {
+        const overId = getOverId(x, y);
+        if (draggingIdRef.current && overId && overId !== draggingIdRef.current) {
+          onReorder(draggingIdRef.current, overId);
+        }
+      }
+      draggingIdRef.current = null;
+      setDraggingId(null);
+      setDragOverId(null);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
   };
-  const handleDragEnd = () => {
-    setDraggingId(null);
-    setDragOverId(null);
-  };
+
   return (
     <div className="card" style={{ padding: "12px 14px", marginBottom: "12px", borderColor: color + "33" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
@@ -1202,24 +1226,25 @@ function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder
       {todos.map((todo, idx) => (
         <div
           key={todo.id}
-          draggable
-          onDragStart={e => handleDragStart(e, todo.id)}
-          onDragOver={e => handleDragOver(e, todo.id)}
-          onDrop={e => handleDrop(e, todo.id)}
-          onDragEnd={handleDragEnd}
+          data-todo-id={todo.id}
           style={{
             display: "flex", alignItems: "center", gap: "8px",
             padding: "7px 2px",
             borderTop: idx === 0 ? "1px solid #1a1a2e" : "none",
             borderBottom: "1px solid #1a1a2e",
             opacity: draggingId === todo.id ? 0.4 : 1,
-            background: dragOverId === todo.id ? color + "11" : "transparent",
-            transition: "background 0.1s",
+            background: dragOverId === todo.id ? color + "22" : "transparent",
+            transition: "background 0.15s",
+            // ドラッグ中の要素を elementFromPoint の対象から外す
+            pointerEvents: draggingId === todo.id ? "none" : "auto",
           }}>
-          <span style={{
-            cursor: "grab", color: "#333", fontSize: "13px", flexShrink: 0,
-            userSelect: "none", padding: "0 2px",
-          }}>⠿</span>
+          <span
+            onPointerDown={e => handlePointerDown(e, todo.id)}
+            style={{
+              cursor: "grab", color: "#444", fontSize: "14px", flexShrink: 0,
+              userSelect: "none", padding: "0 2px",
+              touchAction: "none", // スマホでスクロールではなくドラッグを優先
+            }}>⠿</span>
           <input type="checkbox" checked={todo.done} onChange={() => onToggle(todo.id)}
             style={{ accentColor: color, cursor: "pointer", flexShrink: 0 }} />
           {editingId === todo.id ? (
