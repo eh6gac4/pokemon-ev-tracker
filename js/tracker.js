@@ -27,11 +27,17 @@ function EVTracker() {
   const swipeX = React.useRef(null);
   const swipeY = React.useRef(null);
   const onSwipeStart = (e) => {
+    if (e.touches.length > 1) return; // ピンチズーム中は無視
     swipeX.current = e.touches[0].clientX;
     swipeY.current = e.touches[0].clientY;
   };
   const onSwipeEnd = (e) => {
     if (swipeX.current === null) return;
+    // ズーム中は誤爆防止のため無視
+    if (window.visualViewport && window.visualViewport.scale > 1) {
+      swipeX.current = null;
+      return;
+    }
     const dx = e.changedTouches[0].clientX - swipeX.current;
     const dy = e.changedTouches[0].clientY - swipeY.current;
     swipeX.current = null;
