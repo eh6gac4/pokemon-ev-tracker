@@ -5,7 +5,7 @@ import { HOLD_ITEMS, LOCATION_DATA } from './data-items.js';
 import { Panel, PokemonSearch, MoveRow, VerBadge, tmItemName } from './components-base.jsx';
 import { natLabel } from './components-ikusei.jsx';
 
-export function IVChecker({ color }) {
+export function IVChecker({ color, ivs, onSave }) {
   const [open,   setOpen]   = useState(false);
   const [mon,    setMon]    = useState(0);
   const [lvStr,  setLvStr]  = useState("50");
@@ -84,6 +84,8 @@ export function IVChecker({ color }) {
       {STATS.map(stat => {
         const isUp = nature.up === stat.key;
         const isDn = nature.dn === stat.key;
+        const calcResult = calcIV(stat.key);
+        const isSingle = calcResult && calcResult.length === 1;
         return (
           <div key={stat.key} style={{ display: "grid", gridTemplateColumns: "62px 52px 1fr 44px", gap: "3px 6px", alignItems: "center", marginBottom: "4px" }}>
             <div style={{ fontSize: "11px", color: isUp ? "#f5d020" : isDn ? "#ff6b6b" : "#888" }}>
@@ -102,11 +104,106 @@ export function IVChecker({ color }) {
               className="input-dark"
               style={{ fontSize: "11px", padding: "4px 5px", textAlign: "center", width: "100%" }}
             />
-            <div style={{ fontSize: "13px", fontWeight: "bold", color: ivColor(stat.key), textAlign: "center" }}>{ivDisp(stat.key)}</div>
+            <div
+              title={isSingle && onSave ? "クリックで登録" : undefined}
+              onClick={() => {
+                if (!isSingle || !onSave) return;
+                onSave({ ...(ivs || {}), [stat.key]: calcResult[0] });
+              }}
+              style={{
+                fontSize: "13px", fontWeight: "bold", color: ivColor(stat.key), textAlign: "center",
+                cursor: isSingle && onSave ? "pointer" : "default",
+                background: isSingle && onSave ? "#ffffff11" : "transparent",
+                borderRadius: "4px", padding: "2px 0",
+              }}
+            >
+              {ivDisp(stat.key)}
+            </div>
           </div>
         );
       })}
-      <div style={{ fontSize: "8px", color: "#333", marginTop: "6px" }}>「？」は実数値・努力値・レベルを確認してください</div>
+      {onSave && (() => {
+        const canSaveAll = STATS.every(s => { const r = calcIV(s.key); return r && r.length === 1; });
+        return canSaveAll ? (
+          <button
+            onClick={() => {
+              const newIVs = Object.fromEntries(STATS.map(s => [s.key, calcIV(s.key)[0]]));
+              onSave(newIVs);
+            }}
+            style={{
+              width: "100%", marginTop: "6px", background: "#1a3a1a", border: "1px solid #7fff7f55",
+              borderRadius: "6px", color: "#7fff7f", fontSize: "11px", padding: "7px", cursor: "pointer",
+              fontFamily: "inherit", letterSpacing: "1px",
+            }}
+          >✅ 全ステータスの個体値を登録</button>
+        ) : null;
+      })()}
+      <div style={{ fontSize: "8px", color: "#333", marginTop: "6px" }}>「？」は実数値・努力値・レベルを確認　各値クリックで個別登録</div>
+    </Panel>
+  );
+}
+
+export function IVCompare({ party, allIVs, color }) {
+  const [open, setOpen] = useState(false);
+
+  const ivDispColor = (val) => {
+    if (val === null || val === undefined) return "#333";
+    if (val >= 30) return "#7fff7f";
+    if (val <= 5)  return "#ff6b6b";
+    return "#f5d020";
+  };
+
+  const hasAny = party.some(p => STATS.some(s => {
+    const v = (allIVs[p.name] || {})[s.key];
+    return v !== null && v !== undefined;
+  }));
+
+  return (
+    <Panel title="🧬 個体値比較" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      {!hasAny && (
+        <div style={{ fontSize: "11px", color: "#444", textAlign: "center", padding: "10px 0" }}>
+          育成タブで個体値を登録するとここに表示されます
+        </div>
+      )}
+      {hasAny && (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }}>
+            <thead>
+              <tr>
+                <th style={{ fontSize: "9px", color: "#444", padding: "4px 6px 2px 0", textAlign: "left" }} />
+                {party.map(p => (
+                  <th key={p.name} style={{ fontSize: "14px", color: p.color, padding: "4px 6px 2px", textAlign: "center" }}>
+                    {p.icon}
+                  </th>
+                ))}
+              </tr>
+              <tr>
+                <th style={{ padding: "0 6px 6px 0" }} />
+                {party.map(p => (
+                  <th key={p.name} style={{ fontSize: "8px", color: "#555", padding: "0 4px 6px", textAlign: "center" }}>
+                    {p.name.length > 5 ? p.name.slice(0, 4) + "…" : p.name}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {STATS.map(stat => (
+                <tr key={stat.key} style={{ borderTop: "1px solid #1a1a2e" }}>
+                  <td style={{ fontSize: "11px", color: "#666", padding: "4px 10px 4px 0", whiteSpace: "nowrap" }}>{stat.jp}</td>
+                  {party.map(p => {
+                    const val = (allIVs[p.name] || {})[stat.key];
+                    return (
+                      <td key={p.name} style={{ textAlign: "center", padding: "4px 4px", fontWeight: "bold", color: ivDispColor(val) }}>
+                        {val !== null && val !== undefined ? val : "—"}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </Panel>
   );
 }

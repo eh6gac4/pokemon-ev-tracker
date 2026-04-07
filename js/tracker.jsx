@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  DEFAULT_PARTY, STATS, MAX_STAT, MAX_TOTAL, initEVs, COLORS, POKEMON_DATA
+  DEFAULT_PARTY, STATS, MAX_STAT, MAX_TOTAL, initEVs, initIVs, COLORS, POKEMON_DATA
 } from './data-pokemon.js';
 import { getLearnableMoves, getLearnset, ALL_MOVES } from './data-moves.js';
 import { AutoTextarea, StatRow, Panel } from './components-base.jsx';
-import { AddMonModal, NaturePicker, ItemPicker, MovePicker, PartySlots, PartyPickerModal } from './components-ikusei.jsx';
-import { IVChecker, EVSearch, EVGuide, PokedexPanel, TypeChart, LocationGuide, MoveTutorPanel, MoveReversePanel, EVRankPanel, StatRankPanel, AbilitySearch } from './components-chosa.jsx';
+import { AddMonModal, NaturePicker, ItemPicker, MovePicker, PartySlots, PartyPickerModal, IVPanel } from './components-ikusei.jsx';
+import { IVChecker, IVCompare, EVSearch, EVGuide, PokedexPanel, TypeChart, LocationGuide, MoveTutorPanel, MoveReversePanel, EVRankPanel, StatRankPanel, AbilitySearch } from './components-chosa.jsx';
 import { TodoList, CapturePanel, AdventurePanel } from './components-boken.jsx';
 
 export default function EVTracker() {
   const [party,     setParty]    = useState(DEFAULT_PARTY);
   const [allEVs,    setAllEVs]   = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
+  const [allIVs,    setAllIVs]   = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initIVs()])));
   const [allMoves,  setAllMoves] = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, ["","","",""]])));
   const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
   const [loaded,       setLoaded]       = useState(false);
@@ -169,6 +170,7 @@ export default function EVTracker() {
           return { ...p, dexId: idx >= 0 ? idx : null };
         }));
         if (saved.allEVs)       setAllEVs(saved.allEVs);
+        if (saved.allIVs)       setAllIVs(saved.allIVs);
         if (saved.allMoves)     setAllMoves(saved.allMoves);
         if (saved.selected)     setSelected(saved.selected);
         if (saved.checkedItems)  setCheckedItems(saved.checkedItems);
@@ -190,11 +192,11 @@ export default function EVTracker() {
       fetch("/api/data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty }),
+        body: JSON.stringify({ party, allEVs, allIVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty }),
       }).catch(() => {});
     }, 800);
     return () => clearTimeout(timer);
-  }, [party, allEVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, loaded]);
+  }, [party, allEVs, allIVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, loaded]);
 
   const toggleItem  = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
   const resetItems  = () => setCheckedItems({});
@@ -266,10 +268,18 @@ export default function EVTracker() {
     return { ...prev, [selected]: next };
   });
 
+  const updateIV = (key, val) => setAllIVs(prev => ({
+    ...prev,
+    [selected]: { ...(prev[selected] || initIVs()), [key]: val },
+  }));
+
+  const saveIVs = (ivs) => setAllIVs(prev => ({ ...prev, [selected]: ivs }));
+
   const removeMon = (name) => {
     const next = party.filter(p => p.name !== name);
     setParty(next);
     setAllEVs(prev => { const n = { ...prev }; delete n[name]; return n; });
+    setAllIVs(prev => { const n = { ...prev }; delete n[name]; return n; });
     setAllMoves(prev => { const n = { ...prev }; delete n[name]; return n; });
     if (selected === name && next.length > 0) setSelected(next[0].name);
     setActiveParty(prev => prev.map(n => n === name ? null : n));
@@ -283,6 +293,12 @@ export default function EVTracker() {
     setAllEVs(prev => {
       const n = { ...prev };
       n[trimmed] = n[oldName] || initEVs();
+      delete n[oldName];
+      return n;
+    });
+    setAllIVs(prev => {
+      const n = { ...prev };
+      n[trimmed] = n[oldName] || initIVs();
       delete n[oldName];
       return n;
     });
@@ -302,6 +318,7 @@ export default function EVTracker() {
     if (!trimmed || party.find(p => p.name === trimmed)) return;
     setParty(prev => [...prev, { name: trimmed, icon: newIcon, color: newColor, memo: "", nature: "", dexId: newDexId }]);
     setAllEVs(prev => ({ ...prev, [trimmed]: initEVs() }));
+    setAllIVs(prev => ({ ...prev, [trimmed]: initIVs() }));
     setAllMoves(prev => ({ ...prev, [trimmed]: ["","","",""] }));
     setSelected(trimmed);
     setAdding(false);
@@ -437,6 +454,9 @@ export default function EVTracker() {
           {/* 性格 */}
           <NaturePicker value={mon.nature || ""} color={mon.color} onChange={updateNature} />
 
+          {/* 個体値 */}
+          <IVPanel ivs={allIVs[selected] || initIVs()} color={mon.color} onChange={updateIV} />
+
           {/* 持ち物 */}
           <ItemPicker value={mon.item || ""} color={mon.color} onChange={updateItem} />
 
@@ -501,10 +521,11 @@ export default function EVTracker() {
 
         {/* ===== データカラム ===== */}
         <div className={activeTab === "chosa" ? "" : "col-hidden"}>
+          <IVCompare party={party} allIVs={allIVs} color={mon.color} />
           <PokedexPanel color={mon.color} dexTarget={dexTarget} onDexTargetConsumed={() => setDexTarget(null)} />
           <TypeChart color={mon.color} />
           <LocationGuide color={mon.color} />
-          <IVChecker color={mon.color} />
+          <IVChecker color={mon.color} ivs={allIVs[selected] || initIVs()} onSave={saveIVs} />
           <EVGuide color={mon.color} />
           <AbilitySearch color={mon.color} />
           <EVSearch macho={macho} color={mon.color} />

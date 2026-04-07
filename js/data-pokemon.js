@@ -27,6 +27,7 @@ export const MAX_TOTAL = 510;
 export const VITAMIN_CAP = 100;
 
 export const initEVs = () => Object.fromEntries(STATS.map(s => [s.key, 0]));
+export const initIVs = () => Object.fromEntries(STATS.map(s => [s.key, null]));
 export const vitaminLeft = (ev) => ev < VITAMIN_CAP ? Math.ceil((VITAMIN_CAP - ev) / 10) : 0;
 
 export const NATURES = [

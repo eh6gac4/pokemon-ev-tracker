@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { POKEMON_DATA, COLORS, ICONS, NATURES, MAX_STAT, MAX_TOTAL, STAT_JP } from './data-pokemon.js';
+import { POKEMON_DATA, COLORS, ICONS, NATURES, MAX_STAT, MAX_TOTAL, STAT_JP, STATS } from './data-pokemon.js';
 import { TM_LIST, ALL_MOVES, getLearnset, getLearnableMoves, MOVE_DATA, TYPE_COLORS } from './data-moves.js';
 import { ITEM_DATA, HOLD_ITEMS } from './data-items.js';
 import { Panel, PokemonSearch, AutoTextarea, tmItemName } from './components-base.jsx';
@@ -442,3 +442,45 @@ export function PartyPickerModal({ roster, activeParty, onSelect, onClose, color
   );
 }
 
+
+export function IVPanel({ ivs, color, onChange }) {
+  const [open, setOpen] = useState(false);
+
+  const ivColor = (val) => {
+    if (val === null || val === undefined) return "#555";
+    if (val >= 30) return "#7fff7f";
+    if (val <= 5)  return "#ff6b6b";
+    return "#f5d020";
+  };
+
+  return (
+    <Panel title="🧬 個体値" open={open} onToggle={() => setOpen(v => !v)} color={color}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 14px" }}>
+        {STATS.map(stat => {
+          const val = ivs?.[stat.key];
+          return (
+            <div key={stat.key} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <div style={{ fontSize: "11px", color: "#666", width: "38px", flexShrink: 0 }}>{stat.jp}</div>
+              <input
+                type="number" min="0" max="31"
+                value={val !== null && val !== undefined ? val : ""}
+                onChange={e => {
+                  const raw = e.target.value;
+                  const n = raw === "" ? null : Math.max(0, Math.min(31, parseInt(raw) || 0));
+                  onChange(stat.key, n);
+                }}
+                placeholder="—"
+                className="input-dark"
+                style={{
+                  flex: 1, fontSize: "13px", padding: "5px 6px", textAlign: "center",
+                  color: ivColor(val),
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ fontSize: "8px", color: "#333", marginTop: "8px" }}>0〜31で入力　未入力は未登録</div>
+    </Panel>
+  );
+}
