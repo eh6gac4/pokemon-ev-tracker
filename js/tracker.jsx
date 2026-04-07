@@ -18,10 +18,16 @@ export default function EVTracker() {
   const TABS = ["boken", "ikusei", "chosa"];
   const initialTab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "boken";
   const [activeTab,    setActiveTab]    = useState(initialTab);
+  const [dexTarget,    setDexTarget]    = useState(null);
 
   const navigateTab = (tab) => {
     setActiveTab(tab);
     history.pushState({ tab }, '', '#' + tab);
+  };
+
+  const openDex = (dexId) => {
+    setDexTarget(dexId);
+    navigateTab("chosa");
   };
 
   useEffect(() => {
@@ -495,7 +501,7 @@ export default function EVTracker() {
 
         {/* ===== データカラム ===== */}
         <div className={activeTab === "chosa" ? "" : "col-hidden"}>
-          <PokedexPanel color={mon.color} />
+          <PokedexPanel color={mon.color} dexTarget={dexTarget} onDexTargetConsumed={() => setDexTarget(null)} />
           <TypeChart color={mon.color} />
           <LocationGuide color={mon.color} />
           <IVChecker color={mon.color} />
@@ -511,7 +517,7 @@ export default function EVTracker() {
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
           <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} onReorder={reorderTodo} />
-          <CapturePanel color={mon.color} captureCount={captureCount} captureGoals={captureGoals} onCountChange={setCaptureCount} onAddGoal={addCaptureGoal} onToggleGoal={toggleCaptureGoal} onDeleteGoal={deleteCaptureGoal} />
+          <CapturePanel color={mon.color} captureCount={captureCount} captureGoals={captureGoals} onCountChange={setCaptureCount} onAddGoal={addCaptureGoal} onToggleGoal={toggleCaptureGoal} onDeleteGoal={deleteCaptureGoal} onOpenDex={openDex} />
           <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
         </div>
       </div>

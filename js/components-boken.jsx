@@ -347,7 +347,7 @@ const CAPTURE_MILESTONES = [
   { count: 60, item: "ぜんこくずかん",               location: "マサラタウン（殿堂入り後）" },
 ];
 
-export function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal }) {
+export function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal, onOpenDex }) {
   const [open, setOpen]   = useState(false);
   const [query, setQuery] = useState("");
 
@@ -465,11 +465,19 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
           }}>
             <input type="checkbox" checked={goal.done} onChange={() => onToggleGoal(goal.id)}
               style={{ accentColor: color, cursor: "pointer", flexShrink: 0 }} />
-            <span style={{
-              flex: 1, fontSize: "11px",
-              color: goal.done ? "#444" : "#ddd",
-              textDecoration: goal.done ? "line-through" : "none",
-            }}>{goal.name}</span>
+            <span
+              onClick={() => {
+                const idx = POKEMON_DATA.findIndex(p => p[1] === goal.name);
+                if (idx >= 0) onOpenDex?.(idx);
+              }}
+              style={{
+                flex: 1, fontSize: "11px",
+                color: goal.done ? "#444" : "#ddd",
+                textDecoration: goal.done ? "line-through" : "none",
+                cursor: "pointer",
+              }}
+              title="図鑑で確認"
+            >{goal.name}</span>
             <button onClick={() => onDeleteGoal(goal.id)} style={{
               background: "transparent", border: "none", color: "#555",
               cursor: "pointer", fontSize: "13px", padding: "0 2px", fontFamily: "inherit",

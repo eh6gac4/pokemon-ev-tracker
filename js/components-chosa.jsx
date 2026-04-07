@@ -170,10 +170,17 @@ export function EVSearch({ macho, color }) {
 
 // わざ一行表示（PokedexPanel の各タブで共用）
 
-export function PokedexPanel({ color }) {
+export function PokedexPanel({ color, dexTarget, onDexTargetConsumed }) {
   const [open, setOpen]       = useState(false);
   const [mon,  setMon]        = useState(0);
   const [moveTab, setMoveTab]     = useState("lv");
+
+  useEffect(() => {
+    if (dexTarget == null) return;
+    setMon(dexTarget);
+    setOpen(true);
+    onDexTargetConsumed?.();
+  }, [dexTarget]);
 
   const p        = POKEMON_DATA[mon];
   const { lv: learnset, tm: tmMoves, egg: eggMoves, tutor: tutorMoves } = getLearnset(p[0]);
