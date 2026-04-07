@@ -456,10 +456,14 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
                 <div key={p[0]} onMouseDown={() => { add(p[1]); }} style={{
                   padding: "7px 10px", cursor: "pointer", fontSize: "12px", color: "#ccc",
                   borderBottom: "1px solid #1a2a3a",
+                  display: "flex", alignItems: "center", gap: "8px",
                 }}
                   onMouseEnter={e => e.currentTarget.style.background = color + "22"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
+                  <span style={{ fontSize: "10px", color: "#444", minWidth: "36px", flexShrink: 0 }}>
+                    No.{String(p[0]).padStart(3, "0")}
+                  </span>
                   {p[1]}
                 </div>
               ))}
@@ -477,7 +481,9 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
           )}
         </div>
 
-        {captureGoals.map((goal, idx) => (
+        {captureGoals.map((goal, idx) => {
+          const dexNo = POKEMON_DATA.find(p => p[1] === goal.name)?.[0];
+          return (
           <div key={goal.id} style={{
             display: "flex", alignItems: "center", gap: "8px", padding: "7px 2px",
             borderTop: idx === 0 ? "1px solid #1a1a2e" : "none",
@@ -485,6 +491,11 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
           }}>
             <input type="checkbox" checked={goal.done} onChange={() => onToggleGoal(goal.id)}
               style={{ accentColor: color, cursor: "pointer", flexShrink: 0 }} />
+            {dexNo != null && (
+              <span style={{ fontSize: "10px", color: goal.done ? "#333" : "#444", minWidth: "36px", flexShrink: 0 }}>
+                No.{String(dexNo).padStart(3, "0")}
+              </span>
+            )}
             <span
               onClick={() => {
                 const idx = POKEMON_DATA.findIndex(p => p[1] === goal.name);
@@ -506,7 +517,8 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
               onMouseLeave={e => e.currentTarget.style.color = "#555"}
             >✕</button>
           </div>
-        ))}
+          );
+        })}
         {captureGoals.length === 0 && !focused && query.length === 0 && (
           <div style={{ textAlign: "center", fontSize: "10px", color: "#2a2a4a", padding: "8px 0 2px" }}>
             上の欄をタップして追加しよう
