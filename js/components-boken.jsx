@@ -348,12 +348,15 @@ const CAPTURE_MILESTONES = [
 ];
 
 export function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal, onOpenDex }) {
-  const [open, setOpen]   = useState(false);
-  const [query, setQuery] = useState("");
+  const [open, setOpen]     = useState(false);
+  const [query, setQuery]   = useState("");
+  const [focused, setFocused] = useState(false);
 
-  const suggestions = query.length >= 1
-    ? POKEMON_DATA.filter(p => p[1].includes(query) && !captureGoals.some(g => g.name === p[1])).slice(0, 8)
-    : [];
+  const showList = focused || query.length >= 1;
+  const suggestions = POKEMON_DATA.filter(p =>
+    (query.length === 0 || p[1].includes(query)) &&
+    !captureGoals.some(g => g.name === p[1])
+  );
 
   const add = (name) => { onAddGoal(name); setQuery(""); };
 
@@ -432,18 +435,25 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="ポケモン名で検索して追加…"
+            onFocus={() => setFocused(true)}
+            onBlur={() => setTimeout(() => setFocused(false), 150)}
+            placeholder="ポケモン名で絞り込む / タップで一覧表示…"
             style={{
               width: "100%", background: "#0e0e1e", border: "1px solid #2a2a4a",
-              borderRadius: suggestions.length > 0 ? "6px 6px 0 0" : "6px",
+              borderRadius: showList && suggestions.length > 0 ? "6px 6px 0 0" : "6px",
               color: "#ddd", fontSize: "12px", padding: "7px 10px",
               fontFamily: "inherit", outline: "none", boxSizing: "border-box",
             }}
           />
-          {suggestions.length > 0 && (
-            <div style={{ position: "absolute", zIndex: 10, width: "100%", background: "#0d1a2e", border: "1px solid #2a2a4a", borderTop: "none", borderRadius: "0 0 6px 6px" }}>
+          {showList && suggestions.length > 0 && (
+            <div style={{
+              position: "absolute", zIndex: 10, width: "100%",
+              background: "#0d1a2e", border: "1px solid #2a2a4a", borderTop: "none",
+              borderRadius: "0 0 6px 6px",
+              maxHeight: "180px", overflowY: "auto",
+            }}>
               {suggestions.map(p => (
-                <div key={p[0]} onMouseDown={() => add(p[1])} style={{
+                <div key={p[0]} onMouseDown={() => { add(p[1]); }} style={{
                   padding: "7px 10px", cursor: "pointer", fontSize: "12px", color: "#ccc",
                   borderBottom: "1px solid #1a2a3a",
                 }}
@@ -453,6 +463,16 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
                   {p[1]}
                 </div>
               ))}
+            </div>
+          )}
+          {showList && suggestions.length === 0 && (
+            <div style={{
+              position: "absolute", zIndex: 10, width: "100%",
+              background: "#0d1a2e", border: "1px solid #2a2a4a", borderTop: "none",
+              borderRadius: "0 0 6px 6px", padding: "8px 10px",
+              fontSize: "11px", color: "#444",
+            }}>
+              追加できるポケモンがありません
             </div>
           )}
         </div>
@@ -487,9 +507,9 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
             >✕</button>
           </div>
         ))}
-        {captureGoals.length === 0 && query.length === 0 && (
+        {captureGoals.length === 0 && !focused && query.length === 0 && (
           <div style={{ textAlign: "center", fontSize: "10px", color: "#2a2a4a", padding: "8px 0 2px" }}>
-            ポケモン名を入力して追加しよう
+            上の欄をタップして追加しよう
           </div>
         )}
       </div>
