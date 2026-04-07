@@ -4,6 +4,8 @@
 標準ライブラリのみ使用: python test_server.py
 """
 
+import gzip
+import http.client
 import http.server
 import json
 import os
@@ -319,6 +321,84 @@ class TestHTTPServer(unittest.TestCase):
             urllib.request.urlopen(req)
         self.assertEqual(ctx.exception.code, 501)
 
+    # --- ETag / 304 Not Modified ---
+
+    def test_etag_header_present_in_response(self):
+        with urllib.request.urlopen(self.url("/index.html")) as res:
+            self.assertIsNotNone(res.headers.get("ETag"))
+
+    def test_304_returned_when_etag_matches(self):
+        """同じ ETag を If-None-Match で送ると 304 が返ること"""
+        with urllib.request.urlopen(self.url("/index.html")) as res:
+            etag = res.headers.get("ETag")
+        self.assertIsNotNone(etag)
+        conn = http.client.HTTPConnection("127.0.0.1", self.port)
+        conn.request("GET", "/index.html", headers={"If-None-Match": etag})
+        resp = conn.getresponse()
+        conn.close()
+        self.assertEqual(resp.status, 304)
+
+    def test_200_returned_when_etag_does_not_match(self):
+        """ETag が一致しない場合は通常どおり 200 が返ること"""
+        conn = http.client.HTTPConnection("127.0.0.1", self.port)
+        conn.request("GET", "/index.html", headers={"If-None-Match": '"stale-etag"'})
+        resp = conn.getresponse()
+        conn.close()
+        self.assertEqual(resp.status, 200)
+
+    # --- Gzip 圧縮 ---
+
+    def test_gzip_encoding_returned_when_accepted(self):
+        """Accept-Encoding: gzip を送ると Content-Encoding: gzip が返ること"""
+        req = urllib.request.Request(
+            self.url("/index.html"),
+            headers={"Accept-Encoding": "gzip"},
+        )
+        with urllib.request.urlopen(req) as res:
+            self.assertEqual(res.headers.get("Content-Encoding"), "gzip")
+
+    def test_gzip_body_is_valid(self):
+        """gzip レスポンスのボディが正常に解凍できること"""
+        req = urllib.request.Request(
+            self.url("/index.html"),
+            headers={"Accept-Encoding": "gzip"},
+        )
+        with urllib.request.urlopen(req) as res:
+            raw = res.read()
+        decompressed = gzip.decompress(raw)
+        self.assertIn(b"<!doctype html>", decompressed.lower())
+
+    def test_no_gzip_when_not_accepted(self):
+        """Accept-Encoding を送らないと Content-Encoding ヘッダーが付かないこと"""
+        with urllib.request.urlopen(self.url("/index.html")) as res:
+            self.assertIsNone(res.headers.get("Content-Encoding"))
+
+    # --- クエリ文字列付き静的ファイル ---
+
+    def test_static_path_with_query_string_returns_200(self):
+        """`/index.html?v=123` のようなクエリ文字列付きでも 200 が返ること"""
+        with urllib.request.urlopen(self.url("/index.html?v=123")) as res:
+            self.assertEqual(res.status, 200)
+            self.assertIn("text/html", res.headers.get("Content-Type", ""))
+
+    def test_root_path_with_query_string_returns_200(self):
+        """`/?reload=1` のようなクエリ文字列付きルートでも 200 が返ること"""
+        with urllib.request.urlopen(self.url("/?reload=1")) as res:
+            self.assertEqual(res.status, 200)
+
+    # --- POST CORS ヘッダー ---
+
+    def test_post_api_data_cors_header(self):
+        """POST /api/data のレスポンスにも Access-Control-Allow-Origin が付くこと"""
+        req = urllib.request.Request(
+            self.url("/api/data"),
+            data=json.dumps({"selected": "テスト"}).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req) as res:
+            self.assertEqual(res.headers.get("Access-Control-Allow-Origin"), "*")
+
 
 # ---------------------------------------------------------------------------
 # EV ルール ロジックテスト（index.html の change() をPythonで再現）
@@ -522,6 +602,14 @@ class TestVitamins(unittest.TestCase):
     def test_91ev_can_use_1_vitamin(self):
         # ceil((100-91)/10) = ceil(0.9) = 1
         self.assertEqual(self._vl(91), 1)
+
+    def test_10ev_can_use_9_vitamins(self):
+        # ceil((100-10)/10) = ceil(9.0) = 9
+        self.assertEqual(self._vl(10), 9)
+
+    def test_9ev_can_use_10_vitamins(self):
+        # ceil((100-9)/10) = ceil(9.1) = 10
+        self.assertEqual(self._vl(9), 10)
 
 
 # ---------------------------------------------------------------------------
