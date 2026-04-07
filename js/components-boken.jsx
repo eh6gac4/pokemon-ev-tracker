@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ITEM_DATA } from './data-items.js';
-import { POKEMON_DATA } from './data-pokemon.js';
+import { ITEM_DATA, LOCATION_DATA, OBTAIN_DATA } from './data-items.js';
+import { POKEMON_DATA, EVOLUTION_DATA } from './data-pokemon.js';
 import { Panel, tmItemName } from './components-base.jsx';
 
 function renderTextWithLinks(text, done) {
@@ -347,6 +347,25 @@ const CAPTURE_MILESTONES = [
   { count: 60, item: "ぜんこくずかん",               location: "マサラタウン（殿堂入り後）" },
 ];
 
+function getHowToGet(name) {
+  if (OBTAIN_DATA[name]) return OBTAIN_DATA[name];
+  const locs = LOCATION_DATA.filter(l => l.pokemon.some(p => p.name === name));
+  if (locs.length > 0) {
+    return locs.length === 1 ? locs[0].name : `${locs[0].name} ほか`;
+  }
+  const entry = POKEMON_DATA.find(p => p[1] === name);
+  if (entry) {
+    const evo = EVOLUTION_DATA[entry[0]];
+    if (evo?.pre?.length > 0) {
+      const preId = evo.pre[0].id;
+      const preMon = POKEMON_DATA.find(p => p[0] === preId);
+      const cond = evo.pre[0].cond;
+      if (preMon) return `${preMon[1]} から進化（${cond}）`;
+    }
+  }
+  return "";
+}
+
 export function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal, onOpenDex }) {
   const [open, setOpen]     = useState(false);
   const [query, setQuery]   = useState("");
@@ -483,6 +502,7 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
 
         {captureGoals.map((goal, idx) => {
           const dexNo = POKEMON_DATA.find(p => p[1] === goal.name)?.[0];
+          const howTo = getHowToGet(goal.name);
           return (
           <div key={goal.id} style={{
             display: "flex", alignItems: "center", gap: "8px", padding: "7px 2px",
@@ -496,19 +516,26 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
                 No.{String(dexNo).padStart(3, "0")}
               </span>
             )}
-            <span
-              onClick={() => {
-                const idx = POKEMON_DATA.findIndex(p => p[1] === goal.name);
-                if (idx >= 0) onOpenDex?.(idx);
-              }}
-              style={{
-                flex: 1, fontSize: "11px",
-                color: goal.done ? "#444" : "#ddd",
-                textDecoration: goal.done ? "line-through" : "none",
-                cursor: "pointer",
-              }}
-              title="図鑑で確認"
-            >{goal.name}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <span
+                onClick={() => {
+                  const idx = POKEMON_DATA.findIndex(p => p[1] === goal.name);
+                  if (idx >= 0) onOpenDex?.(idx);
+                }}
+                style={{
+                  fontSize: "11px", display: "block",
+                  color: goal.done ? "#444" : "#ddd",
+                  textDecoration: goal.done ? "line-through" : "none",
+                  cursor: "pointer",
+                }}
+                title="図鑑で確認"
+              >{goal.name}</span>
+              {howTo && (
+                <span style={{ fontSize: "10px", color: goal.done ? "#2a2a3a" : "#555", display: "block", marginTop: "1px" }}>
+                  {howTo}
+                </span>
+              )}
+            </div>
             <button onClick={() => onDeleteGoal(goal.id)} style={{
               background: "transparent", border: "none", color: "#555",
               cursor: "pointer", fontSize: "13px", padding: "0 2px", fontFamily: "inherit",
