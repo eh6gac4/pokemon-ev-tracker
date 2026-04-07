@@ -510,7 +510,7 @@ export default function EVTracker() {
 
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
-          <TodoList color={mon.color} todos={[...todoList.filter(t => !t.done), ...todoList.filter(t => t.done)]} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} onReorder={reorderTodo} />
+          <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} onReorder={reorderTodo} />
           <CapturePanel color={mon.color} captureCount={captureCount} captureGoals={captureGoals} onCountChange={setCaptureCount} onAddGoal={addCaptureGoal} onToggleGoal={toggleCaptureGoal} onDeleteGoal={deleteCaptureGoal} />
           <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
         </div>

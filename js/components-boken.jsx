@@ -22,6 +22,7 @@ export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, on
   const [editText, setEditText] = useState("");
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
+  const [todoTab, setTodoTab] = useState("todo");
   const draggingIdRef = React.useRef(null);
   const submit = () => {
     const t = text.trim();
@@ -39,7 +40,17 @@ export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, on
     setEditingId(null);
   };
   const cancelEdit = () => setEditingId(null);
-  const doneCount = todos.filter(t => t.done).length;
+  const pendingCount = todos.filter(t => !t.done).length;
+  const doneCount    = todos.filter(t =>  t.done).length;
+  const visibleTodos = todos.filter(t => todoTab === "todo" ? !t.done : t.done);
+
+  // チェック時に自動タブ切り替え（未完了→完了タブへ、完了→未完了タブへ）
+  const handleToggle = (id) => {
+    const todo = todos.find(t => t.id === id);
+    if (todo && !todo.done) setTodoTab("done");
+    if (todo &&  todo.done) setTodoTab("todo");
+    onToggle(id);
+  };
 
   // pointer events で PC・スマホ両対応のドラッグを実現
   // ドラッグ中の要素に pointer-events:none を設定し、
@@ -84,38 +95,63 @@ export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, on
 
   return (
     <div className="card" style={{ padding: "12px 14px", marginBottom: "12px", borderColor: color + "33" }}>
+      {/* ヘッダー */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
         <span style={{ fontSize: "11px", color, letterSpacing: "1px" }}>📝 やることリスト</span>
-        {todos.length > 0 && (
-          <span style={{ fontSize: "10px", color: doneCount >= todos.length ? "#7fff7f" : "#555" }}>
-            {doneCount}/{todos.length}
-          </span>
+        {todos.length > 0 && doneCount >= todos.length && (
+          <span style={{ fontSize: "10px", color: "#7fff7f" }}>✓ 全完了</span>
         )}
       </div>
-      <div style={{ display: "flex", gap: "6px", marginBottom: todos.length > 0 ? "8px" : "0" }}>
-        <input
-          value={text}
-          onChange={e => setText(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && !e.isComposing && submit()}
-          placeholder="やることを入力…"
-          style={{
-            flex: 1, background: "#0e0e1e", border: "1px solid #2a2a4a",
-            borderRadius: "6px", color: "#ddd", fontSize: "12px",
-            padding: "7px 10px", fontFamily: "inherit", outline: "none",
-          }}
-        />
-        <button onClick={submit} style={{
-          background: color + "22", border: `1px solid ${color + "55"}`,
-          borderRadius: "6px", color, fontSize: "16px", padding: "4px 12px",
-          cursor: "pointer", fontFamily: "inherit", lineHeight: 1,
-        }}>＋</button>
+
+      {/* タブ */}
+      <div style={{ display: "flex", marginBottom: "10px", borderBottom: "1px solid #1a1a2e" }}>
+        {[
+          { key: "todo", label: "未完了", count: pendingCount },
+          { key: "done", label: "完了",   count: doneCount    },
+        ].map(({ key, label, count }) => (
+          <button key={key} onClick={() => setTodoTab(key)} style={{
+            flex: 1, background: "transparent", border: "none",
+            borderBottom: todoTab === key ? `2px solid ${color}` : "2px solid transparent",
+            color: todoTab === key ? color : "#555",
+            fontSize: "11px", padding: "4px 0 6px", cursor: "pointer",
+            fontFamily: "inherit", transition: "color 0.15s",
+          }}>
+            {label}{count > 0 && <span style={{ marginLeft: "4px", fontSize: "10px", opacity: 0.7 }}>({count})</span>}
+          </button>
+        ))}
       </div>
-      {todos.length === 0 && (
-        <div style={{ textAlign: "center", fontSize: "10px", color: "#2a2a4a", padding: "8px 0 2px" }}>
-          やることを追加しよう
+
+      {/* 入力欄（未完了タブのみ） */}
+      {todoTab === "todo" && (
+        <div style={{ display: "flex", gap: "6px", marginBottom: visibleTodos.length > 0 ? "8px" : "0" }}>
+          <input
+            value={text}
+            onChange={e => setText(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && !e.isComposing && submit()}
+            placeholder="やることを入力…"
+            style={{
+              flex: 1, background: "#0e0e1e", border: "1px solid #2a2a4a",
+              borderRadius: "6px", color: "#ddd", fontSize: "12px",
+              padding: "7px 10px", fontFamily: "inherit", outline: "none",
+            }}
+          />
+          <button onClick={submit} style={{
+            background: color + "22", border: `1px solid ${color + "55"}`,
+            borderRadius: "6px", color, fontSize: "16px", padding: "4px 12px",
+            cursor: "pointer", fontFamily: "inherit", lineHeight: 1,
+          }}>＋</button>
         </div>
       )}
-      {todos.map((todo, idx) => (
+
+      {/* 空メッセージ */}
+      {visibleTodos.length === 0 && (
+        <div style={{ textAlign: "center", fontSize: "10px", color: "#2a2a4a", padding: "8px 0 2px" }}>
+          {todoTab === "todo" ? "やることを追加しよう" : "完了したタスクはありません"}
+        </div>
+      )}
+
+      {/* リスト */}
+      {visibleTodos.map((todo, idx) => (
         <div
           key={todo.id}
           data-todo-id={todo.id}
@@ -127,17 +163,19 @@ export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, on
             opacity: draggingId === todo.id ? 0.4 : 1,
             background: dragOverId === todo.id ? color + "22" : "transparent",
             transition: "background 0.15s",
-            // ドラッグ中の要素を elementFromPoint の対象から外す
             pointerEvents: draggingId === todo.id ? "none" : "auto",
           }}>
-          <span
-            onPointerDown={e => handlePointerDown(e, todo.id)}
-            style={{
-              cursor: "grab", color: "#444", fontSize: "14px", flexShrink: 0,
-              userSelect: "none", padding: "0 2px",
-              touchAction: "none", // スマホでスクロールではなくドラッグを優先
-            }}>⠿</span>
-          <input type="checkbox" checked={todo.done} onChange={() => onToggle(todo.id)}
+          {/* ドラッグハンドル（未完了タブのみ） */}
+          {todoTab === "todo" && (
+            <span
+              onPointerDown={e => handlePointerDown(e, todo.id)}
+              style={{
+                cursor: "grab", color: "#444", fontSize: "14px", flexShrink: 0,
+                userSelect: "none", padding: "0 2px",
+                touchAction: "none",
+              }}>⠿</span>
+          )}
+          <input type="checkbox" checked={todo.done} onChange={() => handleToggle(todo.id)}
             style={{ accentColor: color, cursor: "pointer", flexShrink: 0 }} />
           {editingId === todo.id ? (
             <input
