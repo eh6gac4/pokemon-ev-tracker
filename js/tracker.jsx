@@ -15,7 +15,25 @@ export default function EVTracker() {
   const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
   const [loaded,       setLoaded]       = useState(false);
   const [macho,        setMacho]        = useState(false);
-  const [activeTab,    setActiveTab]    = useState("boken");
+  const TABS = ["boken", "ikusei", "chosa"];
+  const initialTab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "boken";
+  const [activeTab,    setActiveTab]    = useState(initialTab);
+
+  const navigateTab = (tab) => {
+    setActiveTab(tab);
+    history.pushState({ tab }, '', '#' + tab);
+  };
+
+  useEffect(() => {
+    const onPop = (e) => {
+      const tab = e.state?.tab || location.hash.slice(1);
+      if (TABS.includes(tab)) setActiveTab(tab);
+    };
+    // 初回ロード時のエントリを replaceState で記録
+    history.replaceState({ tab: initialTab }, '', '#' + initialTab);
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
   const [adding,       setAdding]       = useState(false);
   const [newName,      setNewName]      = useState("");
   const [newIcon,      setNewIcon]      = useState("🐣");
@@ -33,7 +51,6 @@ export default function EVTracker() {
   const [partyPickSlot, setPartyPickSlot] = useState(null);
 
   // swipe to change tab
-  const TABS = ["boken", "ikusei", "chosa"];
   const swipeX = React.useRef(null);
   const swipeY = React.useRef(null);
   const onSwipeStart = (e) => {
@@ -53,8 +70,8 @@ export default function EVTracker() {
     swipeX.current = null;
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
       const i = TABS.indexOf(activeTab);
-      if (dx < 0 && i < TABS.length - 1) setActiveTab(TABS[i + 1]);
-      if (dx > 0 && i > 0)               setActiveTab(TABS[i - 1]);
+      if (dx < 0 && i < TABS.length - 1) navigateTab(TABS[i + 1]);
+      if (dx > 0 && i > 0)               navigateTab(TABS[i - 1]);
     }
   };
 
@@ -501,13 +518,13 @@ export default function EVTracker() {
 
       {/* Bottom nav（モバイルのみ） */}
       <nav className="bottom-nav">
-        <button onClick={() => setActiveTab("boken")} style={{ color: activeTab === "boken" ? mon.color : "#555", borderTopColor: activeTab === "boken" ? mon.color : "transparent" }}>
+        <button onClick={() => navigateTab("boken")} style={{ color: activeTab === "boken" ? mon.color : "#555", borderTopColor: activeTab === "boken" ? mon.color : "transparent" }}>
           🗺 冒険
         </button>
-        <button onClick={() => setActiveTab("ikusei")} style={{ color: activeTab === "ikusei" ? mon.color : "#555", borderTopColor: activeTab === "ikusei" ? mon.color : "transparent" }}>
+        <button onClick={() => navigateTab("ikusei")} style={{ color: activeTab === "ikusei" ? mon.color : "#555", borderTopColor: activeTab === "ikusei" ? mon.color : "transparent" }}>
           💪 育成
         </button>
-        <button onClick={() => setActiveTab("chosa")} style={{ color: activeTab === "chosa" ? mon.color : "#555", borderTopColor: activeTab === "chosa" ? mon.color : "transparent" }}>
+        <button onClick={() => navigateTab("chosa")} style={{ color: activeTab === "chosa" ? mon.color : "#555", borderTopColor: activeTab === "chosa" ? mon.color : "transparent" }}>
           📊 データ
         </button>
         <button onClick={() => { location.reload(true); }} title="全ファイルをキャッシュなしで再取得" style={{ flex: "0 0 auto", padding: "16px 14px", color: "#2a2a4a", fontSize: "16px", borderTopColor: "transparent" }}>

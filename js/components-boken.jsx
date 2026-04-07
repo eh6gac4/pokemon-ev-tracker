@@ -3,6 +3,19 @@ import { ITEM_DATA } from './data-items.js';
 import { POKEMON_DATA } from './data-pokemon.js';
 import { Panel, tmItemName } from './components-base.jsx';
 
+function renderTextWithLinks(text, done) {
+  const URL_RE = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(URL_RE);
+  return parts.map((part, i) =>
+    URL_RE.test(part)
+      ? <a key={i} href={part} target="_blank" rel="noopener noreferrer"
+          style={{ color: done ? "#555" : "#7ab4ff", wordBreak: "break-all" }}
+          onClick={e => e.stopPropagation()}
+        >{part}</a>
+      : part
+  );
+}
+
 export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder }) {
   const [text, setText] = useState("");
   const [editingId, setEditingId] = useState(null);
@@ -153,7 +166,7 @@ export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, on
                 wordBreak: "break-all",
                 cursor: todo.done ? "default" : "text",
               }}
-            >{todo.text}</span>
+            >{renderTextWithLinks(todo.text, todo.done)}</span>
           )}
           <button onClick={() => onDelete(todo.id)} style={{
             background: "transparent", border: "none", color: "#555",
