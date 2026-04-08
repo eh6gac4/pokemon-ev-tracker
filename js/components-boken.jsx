@@ -349,10 +349,6 @@ const CAPTURE_MILESTONES = [
 
 function getHowToGet(name) {
   if (OBTAIN_DATA[name]) return OBTAIN_DATA[name];
-  const locs = LOCATION_DATA.filter(l => l.pokemon.some(p => p.name === name));
-  if (locs.length > 0) {
-    return locs.length === 1 ? locs[0].name : `${locs[0].name} ほか`;
-  }
   const entry = POKEMON_DATA.find(p => p[1] === name);
   if (entry) {
     const evo = EVOLUTION_DATA[entry[0]];
@@ -362,6 +358,10 @@ function getHowToGet(name) {
       const cond = evo.pre[0].cond;
       if (preMon) return `${preMon[1]} から進化（${cond}）`;
     }
+  }
+  const locs = LOCATION_DATA.filter(l => l.pokemon.some(p => p.name === name));
+  if (locs.length > 0) {
+    return locs.length === 1 ? locs[0].name : `${locs[0].name} ほか`;
   }
   return "";
 }
