@@ -380,7 +380,7 @@ export const EV_GUIDE = [
   { stat: "def", jp: "ぼうぎょ", spots: [
     { name: "モンジャラ", ev: 1, level: "Lv17-28", note: "21番道路 100%★" },
     { name: "サンド",     ev: 1, level: "Lv11-17", note: "4〜11番道路 25〜40%（LG）" },
-    { name: "イシツブテ", ev: 1, level: "Lv7-10",  note: "おつきみやま / 岩山の洞窟 35%" },
+    { name: "イシツブテ", ev: 1, level: "Lv7-10",  note: "おつきみやま / イワヤマトンネル 35%" },
   ]},
   { stat: "spa", jp: "とくこう", spots: [
     { name: "ゴース",     ev: 1, level: "Lv13-19", note: "ポケモンタワー3〜6F 85〜90%★" },

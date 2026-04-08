@@ -328,7 +328,7 @@ export const LOCATION_DATA = [
     { name: "ケーシィ",   evs: { spa: 1 }, rate: "15%" },
     { name: "ユンゲラー", evs: { spa: 2 }, rate: "5%" },
   ]},
-  // ─── シオンタウン → 岩山の洞窟 ───
+  // ─── シオンタウン → イワヤマトンネル ───
   { name: "9番道路", ver: "", pokemon: [
     { name: "コラッタ",   evs: { spe: 1 }, rate: "40%" },
     { name: "オニスズメ", evs: { spe: 1 }, rate: "35%" },
@@ -341,14 +341,14 @@ export const LOCATION_DATA = [
     { name: "アーボ",     evs: { atk: 1 }, rate: "25%", ver: "FR" },
     { name: "サンド",     evs: { def: 1 }, rate: "25%", ver: "LG" },
   ]},
-  { name: "岩山の洞窟 1F", ver: "", pokemon: [
+  { name: "イワヤマトンネル 1F", ver: "", pokemon: [
     { name: "イシツブテ", evs: { def: 1 }, rate: "35%", best: true },
     { name: "ズバット",   evs: { spe: 1 }, rate: "30%" },
     { name: "マンキー",   evs: { atk: 1 }, rate: "15%" },
     { name: "ワンリキー", evs: { atk: 1 }, rate: "15%" },
     { name: "イワーク",   evs: { def: 2 }, rate: "5%" },
   ]},
-  { name: "岩山の洞窟 B1F", ver: "", pokemon: [
+  { name: "イワヤマトンネル B1F", ver: "", pokemon: [
     { name: "イシツブテ", evs: { def: 1 }, rate: "35%", best: true },
     { name: "ズバット",   evs: { spe: 1 }, rate: "30%" },
     { name: "マンキー",   evs: { atk: 1 }, rate: "15%" },
