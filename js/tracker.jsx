@@ -54,8 +54,9 @@ export default function EVTracker() {
   const [renameValue,  setRenameValue]  = useState("");
   const [iconEditing,  setIconEditing]  = useState(false);
   const [iconValue,    setIconValue]    = useState("");
-  const [activeParty,  setActiveParty]  = useState([null,null,null,null,null,null]);
+  const [activeParty,   setActiveParty]   = useState([null,null,null,null,null,null]);
   const [partyPickSlot, setPartyPickSlot] = useState(null);
+  const [archivedParty, setArchivedParty] = useState([]);
 
   // swipe to change tab
   const swipeX = React.useRef(null);
@@ -181,6 +182,7 @@ export default function EVTracker() {
           const ap = saved.activeParty;
           setActiveParty([...ap, null, null, null, null, null, null].slice(0, 6));
         }
+        if (saved.archivedParty) setArchivedParty(saved.archivedParty);
       })
       .catch(() => {})
       .finally(() => setLoaded(true));
@@ -192,11 +194,11 @@ export default function EVTracker() {
       fetch("/api/data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ party, allEVs, allIVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty }),
+        body: JSON.stringify({ party, allEVs, allIVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, archivedParty }),
       }).catch(() => {});
     }, 800);
     return () => clearTimeout(timer);
-  }, [party, allEVs, allIVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, loaded]);
+  }, [party, allEVs, allIVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, archivedParty, loaded]);
 
   const toggleItem  = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
   const resetItems  = () => setCheckedItems({});
@@ -285,6 +287,24 @@ export default function EVTracker() {
     setActiveParty(prev => prev.map(n => n === name ? null : n));
   };
 
+  const archiveMon = (name) => {
+    const mon = party.find(p => p.name === name);
+    if (!mon) return;
+    const next = party.filter(p => p.name !== name);
+    setParty(next);
+    setArchivedParty(prev => [...prev, mon]);
+    if (selected === name && next.length > 0) setSelected(next[0].name);
+    setActiveParty(prev => prev.map(n => n === name ? null : n));
+  };
+
+  const unarchiveMon = (name) => {
+    const mon = archivedParty.find(p => p.name === name);
+    if (!mon || party.find(p => p.name === name)) return;
+    setArchivedParty(prev => prev.filter(p => p.name !== name));
+    setParty(prev => [...prev, mon]);
+    setSelected(name);
+  };
+
   const renameMon = (oldName, newName) => {
     const trimmed = newName.trim();
     if (!trimmed || trimmed === oldName) { setRenaming(false); return; }
@@ -359,8 +379,10 @@ export default function EVTracker() {
             <PartyPickerModal
               roster={party}
               activeParty={activeParty}
+              archivedParty={archivedParty}
               color={mon.color}
               onSelect={name => setPartySlot(partyPickSlot, name)}
+              onUnarchive={unarchiveMon}
               onClose={() => setPartyPickSlot(null)}
             />
           )}
@@ -470,11 +492,14 @@ export default function EVTracker() {
             <button onClick={reset} style={{ flex: 1, background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
               EV リセット
             </button>
-            {party.length > 1 && (
-              <button onClick={() => removeMon(selected)} style={{ flex: 1, background: "transparent", border: "1px solid #ff444444", borderRadius: "7px", color: "#ff6666", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
-                {selected} を削除
+            {party.length > 1 && (<>
+              <button onClick={() => archiveMon(selected)} style={{ flex: 1, background: "transparent", border: "1px solid #f5d02044", borderRadius: "7px", color: "#f5d020", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
+                アーカイブ
               </button>
-            )}
+              <button onClick={() => removeMon(selected)} style={{ flex: 1, background: "transparent", border: "1px solid #ff444444", borderRadius: "7px", color: "#ff6666", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
+                削除
+              </button>
+            </>)}
           </div>
 
           {renaming ? (

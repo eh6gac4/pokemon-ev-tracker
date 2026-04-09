@@ -423,34 +423,81 @@ export function PartySlots({ slots, roster, color, onSlotSelect, onSlotClear, on
   );
 }
 
-export function PartyPickerModal({ roster, activeParty, onSelect, onClose, color }) {
+export function PartyPickerModal({ roster, activeParty, archivedParty = [], onSelect, onUnarchive, onClose, color }) {
+  const [tab, setTab] = useState("active");
   const available = roster.filter(p => !activeParty.includes(p.name));
+
+  const tabBtn = (id, label) => (
+    <button
+      key={id}
+      onClick={() => setTab(id)}
+      style={{
+        flex: 1, background: tab === id ? color + "22" : "transparent",
+        border: `1px solid ${tab === id ? color + "66" : "#2a2a4a"}`,
+        borderRadius: "6px", padding: "7px", cursor: "pointer",
+        color: tab === id ? color : "#555", fontSize: "10px",
+        fontFamily: "inherit", letterSpacing: "1px",
+      }}
+    >{label}{tab !== id && id === "archived" && archivedParty.length > 0 && ` (${archivedParty.length})`}</button>
+  );
+
   return (
     <div
       style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 200, display: "flex", alignItems: "flex-end" }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div style={{ width: "100%", background: "#1a1a2e", borderRadius: "16px 16px 0 0", padding: "16px 16px 24px", maxHeight: "65vh", overflowY: "auto" }}>
-        <div style={{ fontSize: "10px", color: "#555", marginBottom: "12px", letterSpacing: "2px", textAlign: "center" }}>パーティに入れるポケモンを選択</div>
-        {available.length === 0 ? (
-          <div style={{ textAlign: "center", color: "#555", fontSize: "11px", padding: "20px" }}>育成中のポケモンは全員パーティに入っています</div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "12px" }}>
-            {available.map(p => (
-              <button
-                key={p.name}
-                onClick={() => onSelect(p.name)}
-                style={{
-                  background: `${p.color}22`, border: `1px solid ${p.color}55`,
-                  borderRadius: "10px", padding: "10px 6px", cursor: "pointer", textAlign: "center",
-                }}
-              >
-                <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
-                <div style={{ fontSize: "10px", color: p.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-              </button>
-            ))}
-          </div>
+        <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
+          {tabBtn("active", "育成中")}
+          {tabBtn("archived", "アーカイブ済み")}
+        </div>
+
+        {tab === "active" && (
+          available.length === 0 ? (
+            <div style={{ textAlign: "center", color: "#555", fontSize: "11px", padding: "20px" }}>育成中のポケモンは全員パーティに入っています</div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "12px" }}>
+              {available.map(p => (
+                <button
+                  key={p.name}
+                  onClick={() => onSelect(p.name)}
+                  style={{
+                    background: `${p.color}22`, border: `1px solid ${p.color}55`,
+                    borderRadius: "10px", padding: "10px 6px", cursor: "pointer", textAlign: "center",
+                  }}
+                >
+                  <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
+                  <div style={{ fontSize: "10px", color: p.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                </button>
+              ))}
+            </div>
+          )
         )}
+
+        {tab === "archived" && (
+          archivedParty.length === 0 ? (
+            <div style={{ textAlign: "center", color: "#555", fontSize: "11px", padding: "20px" }}>アーカイブ済みのポケモンはいません</div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "12px" }}>
+              {archivedParty.map(p => (
+                <button
+                  key={p.name}
+                  onClick={() => { onUnarchive(p.name); onSelect(p.name); onClose(); }}
+                  style={{
+                    background: `${p.color}11`, border: `1px solid ${p.color}33`,
+                    borderRadius: "10px", padding: "10px 6px", cursor: "pointer", textAlign: "center",
+                    opacity: 0.8,
+                  }}
+                >
+                  <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
+                  <div style={{ fontSize: "10px", color: p.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                  <div style={{ fontSize: "8px", color: "#555", marginTop: "2px" }}>復元して追加</div>
+                </button>
+              ))}
+            </div>
+          )
+        )}
+
         <button
           onClick={onClose}
           style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "8px", color: "#555", padding: "11px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px" }}
