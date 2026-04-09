@@ -44,11 +44,7 @@ export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, on
   const doneCount    = todos.filter(t =>  t.done).length;
   const visibleTodos = todos.filter(t => todoTab === "todo" ? !t.done : t.done);
 
-  // チェック時に自動タブ切り替え（未完了→完了タブへ、完了→未完了タブへ）
   const handleToggle = (id) => {
-    const todo = todos.find(t => t.id === id);
-    if (todo && !todo.done) setTodoTab("done");
-    if (todo &&  todo.done) setTodoTab("todo");
     onToggle(id);
   };
 
