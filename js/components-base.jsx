@@ -9,7 +9,7 @@ export function tmItemName(item) {
   return `${prefix}${num} ${TM_LIST[item.tmId] || ""}`;
 }
 
-export function AutoTextarea({ value, onChange, placeholder }) {
+export const AutoTextarea = React.memo(function AutoTextarea({ value, onChange, placeholder }) {
   const ref = useRef(null);
   useEffect(() => {
     if (!ref.current) return;
@@ -26,9 +26,9 @@ export function AutoTextarea({ value, onChange, placeholder }) {
       style={{ width: "100%", lineHeight: "1.5", fontSize: "11px", padding: "7px 10px", background: "#0d0d1a", border: "1px solid #2a2a4a", minHeight: "65px" }}
     />
   );
-}
+});
 
-export function Panel({ title, open, onToggle, color, children }) {
+export const Panel = React.memo(function Panel({ title, open, onToggle, color, children }) {
   return (
     <div style={{ marginBottom: "10px" }}>
       <button
@@ -50,9 +50,9 @@ export function Panel({ title, open, onToggle, color, children }) {
       )}
     </div>
   );
-}
+});
 
-export function StatRow({ stat, val, color, macho, onChange }) {
+export const StatRow = React.memo(function StatRow({ stat, val, color, macho, onChange }) {
   const isMaxed = val >= MAX_STAT;
   const vLeft   = vitaminLeft(val);
   const steps    = macho ? [[-1,"－"],[1,"＋2"],[2,"＋4"],[3,"＋6"]]   : [[-1,"－"],[1,"＋1"],[2,"＋2"],[3,"＋3"]];
@@ -104,13 +104,13 @@ export function StatRow({ stat, val, color, macho, onChange }) {
       </div>
     </div>
   );
-}
+});
 
 // ─── feature components ──────────────────────────────────────────────────────
 
 // 共通ポケモン検索コンポーネント（AddMonModal・IVChecker・PokedexPanel で共用）
 
-export function PokemonSearch({ value, onSelect, color, placeholder = "ポケモン名・番号で検索…", maxHeight = "200px" }) {
+export const PokemonSearch = React.memo(function PokemonSearch({ value, onSelect, color, placeholder = "ポケモン名・番号で検索…", maxHeight = "200px" }) {
   const [query, setQuery] = useState("");
   const [open,  setOpen]  = useState(false);
 
@@ -152,9 +152,9 @@ export function PokemonSearch({ value, onSelect, color, placeholder = "ポケモ
       )}
     </div>
   );
-}
+});
 
-export function MoveRow({ move, prefix = null }) {
+export const MoveRow = React.memo(function MoveRow({ move, prefix = null }) {
   const md = MOVE_DATA[move];
   const tc = md ? (TYPE_COLORS[md[0]] || "#555") : null;
   return (
@@ -178,9 +178,9 @@ export function MoveRow({ move, prefix = null }) {
       )}
     </div>
   );
-}
+});
 
-export function VerBadge({ v }) {
+export const VerBadge = React.memo(function VerBadge({ v }) {
   if (!v) return null;
   const isFR = v === "FR";
   return (
@@ -189,5 +189,4 @@ export function VerBadge({ v }) {
       color:      isFR ? "#ff8888"   : "#8888ff",
       border: `1px solid ${isFR ? "#cc222255" : "#2244cc55"}` }}>{v}</span>
   );
-}
-
+});

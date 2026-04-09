@@ -4,7 +4,7 @@ import { TM_LIST, ALL_MOVES, getLearnset, getLearnableMoves, MOVE_DATA, TYPE_COL
 import { ITEM_DATA, HOLD_ITEMS } from './data-items.js';
 import { Panel, PokemonSearch, AutoTextarea, tmItemName } from './components-base.jsx';
 
-export function AddMonModal({ newName, newIcon, newColor, newDexId, setNewName, setNewIcon, setNewColor, setNewDexId, onAdd, onCancel, borderColor }) {
+export const AddMonModal = React.memo(function AddMonModal({ newName, newIcon, newColor, newDexId, setNewName, setNewIcon, setNewColor, setNewDexId, onAdd, onCancel, borderColor }) {
 
   return (
     <div className="card" style={{ padding: "14px", marginBottom: "14px", borderColor: borderColor + "55", borderRadius: "12px" }}>
@@ -50,13 +50,13 @@ export function AddMonModal({ newName, newIcon, newColor, newDexId, setNewName, 
       </div>
     </div>
   );
-}
+});
 
 export const natLabel = (n) => n.up
   ? `${n.name}（↑${STAT_JP[n.up]} / ↓${STAT_JP[n.dn]}）`
   : `${n.name}（補正なし）`;
 
-export function NaturePicker({ value, color, onChange }) {
+export const NaturePicker = React.memo(function NaturePicker({ value, color, onChange }) {
   const [open,  setOpen]  = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef(null);
@@ -134,11 +134,11 @@ export function NaturePicker({ value, color, onChange }) {
       )}
     </div>
   );
-}
+});
 
 // ─── item picker ─────────────────────────────────────────────────────────────
 
-export function ItemPicker({ value, color, onChange }) {
+export const ItemPicker = React.memo(function ItemPicker({ value, color, onChange }) {
   const [open,  setOpen]  = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef(null);
@@ -212,11 +212,11 @@ export function ItemPicker({ value, color, onChange }) {
       )}
     </div>
   );
-}
+});
 
 // ─── main component ──────────────────────────────────────────────────────────
 
-export function MovePicker({ moves, color, onChange, learnableMoves, learnset }) {
+export const MovePicker = React.memo(function MovePicker({ moves, color, onChange, learnableMoves, learnset }) {
   const [activeSlot, setActiveSlot] = useState(null);
   const [query, setQuery]           = useState("");
   const inputRef = useRef(null);
@@ -368,9 +368,9 @@ export function MovePicker({ moves, color, onChange, learnableMoves, learnset })
       </div>
     </div>
   );
-}
+});
 
-export function PartySlots({ slots, roster, color, onSlotSelect, onSlotClear, onEmptySlotClick }) {
+export const PartySlots = React.memo(function PartySlots({ slots, roster, color, onSlotSelect, onSlotClear, onEmptySlotClick }) {
   const filled = slots.filter(Boolean).length;
   return (
     <div className="card" style={{ padding: "10px 12px", marginBottom: "16px", borderColor: color + "44" }}>
@@ -421,9 +421,9 @@ export function PartySlots({ slots, roster, color, onSlotSelect, onSlotClear, on
       </div>
     </div>
   );
-}
+});
 
-export function PartyPickerModal({ roster, activeParty, archivedParty = [], onSelect, onUnarchive, onClose, color }) {
+export const PartyPickerModal = React.memo(function PartyPickerModal({ roster, activeParty, archivedParty = [], onSelect, onUnarchive, onClose, color }) {
   const [tab, setTab] = useState("active");
   const available = roster.filter(p => !activeParty.includes(p.name));
 
@@ -505,10 +505,10 @@ export function PartyPickerModal({ roster, activeParty, archivedParty = [], onSe
       </div>
     </div>
   );
-}
+});
 
 
-export function IVPanel({ ivs, color, onChange }) {
+export const IVPanel = React.memo(function IVPanel({ ivs, color, onChange }) {
   const [open, setOpen] = useState(false);
 
   const ivColor = (val) => {
@@ -548,4 +548,4 @@ export function IVPanel({ ivs, color, onChange }) {
       <div style={{ fontSize: "8px", color: "#333", marginTop: "8px" }}>0〜31で入力　未入力は未登録</div>
     </Panel>
   );
-}
+});

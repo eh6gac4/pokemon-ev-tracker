@@ -16,7 +16,7 @@ function renderTextWithLinks(text, done) {
   );
 }
 
-export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder }) {
+export const TodoList = React.memo(function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder }) {
   const [text, setText] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
@@ -214,9 +214,9 @@ export function TodoList({ color, todos, onAdd, onToggle, onDelete, onRename, on
       ))}
     </div>
   );
-}
+});
 
-export function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
+export const AdventurePanel = React.memo(function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
   const [filter,    setFilter]    = useState("all");
   const [openAreas, setOpenAreas] = useState({});
   const [openImgs,  setOpenImgs]  = useState({});
@@ -332,7 +332,7 @@ export function AdventurePanel({ color, checkedItems, onToggle, onReset }) {
       </div>
     </div>
   );
-}
+});
 
 const CAPTURE_MILESTONES = [
   { count: 10, item: "ひでんマシン05（フラッシュ）", location: "2ばんどうろゲート" },
@@ -362,7 +362,7 @@ function getHowToGet(name) {
   return "";
 }
 
-export function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal, onOpenDex }) {
+export const CapturePanel = React.memo(function CapturePanel({ color, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal, onOpenDex }) {
   const [open, setOpen]     = useState(false);
   const [query, setQuery]   = useState("");
   const [focused, setFocused] = useState(false);
@@ -550,7 +550,7 @@ export function CapturePanel({ color, captureCount, captureGoals, onCountChange,
       </div>
     </Panel>
   );
-}
+});
 
 // ─────────────────────────────────────────
 // わざ逆引き

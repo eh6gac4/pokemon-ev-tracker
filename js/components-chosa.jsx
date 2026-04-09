@@ -5,7 +5,7 @@ import { HOLD_ITEMS, LOCATION_DATA } from './data-items.js';
 import { Panel, PokemonSearch, MoveRow, VerBadge, tmItemName } from './components-base.jsx';
 import { natLabel } from './components-ikusei.jsx';
 
-export function IVChecker({ color, ivs, onSave }) {
+export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave }) {
   const [open,   setOpen]   = useState(false);
   const [mon,    setMon]    = useState(0);
   const [lvStr,  setLvStr]  = useState("50");
@@ -141,9 +141,9 @@ export function IVChecker({ color, ivs, onSave }) {
       <div style={{ fontSize: "8px", color: "#333", marginTop: "6px" }}>「？」は実数値・努力値・レベルを確認　各値クリックで個別登録</div>
     </Panel>
   );
-}
+});
 
-export function IVCompare({ party, allIVs, color }) {
+export const IVCompare = React.memo(function IVCompare({ party, allIVs, color }) {
   const [open, setOpen] = useState(false);
 
   const ivDispColor = (val) => {
@@ -206,9 +206,9 @@ export function IVCompare({ party, allIVs, color }) {
       )}
     </Panel>
   );
-}
+});
 
-export function EVSearch({ macho, color }) {
+export const EVSearch = React.memo(function EVSearch({ macho, color }) {
   const [open,   setOpen]   = useState(false);
   const [query,  setQuery]  = useState("");
   const [filter, setFilter] = useState(null);
@@ -263,11 +263,11 @@ export function EVSearch({ macho, color }) {
       {macho && <div style={{ fontSize: "8px", color: "#ff6b35", marginTop: "6px" }}>🥊 強制ギプス装備中：EV×2表示</div>}
     </Panel>
   );
-}
+});
 
 // わざ一行表示（PokedexPanel の各タブで共用）
 
-export function PokedexPanel({ color, dexTarget, onDexTargetConsumed }) {
+export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget, onDexTargetConsumed }) {
   const [open, setOpen]       = useState(false);
   const [mon,  setMon]        = useState(0);
   const [moveTab, setMoveTab]     = useState("lv");
@@ -432,9 +432,9 @@ export function PokedexPanel({ color, dexTarget, onDexTargetConsumed }) {
       </div>
     </Panel>
   );
-}
+});
 
-export function EVGuide({ color }) {
+export const EVGuide = React.memo(function EVGuide({ color }) {
   const [open, setOpen] = useState(false);
   return (
     <Panel title="📖 EV稼ぎガイド（FR/LG）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
@@ -454,9 +454,9 @@ export function EVGuide({ color }) {
       <div style={{ fontSize: "8px", color: "#333", marginTop: "4px" }}>強制ギプス装備で獲得EV×2</div>
     </Panel>
   );
-}
+});
 
-export function TypeChart({ color }) {
+export const TypeChart = React.memo(function TypeChart({ color }) {
   const [open, setOpen] = useState(false);
 
   const TYPES = ["ノーマル","ほのお","みず","でんき","くさ","こおり","かくとう","どく","じめん","ひこう","エスパー","むし","いわ","ゴースト","りゅう","あく","はがね"];
@@ -534,9 +534,9 @@ export function TypeChart({ color }) {
       </div>
     </Panel>
   );
-}
+});
 
-export function LocationGuide({ color }) {
+export const LocationGuide = React.memo(function LocationGuide({ color }) {
   const [open, setOpen] = useState(false);
   const [ver, setVer] = useState("all");
 
@@ -589,11 +589,11 @@ export function LocationGuide({ color }) {
       <div style={{ fontSize: "8px", color: "#333", marginTop: "4px" }}>強制ギプス装備で獲得EV×2</div>
     </Panel>
   );
-}
+});
 
 // ─── nature picker ───────────────────────────────────────────────────────────
 
-export function MoveTutorPanel({ color }) {
+export const MoveTutorPanel = React.memo(function MoveTutorPanel({ color }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -622,9 +622,9 @@ export function MoveTutorPanel({ color }) {
       </div>
     </Panel>
   );
-}
+});
 
-export function MoveReversePanel({ color }) {
+export const MoveReversePanel = React.memo(function MoveReversePanel({ color }) {
   const [open, setOpen]   = useState(false);
   const [query, setQuery] = useState("");
   const [chosen, setChosen] = useState("");
@@ -722,13 +722,13 @@ export function MoveReversePanel({ color }) {
       )}
     </Panel>
   );
-}
+});
 
 // ─────────────────────────────────────────
 // EV稼ぎ効率ランキング
 // ─────────────────────────────────────────
 
-export function EVRankPanel({ color }) {
+export const EVRankPanel = React.memo(function EVRankPanel({ color }) {
   const [open, setOpen] = useState(false);
   const [stat, setStat] = useState("hp");
 
@@ -768,13 +768,13 @@ export function EVRankPanel({ color }) {
       <div style={{ fontSize: "8px", color: "#333", marginTop: "4px" }}>強制ギプス装備で×2</div>
     </Panel>
   );
-}
+});
 
 // ─────────────────────────────────────────
 // 種族値ランキング
 // ─────────────────────────────────────────
 
-export function StatRankPanel({ color }) {
+export const StatRankPanel = React.memo(function StatRankPanel({ color }) {
   const [open, setOpen] = useState(false);
   const [stat, setStat] = useState("hp");
 
@@ -821,12 +821,12 @@ export function StatRankPanel({ color }) {
       </div>
     </Panel>
   );
-}
+});
 
 
 // ===== パーティ管理 =====
 
-export function AbilitySearch({ color }) {
+export const AbilitySearch = React.memo(function AbilitySearch({ color }) {
   const [open,  setOpen]  = useState(false);
   const [query, setQuery] = useState("");
 
@@ -877,4 +877,4 @@ export function AbilitySearch({ color }) {
       </div>
     </Panel>
   );
-}
+});

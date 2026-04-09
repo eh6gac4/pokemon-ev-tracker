@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   DEFAULT_PARTY, STATS, MAX_STAT, MAX_TOTAL, initEVs, initIVs, COLORS, POKEMON_DATA
 } from './data-pokemon.js';
@@ -8,6 +8,29 @@ import { AddMonModal, NaturePicker, ItemPicker, MovePicker, PartySlots, PartyPic
 import { IVChecker, IVCompare, EVSearch, EVGuide, PokedexPanel, TypeChart, LocationGuide, MoveTutorPanel, MoveReversePanel, EVRankPanel, StatRankPanel, AbilitySearch } from './components-chosa.jsx';
 import { TodoList, CapturePanel, AdventurePanel } from './components-boken.jsx';
 
+const TABS = ["boken", "ikusei", "chosa"];
+
+const MonCard = React.memo(function MonCard({ mon, evTotal, isActive, inParty, onSelect }) {
+  return (
+    <button
+      className={`mon-btn${isActive ? " active" : ""}`}
+      onClick={() => onSelect(mon.name)}
+      style={{
+        width: "100%", cursor: "pointer", color: "#e8e8e8", textAlign: "center",
+        background: isActive ? `${mon.color}22` : "#16213e",
+        border: `2px solid ${isActive ? mon.color : "#2a2a4a"}`,
+        borderRadius: "10px", padding: "10px 6px 8px",
+        position: "relative",
+      }}
+    >
+      {inParty && <div style={{ position: "absolute", top: "4px", right: "5px", fontSize: "7px", color: mon.color, lineHeight: 1 }}>▲</div>}
+      <div style={{ fontSize: "20px", marginBottom: "3px" }}>{mon.icon}</div>
+      <div style={{ fontSize: "10px", color: isActive ? mon.color : "#aaa", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{mon.name}</div>
+      <div style={{ fontSize: "9px", color: evTotal >= MAX_TOTAL ? "#7fff7f" : "#555", marginTop: "2px" }}>{evTotal}/{MAX_TOTAL}</div>
+    </button>
+  );
+});
+
 export default function EVTracker() {
   const [party,     setParty]    = useState(DEFAULT_PARTY);
   const [allEVs,    setAllEVs]   = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
@@ -16,20 +39,19 @@ export default function EVTracker() {
   const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
   const [loaded,       setLoaded]       = useState(false);
   const [macho,        setMacho]        = useState(false);
-  const TABS = ["boken", "ikusei", "chosa"];
   const initialTab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "boken";
   const [activeTab,    setActiveTab]    = useState(initialTab);
   const [dexTarget,    setDexTarget]    = useState(null);
 
-  const navigateTab = (tab) => {
+  const navigateTab = useCallback((tab) => {
     setActiveTab(tab);
     history.pushState({ tab }, '', '#' + tab);
-  };
+  }, []);
 
-  const openDex = (dexId) => {
+  const openDex = useCallback((dexId) => {
     setDexTarget(dexId);
     navigateTab("chosa");
-  };
+  }, [navigateTab]);
 
   useEffect(() => {
     const onPop = (e) => {
@@ -59,14 +81,14 @@ export default function EVTracker() {
   const [archivedParty, setArchivedParty] = useState([]);
 
   // swipe to change tab
-  const swipeX = React.useRef(null);
-  const swipeY = React.useRef(null);
-  const onSwipeStart = (e) => {
+  const swipeX = useRef(null);
+  const swipeY = useRef(null);
+  const onSwipeStart = useCallback((e) => {
     if (e.touches.length > 1) return; // ピンチズーム中は無視
     swipeX.current = e.touches[0].clientX;
     swipeY.current = e.touches[0].clientY;
-  };
-  const onSwipeEnd = (e) => {
+  }, []);
+  const onSwipeEnd = useCallback((e) => {
     if (swipeX.current === null) return;
     // ズーム中は誤爆防止のため無視
     if (window.visualViewport && window.visualViewport.scale > 1) {
@@ -81,7 +103,7 @@ export default function EVTracker() {
       if (dx < 0 && i < TABS.length - 1) navigateTab(TABS[i + 1]);
       if (dx > 0 && i > 0)               navigateTab(TABS[i - 1]);
     }
-  };
+  }, [activeTab, navigateTab]);
 
   // pull-to-refresh
   useEffect(() => {
@@ -200,20 +222,20 @@ export default function EVTracker() {
     return () => clearTimeout(timer);
   }, [party, allEVs, allIVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, archivedParty, loaded]);
 
-  const toggleItem  = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
-  const resetItems  = () => setCheckedItems({});
-  const addCaptureGoal    = (name) => setCaptureGoals(prev => [...prev, { id: Date.now().toString(), name, done: false }]);
-  const toggleCaptureGoal = (id)   => setCaptureGoals(prev => prev.map(g => g.id === id ? { ...g, done: !g.done } : g));
-  const deleteCaptureGoal = (id)   => setCaptureGoals(prev => prev.filter(g => g.id !== id));
+  const toggleItem  = useCallback((id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] })), []);
+  const resetItems  = useCallback(() => setCheckedItems({}), []);
+  const addCaptureGoal    = useCallback((name) => setCaptureGoals(prev => [...prev, { id: Date.now().toString(), name, done: false }]), []);
+  const toggleCaptureGoal = useCallback((id)   => setCaptureGoals(prev => prev.map(g => g.id === id ? { ...g, done: !g.done } : g)), []);
+  const deleteCaptureGoal = useCallback((id)   => setCaptureGoals(prev => prev.filter(g => g.id !== id)), []);
 
-  const addTodo      = (text) => setTodoList(prev => [{ id: Date.now().toString(), text, done: false }, ...prev]);
-  const toggleTodo   = (id)  => setTodoList(prev => {
+  const addTodo      = useCallback((text) => setTodoList(prev => [{ id: Date.now().toString(), text, done: false }, ...prev]), []);
+  const toggleTodo   = useCallback((id)  => setTodoList(prev => {
     const next = prev.map(t => t.id === id ? { ...t, done: !t.done } : t);
     return [...next.filter(t => !t.done), ...next.filter(t => t.done)];
-  });
-  const deleteTodo   = (id)  => setTodoList(prev => prev.filter(t => t.id !== id));
-  const renameTodo   = (id, text) => setTodoList(prev => prev.map(t => t.id === id ? { ...t, text } : t));
-  const reorderTodo  = (fromId, toId) => setTodoList(prev => {
+  }), []);
+  const deleteTodo   = useCallback((id)  => setTodoList(prev => prev.filter(t => t.id !== id)), []);
+  const renameTodo   = useCallback((id, text) => setTodoList(prev => prev.map(t => t.id === id ? { ...t, text } : t)), []);
+  const reorderTodo  = useCallback((fromId, toId) => setTodoList(prev => {
     const from = prev.findIndex(t => t.id === fromId);
     const to   = prev.findIndex(t => t.id === toId);
     if (from === -1 || to === -1 || from === to) return prev;
@@ -221,9 +243,9 @@ export default function EVTracker() {
     const [item] = next.splice(from, 1);
     next.splice(to, 0, item);
     return next;
-  });
+  }), []);
 
-  const setPartySlot = (slot, name) => {
+  const setPartySlot = useCallback((slot, name) => {
     setActiveParty(prev => {
       const next = [...prev];
       // 既に他のスロットにいれば外す
@@ -232,15 +254,15 @@ export default function EVTracker() {
       return next;
     });
     setPartyPickSlot(null);
-  };
-  const clearPartySlot = (slot) => setActiveParty(prev => { const n = [...prev]; n[slot] = null; return n; });
+  }, []);
+  const clearPartySlot = useCallback((slot) => setActiveParty(prev => { const n = [...prev]; n[slot] = null; return n; }), []);
 
-  const mon       = party.find(p => p.name === selected) || party[0];
-  const evs       = allEVs[selected] || initEVs();
-  const total     = Object.values(evs).reduce((a, b) => a + b, 0);
+  const mon       = useMemo(() => party.find(p => p.name === selected) || party[0], [party, selected]);
+  const evs       = useMemo(() => allEVs[selected] || initEVs(), [allEVs, selected]);
+  const total     = useMemo(() => Object.values(evs).reduce((a, b) => a + b, 0), [evs]);
   const remaining = MAX_TOTAL - total;
 
-  const change = (key, delta) => {
+  const change = useCallback((key, delta) => {
     const d = delta > 0 ? delta * (macho ? 2 : 1) : delta;
     setAllEVs(prev => {
       const cur      = (prev[selected] || initEVs())[key];
@@ -249,35 +271,41 @@ export default function EVTracker() {
       if (curTotal - cur + next > MAX_TOTAL) next = cur + (MAX_TOTAL - curTotal);
       return { ...prev, [selected]: { ...(prev[selected] || initEVs()), [key]: Math.max(0, next) } };
     });
-  };
+  }, [selected, macho]);
 
-  const reset = () => setAllEVs(prev => ({ ...prev, [selected]: initEVs() }));
+  // stat ごとの安定した onChange を事前生成（StatRow の React.memo を有効にする）
+  const changeCallbacks = useMemo(
+    () => Object.fromEntries(STATS.map(s => [s.key, (d) => change(s.key, d)])),
+    [change]
+  );
 
-  const updateMemo   = (text) => setParty(prev => prev.map(p => p.name === selected ? { ...p, memo: text } : p));
-  const updateNature = (name) => setParty(prev => prev.map(p => p.name === selected ? { ...p, nature: name } : p));
-  const updateItem   = (name) => setParty(prev => prev.map(p => p.name === selected ? { ...p, item: name } : p));
-  const updateIcon   = (icon) => {
+  const reset = useCallback(() => setAllEVs(prev => ({ ...prev, [selected]: initEVs() })), [selected]);
+
+  const updateMemo   = useCallback((text) => setParty(prev => prev.map(p => p.name === selected ? { ...p, memo: text } : p)), [selected]);
+  const updateNature = useCallback((name) => setParty(prev => prev.map(p => p.name === selected ? { ...p, nature: name } : p)), [selected]);
+  const updateItem   = useCallback((name) => setParty(prev => prev.map(p => p.name === selected ? { ...p, item: name } : p)), [selected]);
+  const updateIcon   = useCallback((icon) => {
     const trimmed = icon.trim();
     if (!trimmed) return;
     setParty(prev => prev.map(p => p.name === selected ? { ...p, icon: trimmed } : p));
     setIconEditing(false);
-  };
+  }, [selected]);
 
-  const updateMove = (slot, move) => setAllMoves(prev => {
+  const updateMove = useCallback((slot, move) => setAllMoves(prev => {
     const cur = prev[selected] || ["","","",""];
     const next = [...cur];
     next[slot] = move;
     return { ...prev, [selected]: next };
-  });
+  }), [selected]);
 
-  const updateIV = (key, val) => setAllIVs(prev => ({
+  const updateIV = useCallback((key, val) => setAllIVs(prev => ({
     ...prev,
     [selected]: { ...(prev[selected] || initIVs()), [key]: val },
-  }));
+  })), [selected]);
 
-  const saveIVs = (ivs) => setAllIVs(prev => ({ ...prev, [selected]: ivs }));
+  const saveIVs = useCallback((ivs) => setAllIVs(prev => ({ ...prev, [selected]: ivs })), [selected]);
 
-  const removeMon = (name) => {
+  const removeMon = useCallback((name) => {
     const next = party.filter(p => p.name !== name);
     setParty(next);
     setAllEVs(prev => { const n = { ...prev }; delete n[name]; return n; });
@@ -285,27 +313,27 @@ export default function EVTracker() {
     setAllMoves(prev => { const n = { ...prev }; delete n[name]; return n; });
     if (selected === name && next.length > 0) setSelected(next[0].name);
     setActiveParty(prev => prev.map(n => n === name ? null : n));
-  };
+  }, [party, selected]);
 
-  const archiveMon = (name) => {
-    const mon = party.find(p => p.name === name);
-    if (!mon) return;
+  const archiveMon = useCallback((name) => {
+    const m = party.find(p => p.name === name);
+    if (!m) return;
     const next = party.filter(p => p.name !== name);
     setParty(next);
-    setArchivedParty(prev => [...prev, mon]);
+    setArchivedParty(prev => [...prev, m]);
     if (selected === name && next.length > 0) setSelected(next[0].name);
     setActiveParty(prev => prev.map(n => n === name ? null : n));
-  };
+  }, [party, selected]);
 
-  const unarchiveMon = (name) => {
-    const mon = archivedParty.find(p => p.name === name);
-    if (!mon || party.find(p => p.name === name)) return;
+  const unarchiveMon = useCallback((name) => {
+    const m = archivedParty.find(p => p.name === name);
+    if (!m || party.find(p => p.name === name)) return;
     setArchivedParty(prev => prev.filter(p => p.name !== name));
-    setParty(prev => [...prev, mon]);
+    setParty(prev => [...prev, m]);
     setSelected(name);
-  };
+  }, [archivedParty, party]);
 
-  const renameMon = (oldName, newName) => {
+  const renameMon = useCallback((oldName, newName) => {
     const trimmed = newName.trim();
     if (!trimmed || trimmed === oldName) { setRenaming(false); return; }
     if (party.find(p => p.name === trimmed)) return;
@@ -331,9 +359,9 @@ export default function EVTracker() {
     if (selected === oldName) setSelected(trimmed);
     setActiveParty(prev => prev.map(n => n === oldName ? trimmed : n));
     setRenaming(false);
-  };
+  }, [party, selected]);
 
-  const addMon = () => {
+  const addMon = useCallback(() => {
     const trimmed = newName.trim();
     if (!trimmed || party.find(p => p.name === trimmed)) return;
     setParty(prev => [...prev, { name: trimmed, icon: newIcon, color: newColor, memo: "", nature: "", dexId: newDexId }]);
@@ -344,7 +372,16 @@ export default function EVTracker() {
     setAdding(false);
     setNewName("");
     setNewDexId(null);
-  };
+  }, [newName, newIcon, newColor, newDexId, party]);
+
+  const learnableMoves = useMemo(() => {
+    const pd = mon.dexId != null ? POKEMON_DATA[mon.dexId] : null;
+    return pd ? getLearnableMoves(pd[0]) : ALL_MOVES;
+  }, [mon.dexId]);
+  const learnset = useMemo(() => {
+    const pd = mon.dexId != null ? POKEMON_DATA[mon.dexId] : null;
+    return pd ? getLearnset(pd[0]) : null;
+  }, [mon.dexId]);
 
   if (!loaded) return (
     <div style={{ minHeight: "100vh", background: "#1a1a2e", display: "flex", alignItems: "center", justifyContent: "center", color: "#888", fontFamily: "monospace" }}>
@@ -390,30 +427,16 @@ export default function EVTracker() {
           {/* 育成リスト */}
           <div style={{ fontSize: "10px", color: "#444", letterSpacing: "1px", marginBottom: "6px" }}>育成リスト</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "7px", marginBottom: "16px" }}>
-            {party.map(p => {
-              const t        = Object.values(allEVs[p.name] || initEVs()).reduce((a, b) => a + b, 0);
-              const isActive = selected === p.name;
-              const inParty  = activeParty.includes(p.name);
-              return (
-                <button
-                  key={p.name}
-                  className={`mon-btn${isActive ? " active" : ""}`}
-                  onClick={() => setSelected(p.name)}
-                  style={{
-                    width: "100%", cursor: "pointer", color: "#e8e8e8", textAlign: "center",
-                    background: isActive ? `${p.color}22` : "#16213e",
-                    border: `2px solid ${isActive ? p.color : "#2a2a4a"}`,
-                    borderRadius: "10px", padding: "10px 6px 8px",
-                    position: "relative",
-                  }}
-                >
-                  {inParty && <div style={{ position: "absolute", top: "4px", right: "5px", fontSize: "7px", color: p.color, lineHeight: 1 }}>▲</div>}
-                  <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
-                  <div style={{ fontSize: "10px", color: isActive ? p.color : "#aaa", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                  <div style={{ fontSize: "9px", color: t >= MAX_TOTAL ? "#7fff7f" : "#555", marginTop: "2px" }}>{t}/{MAX_TOTAL}</div>
-                </button>
-              );
-            })}
+            {party.map(p => (
+              <MonCard
+                key={p.name}
+                mon={p}
+                evTotal={Object.values(allEVs[p.name] || initEVs()).reduce((a, b) => a + b, 0)}
+                isActive={selected === p.name}
+                inParty={activeParty.includes(p.name)}
+                onSelect={setSelected}
+              />
+            ))}
             <button
               onClick={() => setAdding(true)}
               style={{ background: "#16213e", border: "2px dashed #2a2a4a", borderRadius: "10px", padding: "10px 6px", cursor: "pointer", color: "#555", fontSize: "20px", textAlign: "center", lineHeight: 1 }}
@@ -461,17 +484,12 @@ export default function EVTracker() {
           {/* Stats */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "14px" }}>
             {STATS.map(stat => (
-              <StatRow key={stat.key} stat={stat} val={evs[stat.key] || 0} color={mon.color} macho={macho} onChange={d => change(stat.key, d)} />
+              <StatRow key={stat.key} stat={stat} val={evs[stat.key] || 0} color={mon.color} macho={macho} onChange={changeCallbacks[stat.key]} />
             ))}
           </div>
 
           {/* 技セット */}
-          {(() => {
-            const selPData = mon.dexId != null ? POKEMON_DATA[mon.dexId] : null;
-            const learnableMoves = selPData ? getLearnableMoves(selPData[0]) : ALL_MOVES;
-            const learnset       = selPData ? getLearnset(selPData[0]) : null;
-            return <MovePicker moves={allMoves[selected] || ["","","",""]} color={mon.color} onChange={updateMove} learnableMoves={learnableMoves} learnset={learnset} />;
-          })()}
+          <MovePicker moves={allMoves[selected] || ["","","",""]} color={mon.color} onChange={updateMove} learnableMoves={learnableMoves} learnset={learnset} />
 
           {/* 性格 */}
           <NaturePicker value={mon.nature || ""} color={mon.color} onChange={updateNature} />
