@@ -55,7 +55,8 @@ export function Panel({ title, open, onToggle, color, children }) {
 export function StatRow({ stat, val, color, macho, onChange }) {
   const isMaxed = val >= MAX_STAT;
   const vLeft   = vitaminLeft(val);
-  const steps = macho ? [[-1,"－"],[1,"＋2"],[2,"＋4"],[3,"＋6"]] : [[-1,"－"],[1,"＋1"],[2,"＋2"],[3,"＋3"]];
+  const steps    = macho ? [[-1,"－"],[1,"＋2"],[2,"＋4"],[3,"＋6"]]   : [[-1,"－"],[1,"＋1"],[2,"＋2"],[3,"＋3"]];
+  const bigSteps = macho ? [[10,"＋20"],[25,"＋50"]]                    : [[10,"＋10"],[25,"＋25"]];
   return (
     <div className="card" style={{ padding: "9px 12px", borderColor: isMaxed ? "#7fff7f44" : "#2a2a4a" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
@@ -80,6 +81,23 @@ export function StatRow({ stat, val, color, macho, onChange }) {
             >{label}</button>
           ))}
         </div>
+      </div>
+      <div style={{ display: "flex", gap: "4px", marginBottom: "6px" }}>
+        {bigSteps.map(([d, label]) => (
+          <button
+            key={d}
+            className="step-btn"
+            onClick={() => onChange(d)}
+            style={{
+              flex: 1,
+              background: `${color}22`,
+              border: `1px solid ${color}44`,
+              color: color,
+              fontSize: "12px",
+              padding: "4px 0",
+            }}
+          >{label}</button>
+        ))}
       </div>
       <div className="bar-bg" style={{ height: "4px" }}>
         <div className="bar-fill" style={{ height: "100%", width: `${(val / MAX_STAT) * 100}%`, background: isMaxed ? "#7fff7f" : color, borderRadius: "3px" }} />
