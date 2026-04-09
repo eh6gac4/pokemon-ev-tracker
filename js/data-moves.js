@@ -655,25 +655,67 @@ null,  // 0-indexed placeholder
   TP_FULL,  // ミュウ
 ];
 
+// 進化チェーンデータ（循環import回避のためここで定義）
+// EVOLUTION_DATA[国家図鑑ID] = { pre:[{id,cond}], next:[{id,cond}] }
+import { EVOLUTION_DATA, POKEMON_DATA } from './data-pokemon.js';
+
+// 進化前ポケモンの国家図鑑ID列を返す（最初の祖先→直前の進化前の順）
+function getPreEvoChain(dexId) {
+  const chain = [];
+  let current = dexId;
+  while (true) {
+    const evo = EVOLUTION_DATA[current];
+    if (!evo || !evo.pre || evo.pre.length === 0) break;
+    const preId = evo.pre[0].id;
+    chain.unshift(preId);
+    current = preId;
+  }
+  return chain;
+}
+
 // 技データをポケモン図鑑IDで取得するユーティリティ
+// preEvo: 進化前ポケモンの技リスト（名前付き）
 export function getLearnset(dexId) {
+  const preEvoChain = getPreEvoChain(dexId);
+  const currentMoveNames = new Set([
+    ...(LEARNSET[dexId]    || []).map(([, m]) => m),
+    ...(TM_MOVES[dexId]    || []).map(id => TM_LIST[id]).filter(Boolean),
+    ...(EGG_MOVES[dexId]   || []),
+    ...(TUTOR_MOVES[dexId] || []),
+  ]);
+  const preEvo = preEvoChain.map(preId => {
+    const pName = POKEMON_DATA[preId - 1]?.[1] || `#${preId}`;
+    const lv    = (LEARNSET[preId]    || []).filter(([, m]) => !currentMoveNames.has(m));
+    const tm    = (TM_MOVES[preId]    || []).filter(id => { const n = TM_LIST[id]; return n && !currentMoveNames.has(n); });
+    const egg   = (EGG_MOVES[preId]   || []).filter(m => !currentMoveNames.has(m));
+    const tutor = (TUTOR_MOVES[preId] || []).filter(m => !currentMoveNames.has(m));
+    return { name: pName, lv, tm, egg, tutor };
+  }).filter(p => p.lv.length || p.tm.length || p.egg.length || p.tutor.length);
   return {
     lv:    LEARNSET[dexId]    || [],
     tm:    TM_MOVES[dexId]    || [],
     egg:   EGG_MOVES[dexId]   || [],
     tutor: TUTOR_MOVES[dexId] || [],
+    preEvo,
   };
 }
 
-// 習得可能な全技（重複なし・五十音順）
+// 習得可能な全技（進化前の技を含む・重複なし・五十音順）
 export function getLearnableMoves(dexId) {
-  const { lv, tm, egg, tutor } = getLearnset(dexId);
-  return [...new Set([
+  const { lv, tm, egg, tutor, preEvo } = getLearnset(dexId);
+  const moves = [
     ...lv.map(([, m]) => m),
     ...tm.map(id => TM_LIST[id]).filter(Boolean),
     ...egg,
     ...tutor,
-  ])].sort((a, b) => a.localeCompare(b, "ja"));
+  ];
+  for (const pre of preEvo) {
+    moves.push(...pre.lv.map(([, m]) => m));
+    moves.push(...pre.tm.map(id => TM_LIST[id]).filter(Boolean));
+    moves.push(...pre.egg);
+    moves.push(...pre.tutor);
+  }
+  return [...new Set(moves)].sort((a, b) => a.localeCompare(b, "ja"));
 }
 
 // 全技一覧（レベルアップ・TM/HM・遺伝技・教え技から収集、重複なし・五十音順）

@@ -266,7 +266,7 @@ export function MovePicker({ moves, color, onChange, learnableMoves, learnset })
   };
 
   const renderGroupedList = (currentMove) => {
-    const { lv, tm, egg, tutor } = learnset;
+    const { lv, tm, egg, tutor, preEvo = [] } = learnset;
     const lvSeen = new Set();
     const lvUniq = lv.filter(([, name]) => {
       if (lvSeen.has(name)) return false;
@@ -281,6 +281,24 @@ export function MovePicker({ moves, color, onChange, learnableMoves, learnset })
       }))},
       { key: "egg",   label: "遺伝技",       items: egg.map(name => ({ name, badge: null })) },
       { key: "tutor", label: "教え技",       items: tutor.map(name => ({ name, badge: null })) },
+      ...preEvo.map(pre => {
+        const preLvSeen = new Set();
+        const preLvUniq = pre.lv.filter(([, name]) => {
+          if (preLvSeen.has(name)) return false;
+          preLvSeen.add(name);
+          return true;
+        });
+        return {
+          key: `pre-${pre.name}`,
+          label: `${pre.name}（進化前）`,
+          items: [
+            ...preLvUniq.map(([lvl, name]) => ({ name, badge: `Lv.${lvl}` })),
+            ...pre.tm.map(id => ({ name: TM_LIST[id] || id, badge: id })),
+            ...pre.egg.map(name => ({ name, badge: null })),
+            ...pre.tutor.map(name => ({ name, badge: null })),
+          ],
+        };
+      }),
     ].filter(s => s.items.length > 0);
 
     return sections.flatMap((s, si) => [
