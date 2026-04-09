@@ -5,8 +5,9 @@ import {
 import { getLearnableMoves, getLearnset, ALL_MOVES } from './data-moves.js';
 import { AutoTextarea, StatRow, Panel } from './components-base.jsx';
 import { AddMonModal, NaturePicker, ItemPicker, MovePicker, PartySlots, PartyPickerModal, IVPanel } from './components-ikusei.jsx';
-import { IVChecker, IVCompare, EVSearch, EVGuide, PokedexPanel, TypeChart, LocationGuide, MoveTutorPanel, MoveReversePanel, EVRankPanel, StatRankPanel, AbilitySearch } from './components-chosa.jsx';
-import { TodoList, CapturePanel, AdventurePanel } from './components-boken.jsx';
+
+const ChosaTab = React.lazy(() => import('./components-chosa.jsx'));
+const BokenTab = React.lazy(() => import('./components-boken.jsx'));
 
 const TABS = ["boken", "ikusei", "chosa"];
 
@@ -41,10 +42,12 @@ export default function EVTracker() {
   const [macho,        setMacho]        = useState(false);
   const initialTab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "boken";
   const [activeTab,    setActiveTab]    = useState(initialTab);
+  const [visitedTabs,  setVisitedTabs]  = useState(() => new Set([initialTab]));
   const [dexTarget,    setDexTarget]    = useState(null);
 
   const navigateTab = useCallback((tab) => {
     setActiveTab(tab);
+    setVisitedTabs(prev => { const s = new Set(prev); s.add(tab); return s; });
     history.pushState({ tab }, '', '#' + tab);
   }, []);
 
@@ -53,15 +56,27 @@ export default function EVTracker() {
     navigateTab("chosa");
   }, [navigateTab]);
 
+  const clearDexTarget = useCallback(() => setDexTarget(null), []);
+
   useEffect(() => {
     const onPop = (e) => {
       const tab = e.state?.tab || location.hash.slice(1);
-      if (TABS.includes(tab)) setActiveTab(tab);
+      if (TABS.includes(tab)) {
+        setActiveTab(tab);
+        setVisitedTabs(prev => { const s = new Set(prev); s.add(tab); return s; });
+      }
     };
     // 初回ロード時のエントリを replaceState で記録
     history.replaceState({ tab: initialTab }, '', '#' + initialTab);
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // デスクトップでは全タブを即座に表示
+  useEffect(() => {
+    if (window.matchMedia('(min-width: 768px)').matches) {
+      setVisitedTabs(new Set(TABS));
+    }
   }, []);
   const [adding,       setAdding]       = useState(false);
   const [newName,      setNewName]      = useState("");
@@ -564,25 +579,47 @@ export default function EVTracker() {
 
         {/* ===== データカラム ===== */}
         <div className={activeTab === "chosa" ? "" : "col-hidden"}>
-          <IVCompare party={party} allIVs={allIVs} color={mon.color} />
-          <PokedexPanel color={mon.color} dexTarget={dexTarget} onDexTargetConsumed={() => setDexTarget(null)} />
-          <TypeChart color={mon.color} />
-          <LocationGuide color={mon.color} />
-          <IVChecker color={mon.color} ivs={allIVs[selected] || initIVs()} onSave={saveIVs} />
-          <EVGuide color={mon.color} />
-          <AbilitySearch color={mon.color} />
-          <EVSearch macho={macho} color={mon.color} />
-          <MoveTutorPanel color={mon.color} />
-          <MoveReversePanel color={mon.color} />
-          <EVRankPanel color={mon.color} />
-          <StatRankPanel color={mon.color} />
+          {visitedTabs.has("chosa") && (
+            <React.Suspense fallback={<div style={{ textAlign: "center", padding: "24px", color: "#555" }}>読み込み中…</div>}>
+              <ChosaTab
+                color={mon.color}
+                party={party}
+                allIVs={allIVs}
+                dexTarget={dexTarget}
+                onDexTargetConsumed={clearDexTarget}
+                macho={macho}
+                ivs={allIVs[selected] || initIVs()}
+                onSave={saveIVs}
+              />
+            </React.Suspense>
+          )}
         </div>
 
         {/* ===== 冒険カラム ===== */}
         <div className={activeTab === "boken" ? "" : "col-hidden"}>
-          <TodoList color={mon.color} todos={todoList} onAdd={addTodo} onToggle={toggleTodo} onDelete={deleteTodo} onRename={renameTodo} onReorder={reorderTodo} />
-          <CapturePanel color={mon.color} captureCount={captureCount} captureGoals={captureGoals} onCountChange={setCaptureCount} onAddGoal={addCaptureGoal} onToggleGoal={toggleCaptureGoal} onDeleteGoal={deleteCaptureGoal} onOpenDex={openDex} />
-          <AdventurePanel color={mon.color} checkedItems={checkedItems} onToggle={toggleItem} onReset={resetItems} />
+          {visitedTabs.has("boken") && (
+            <React.Suspense fallback={<div style={{ textAlign: "center", padding: "24px", color: "#555" }}>読み込み中…</div>}>
+              <BokenTab
+                color={mon.color}
+                todos={todoList}
+                onAdd={addTodo}
+                onToggle={toggleTodo}
+                onDelete={deleteTodo}
+                onRename={renameTodo}
+                onReorder={reorderTodo}
+                captureCount={captureCount}
+                captureGoals={captureGoals}
+                onCountChange={setCaptureCount}
+                onAddGoal={addCaptureGoal}
+                onToggleGoal={toggleCaptureGoal}
+                onDeleteGoal={deleteCaptureGoal}
+                onOpenDex={openDex}
+                checkedItems={checkedItems}
+                onToggleItem={toggleItem}
+                onReset={resetItems}
+              />
+            </React.Suspense>
+          )}
         </div>
       </div>
 

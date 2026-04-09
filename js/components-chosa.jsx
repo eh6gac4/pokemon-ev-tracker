@@ -878,3 +878,23 @@ export const AbilitySearch = React.memo(function AbilitySearch({ color }) {
     </Panel>
   );
 });
+
+
+export default function ChosaTab({ color, party, allIVs, dexTarget, onDexTargetConsumed, macho, ivs, onSave }) {
+  return (
+    <>
+      <IVCompare party={party} allIVs={allIVs} color={color} />
+      <PokedexPanel color={color} dexTarget={dexTarget} onDexTargetConsumed={onDexTargetConsumed} />
+      <TypeChart color={color} />
+      <LocationGuide color={color} />
+      <IVChecker color={color} ivs={ivs} onSave={onSave} />
+      <EVGuide color={color} />
+      <AbilitySearch color={color} />
+      <EVSearch macho={macho} color={color} />
+      <MoveTutorPanel color={color} />
+      <MoveReversePanel color={color} />
+      <EVRankPanel color={color} />
+      <StatRankPanel color={color} />
+    </>
+  );
+}

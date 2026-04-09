@@ -555,3 +555,13 @@ export const CapturePanel = React.memo(function CapturePanel({ color, captureCou
 // ─────────────────────────────────────────
 // わざ逆引き
 // ─────────────────────────────────────────
+
+export default function BokenTab({ color, todos, onAdd, onToggle, onDelete, onRename, onReorder, captureCount, captureGoals, onCountChange, onAddGoal, onToggleGoal, onDeleteGoal, onOpenDex, checkedItems, onToggleItem, onReset }) {
+  return (
+    <>
+      <TodoList color={color} todos={todos} onAdd={onAdd} onToggle={onToggle} onDelete={onDelete} onRename={onRename} onReorder={onReorder} />
+      <CapturePanel color={color} captureCount={captureCount} captureGoals={captureGoals} onCountChange={onCountChange} onAddGoal={onAddGoal} onToggleGoal={onToggleGoal} onDeleteGoal={onDeleteGoal} onOpenDex={onOpenDex} />
+      <AdventurePanel color={color} checkedItems={checkedItems} onToggle={onToggleItem} onReset={onReset} />
+    </>
+  );
+}
