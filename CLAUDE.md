@@ -29,10 +29,16 @@
 保存形式：
 ```json
 {
-  "party":    [ { "name": "...", "icon": "...", "color": "...", "memo": "...", "nature": "...", "dexId": 1 } ],
-  "allEVs":   { "ポケモン名": { "hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0 } },
-  "allMoves": { "ポケモン名": ["わざ1", "わざ2", "わざ3", "わざ4"] },
-  "selected": "ポケモン名"
+  "party":        [ { "name": "...", "icon": "...", "color": "...", "memo": "...", "nature": "...", "dexId": 1, "item": "..." } ],
+  "allEVs":       { "ポケモン名": { "hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0 } },
+  "allIVs":       { "ポケモン名": { "hp": 31, "atk": 31, "def": 31, "spa": 31, "spd": 31, "spe": 31 } },
+  "allMoves":     { "ポケモン名": ["わざ1", "わざ2", "わざ3", "わざ4"] },
+  "selected":     "ポケモン名",
+  "activeParty":  ["ポケモン名1", "ポケモン名2"],
+  "checkedItems": { "アイテムid": true },
+  "captureCount": 39,
+  "captureGoals": [ { "id": "1234567890", "name": "タマタマ", "done": false } ],
+  "todoList":     [ { "id": "1234567890", "text": "サファリゾーンへ行く", "done": false } ]
 }
 ```
 
@@ -48,9 +54,9 @@
 |--------|------|
 | `js/tracker.jsx` | ルートコンポーネント。状態管理・自動保存・タブ切替・スワイプ |
 | `js/components-base.jsx` | 共通UI: `AutoTextarea`, `StatRow`, `Panel`, `PokemonSearch`, `MoveRow`, `VerBadge` |
-| `js/components-ikusei.jsx` | 育成タブ: EV管理・技セット・アイテム・パーティ管理 |
-| `js/components-chosa.jsx` | 調査タブ: IVチェッカー・EVサーチ・EV稼ぎガイド・図鑑・タイプ表 |
-| `js/components-boken.jsx` | 冒険タブ: ToDoリスト・捕獲記録 |
+| `js/components-ikusei.jsx` | 育成タブ: EV管理・個体値・技セット・アイテム・パーティ管理 |
+| `js/components-chosa.jsx` | 調査タブ: 個体値チェッカー・個体値比較・EVサーチ・EV稼ぎガイド・図鑑・タイプ相性表・場所別出現・教え技・わざ逆引き・EVランキング・種族値ランキング・特性逆引き |
+| `js/components-boken.jsx` | 冒険タブ: ToDoリスト・冒険チェックリスト（アイテム/HM/TM管理）・捕獲リスト（マイルストーン付き） |
 
 ## テスト
 
