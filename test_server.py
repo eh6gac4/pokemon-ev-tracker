@@ -40,7 +40,7 @@ class TestDatabase(unittest.TestCase):
     def test_load_empty_db_returns_empty_dict(self):
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            self.assertEqual(server.load_data(), {})
+            self.assertEqual(server.load_data("frlg"), {})
 
     def test_save_and_load_roundtrip(self):
         data = {
@@ -52,34 +52,52 @@ class TestDatabase(unittest.TestCase):
         }
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data(data)
-            self.assertEqual(server.load_data(), data)
+            server.save_data("frlg", data)
+            self.assertEqual(server.load_data("frlg"), data)
 
     def test_save_overwrites_existing(self):
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data({"selected": "A"})
-            server.save_data({"selected": "B"})
-            self.assertEqual(server.load_data()["selected"], "B")
+            server.save_data("frlg", {"selected": "A"})
+            server.save_data("frlg", {"selected": "B"})
+            self.assertEqual(server.load_data("frlg")["selected"], "B")
 
     def test_unicode_preserved(self):
         data = {"selected": "ピカチュウ", "note": "てすと"}
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data(data)
-            self.assertEqual(server.load_data(), data)
+            server.save_data("frlg", data)
+            self.assertEqual(server.load_data("frlg"), data)
 
     def test_init_db_is_idempotent(self):
         """init_db() を複数回呼んでもエラーにならない"""
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
             server.init_db()
-            self.assertEqual(server.load_data(), {})
+            self.assertEqual(server.load_data("frlg"), {})
 
+    def test_frlg_and_bdsp_saves_are_independent(self):
+        """FR/LGとBDSPのセーブデータは独立している"""
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data("frlg", {"selected": "リザードン"})
+            server.save_data("bdsp", {"selected": "ディアルガ"})
+            self.assertEqual(server.load_data("frlg")["selected"], "リザードン")
+            self.assertEqual(server.load_data("bdsp")["selected"], "ディアルガ")
 
-# ---------------------------------------------------------------------------
-# HTTP 統合テスト
-# ---------------------------------------------------------------------------
+    def test_bdsp_load_empty_returns_empty_dict(self):
+        """BDSPのセーブがない場合は空dictを返す"""
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            self.assertEqual(server.load_data("bdsp"), {})
+
+    def test_frlg_save_does_not_affect_bdsp(self):
+        """FR/LGへの保存はBDSPに影響しない"""
+        with patch.object(server, "DB_PATH", self.db_path):
+            server.init_db()
+            server.save_data("bdsp", {"selected": "パルキア"})
+            server.save_data("frlg", {"selected": "フシギバナ"})
+            self.assertEqual(server.load_data("bdsp")["selected"], "パルキア")
 
 class TestHTTPServer(unittest.TestCase):
     """HTTPエンドポイントの統合テスト（実サーバーをスレッドで起動）"""
@@ -112,21 +130,21 @@ class TestHTTPServer(unittest.TestCase):
     # --- GET /api/data ---
 
     def test_get_api_data_returns_200(self):
-        with urllib.request.urlopen(self.url("/api/data")) as res:
+        with urllib.request.urlopen(self.url("/api/data?game=frlg")) as res:
             self.assertEqual(res.status, 200)
 
     def test_get_api_data_returns_json(self):
-        with urllib.request.urlopen(self.url("/api/data")) as res:
+        with urllib.request.urlopen(self.url("/api/data?game=frlg")) as res:
             body = json.loads(res.read())
         self.assertIsInstance(body, dict)
 
     def test_get_api_data_content_type(self):
-        with urllib.request.urlopen(self.url("/api/data")) as res:
+        with urllib.request.urlopen(self.url("/api/data?game=frlg")) as res:
             ct = res.headers.get("Content-Type", "")
         self.assertIn("application/json", ct)
 
     def test_get_api_data_cors_header(self):
-        with urllib.request.urlopen(self.url("/api/data")) as res:
+        with urllib.request.urlopen(self.url("/api/data?game=frlg")) as res:
             self.assertEqual(res.headers.get("Access-Control-Allow-Origin"), "*")
 
     # --- POST /api/data ---
@@ -134,7 +152,7 @@ class TestHTTPServer(unittest.TestCase):
     def test_post_valid_json_returns_ok(self):
         data = {"party": [], "allEVs": {}, "selected": "テスト"}
         req = urllib.request.Request(
-            self.url("/api/data"),
+            self.url("/api/data?game=frlg"),
             data=json.dumps(data).encode(),
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -147,19 +165,44 @@ class TestHTTPServer(unittest.TestCase):
     def test_post_then_get_reflects_saved_data(self):
         data = {"party": [], "allEVs": {}, "selected": "ゲンガー"}
         req = urllib.request.Request(
-            self.url("/api/data"),
+            self.url("/api/data?game=frlg"),
             data=json.dumps(data).encode(),
             headers={"Content-Type": "application/json"},
             method="POST",
         )
         urllib.request.urlopen(req).close()
-        with urllib.request.urlopen(self.url("/api/data")) as res:
+        with urllib.request.urlopen(self.url("/api/data?game=frlg")) as res:
             saved = json.loads(res.read())
         self.assertEqual(saved["selected"], "ゲンガー")
 
-    def test_post_invalid_json_returns_400(self):
+    def test_frlg_and_bdsp_api_saves_are_independent(self):
+        """?game=frlg と ?game=bdsp のセーブが互いに独立している"""
+        for game, mon in [("frlg", "ピカチュウ"), ("bdsp", "ディアルガ")]:
+            req = urllib.request.Request(
+                self.url(f"/api/data?game={game}"),
+                data=json.dumps({"selected": mon}).encode(),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            urllib.request.urlopen(req).close()
+        with urllib.request.urlopen(self.url("/api/data?game=frlg")) as res:
+            self.assertEqual(json.loads(res.read())["selected"], "ピカチュウ")
+        with urllib.request.urlopen(self.url("/api/data?game=bdsp")) as res:
+            self.assertEqual(json.loads(res.read())["selected"], "ディアルガ")
+
+    def test_invalid_game_param_falls_back_to_frlg(self):
+        """不正な ?game= 値は frlg にフォールバックする"""
         req = urllib.request.Request(
-            self.url("/api/data"),
+            self.url("/api/data?game=invalid"),
+            data=json.dumps({"selected": "フォールバック"}).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        urllib.request.urlopen(req).close()
+        with urllib.request.urlopen(self.url("/api/data?game=frlg")) as res:
+            self.assertEqual(json.loads(res.read())["selected"], "フォールバック")
+        req = urllib.request.Request(
+            self.url("/api/data?game=frlg"),
             data=b"not json {{",
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -170,7 +213,7 @@ class TestHTTPServer(unittest.TestCase):
 
     def test_post_invalid_json_error_body(self):
         req = urllib.request.Request(
-            self.url("/api/data"),
+            self.url("/api/data?game=frlg"),
             data=b"bad",
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -201,7 +244,7 @@ class TestHTTPServer(unittest.TestCase):
 
     def test_post_empty_body_returns_400(self):
         req = urllib.request.Request(
-            self.url("/api/data"),
+            self.url("/api/data?game=frlg"),
             data=b"",
             headers={"Content-Type": "application/json", "Content-Length": "0"},
             method="POST",
@@ -212,7 +255,7 @@ class TestHTTPServer(unittest.TestCase):
 
     def test_put_method_returns_501(self):
         req = urllib.request.Request(
-            self.url("/api/data"),
+            self.url("/api/data?game=frlg"),
             data=b"{}",
             headers={"Content-Type": "application/json"},
             method="PUT",
@@ -229,12 +272,12 @@ class TestHTTPServer(unittest.TestCase):
     # --- OPTIONS ---
 
     def test_options_returns_204(self):
-        req = urllib.request.Request(self.url("/api/data"), method="OPTIONS")
+        req = urllib.request.Request(self.url("/api/data?game=frlg"), method="OPTIONS")
         with urllib.request.urlopen(req) as res:
             self.assertEqual(res.status, 204)
 
     def test_options_cors_headers(self):
-        req = urllib.request.Request(self.url("/api/data"), method="OPTIONS")
+        req = urllib.request.Request(self.url("/api/data?game=frlg"), method="OPTIONS")
         with urllib.request.urlopen(req) as res:
             self.assertEqual(res.headers.get("Access-Control-Allow-Origin"), "*")
             self.assertIn("POST", res.headers.get("Access-Control-Allow-Methods", ""))
@@ -303,7 +346,7 @@ class TestHTTPServer(unittest.TestCase):
 
     def test_delete_method_returns_501(self):
         req = urllib.request.Request(
-            self.url("/api/data"),
+            self.url("/api/data?game=frlg"),
             method="DELETE",
         )
         with self.assertRaises(urllib.error.HTTPError) as ctx:
@@ -312,7 +355,7 @@ class TestHTTPServer(unittest.TestCase):
 
     def test_patch_method_returns_501(self):
         req = urllib.request.Request(
-            self.url("/api/data"),
+            self.url("/api/data?game=frlg"),
             data=b"{}",
             headers={"Content-Type": "application/json"},
             method="PATCH",
@@ -391,7 +434,7 @@ class TestHTTPServer(unittest.TestCase):
     def test_post_api_data_cors_header(self):
         """POST /api/data のレスポンスにも Access-Control-Allow-Origin が付くこと"""
         req = urllib.request.Request(
-            self.url("/api/data"),
+            self.url("/api/data?game=frlg"),
             data=json.dumps({"selected": "テスト"}).encode(),
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -634,8 +677,8 @@ class TestMemo(unittest.TestCase):
         }
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data(data)
-            result = server.load_data()
+            server.save_data("frlg", data)
+            result = server.load_data("frlg")
         self.assertEqual(result["party"][0]["memo"], "おくびょう　めがねゲンガー")
 
     def test_empty_memo_preserved(self):
@@ -646,16 +689,16 @@ class TestMemo(unittest.TestCase):
         }
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data(data)
-            result = server.load_data()
+            server.save_data("frlg", data)
+            result = server.load_data("frlg")
         self.assertEqual(result["party"][0]["memo"], "")
 
     def test_memo_updated(self):
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data({"party": [{"name": "A", "memo": "before"}], "allEVs": {}, "selected": "A"})
-            server.save_data({"party": [{"name": "A", "memo": "after"}],  "allEVs": {}, "selected": "A"})
-            result = server.load_data()
+            server.save_data("frlg", {"party": [{"name": "A", "memo": "before"}], "allEVs": {}, "selected": "A"})
+            server.save_data("frlg", {"party": [{"name": "A", "memo": "after"}],  "allEVs": {}, "selected": "A"})
+            result = server.load_data("frlg")
         self.assertEqual(result["party"][0]["memo"], "after")
 
 
@@ -698,30 +741,30 @@ class TestExtendedFields(unittest.TestCase):
     def test_nature_field_preserved(self):
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data(self._full_data())
-            result = server.load_data()
+            server.save_data("frlg", self._full_data())
+            result = server.load_data("frlg")
         self.assertEqual(result["party"][0]["nature"], "おくびょう")
 
     def test_dex_id_field_preserved(self):
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data(self._full_data())
-            result = server.load_data()
+            server.save_data("frlg", self._full_data())
+            result = server.load_data("frlg")
         self.assertEqual(result["party"][0]["dexId"], 93)
 
     def test_all_moves_preserved(self):
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data(self._full_data())
-            result = server.load_data()
+            server.save_data("frlg", self._full_data())
+            result = server.load_data("frlg")
         self.assertEqual(result["allMoves"]["ゲンガー"], ["シャドーボール", "サイコキネシス", "でんじは", ""])
 
     def test_empty_move_slot_preserved(self):
         """空文字列の技スロットがそのまま返ること"""
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data(self._full_data())
-            result = server.load_data()
+            server.save_data("frlg", self._full_data())
+            result = server.load_data("frlg")
         self.assertEqual(result["allMoves"]["ゲンガー"][3], "")
 
     def test_multiple_party_members(self):
@@ -742,8 +785,8 @@ class TestExtendedFields(unittest.TestCase):
         }
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data(data)
-            result = server.load_data()
+            server.save_data("frlg", data)
+            result = server.load_data("frlg")
         self.assertEqual(len(result["party"]), 2)
         self.assertEqual(result["party"][1]["nature"], "ひかえめ")
         self.assertEqual(result["allMoves"]["リザードン"][0], "だいもんじ")
@@ -751,11 +794,11 @@ class TestExtendedFields(unittest.TestCase):
     def test_update_moves_overwrites_correctly(self):
         with patch.object(server, "DB_PATH", self.db_path):
             server.init_db()
-            server.save_data(self._full_data())
+            server.save_data("frlg", self._full_data())
             updated = self._full_data()
             updated["allMoves"]["ゲンガー"] = ["なみのり", "", "", ""]
-            server.save_data(updated)
-            result = server.load_data()
+            server.save_data("frlg", updated)
+            result = server.load_data("frlg")
         self.assertEqual(result["allMoves"]["ゲンガー"][0], "なみのり")
 
 

@@ -138,14 +138,16 @@ export const NaturePicker = React.memo(function NaturePicker({ value, color, onC
 
 // ─── item picker ─────────────────────────────────────────────────────────────
 
-export const ItemPicker = React.memo(function ItemPicker({ value, color, onChange }) {
+export const ItemPicker = React.memo(function ItemPicker({ value, color, onChange, gameMode = 'frlg' }) {
   const [open,  setOpen]  = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef(null);
 
+  // ゲームに対応するアイテムのみ表示（games フィールドなし → 全ゲーム共通）
+  const gameItems = HOLD_ITEMS.filter(it => !it.games || it.games.includes(gameMode));
   const filtered = query.trim()
-    ? HOLD_ITEMS.filter(it => it.name.includes(query.trim()) || it.cat.includes(query.trim()))
-    : HOLD_ITEMS;
+    ? gameItems.filter(it => it.name.includes(query.trim()) || it.cat.includes(query.trim()))
+    : gameItems;
 
   const select = (name) => {
     onChange(name);
@@ -153,7 +155,7 @@ export const ItemPicker = React.memo(function ItemPicker({ value, color, onChang
     setQuery("");
   };
 
-  const current = HOLD_ITEMS.find(it => it.name === value) || null;
+  const current = gameItems.find(it => it.name === value) || null;
 
   return (
     <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: color + "22" }}>

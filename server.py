@@ -19,29 +19,41 @@ _dist = Path(__file__).parent / "dist"
 STATIC_DIR = _dist if _dist.is_dir() else Path(__file__).parent
 
 
+VALID_GAMES = {"frlg", "bdsp"}
+
+
 def init_db():
     with sqlite3.connect(DB_PATH) as conn:
         conn.execute("""
-            CREATE TABLE IF NOT EXISTS ev_data (
-                id    INTEGER PRIMARY KEY CHECK (id = 1),
+            CREATE TABLE IF NOT EXISTS game_saves (
+                game  TEXT PRIMARY KEY,
                 data  TEXT NOT NULL
             )
         """)
+        # 旧テーブル (ev_data) から frlg へマイグレーション
+        tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        if "ev_data" in tables:
+            row = conn.execute("SELECT data FROM ev_data WHERE id = 1").fetchone()
+            if row:
+                conn.execute("""
+                    INSERT INTO game_saves (game, data) VALUES ('frlg', ?)
+                    ON CONFLICT(game) DO NOTHING
+                """, (row[0],))
         conn.commit()
 
 
-def load_data():
+def load_data(game: str) -> dict:
     with sqlite3.connect(DB_PATH) as conn:
-        row = conn.execute("SELECT data FROM ev_data WHERE id = 1").fetchone()
+        row = conn.execute("SELECT data FROM game_saves WHERE game = ?", (game,)).fetchone()
         return json.loads(row[0]) if row else {}
 
 
-def save_data(data: dict):
+def save_data(game: str, data: dict):
     with sqlite3.connect(DB_PATH) as conn:
         conn.execute("""
-            INSERT INTO ev_data (id, data) VALUES (1, ?)
-            ON CONFLICT(id) DO UPDATE SET data = excluded.data
-        """, (json.dumps(data, ensure_ascii=False),))
+            INSERT INTO game_saves (game, data) VALUES (?, ?)
+            ON CONFLICT(game) DO UPDATE SET data = excluded.data
+        """, (game, json.dumps(data, ensure_ascii=False)))
         conn.commit()
 
 
@@ -65,9 +77,21 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
+    def _parse_game(self) -> str:
+        """クエリパラメータ ?game= からゲームモードを取得（デフォルト: frlg）"""
+        qs = self.path.split("?", 1)[1] if "?" in self.path else ""
+        for part in qs.split("&"):
+            if part.startswith("game="):
+                g = part[5:]
+                return g if g in VALID_GAMES else "frlg"
+        return "frlg"
+
     def _serve_static(self, path: str):
         raw = path.split("?")[0]
-        if raw in ("/", ""):
+        # /bdsp と /bdsp/* はすべて index.html（SPA）を返す
+        if raw == "/bdsp" or raw.startswith("/bdsp/"):
+            raw = "/index.html"
+        elif raw in ("/", ""):
             raw = "/index.html"
         file_path = STATIC_DIR / raw.lstrip("/")
         if not file_path.is_file():
@@ -117,18 +141,20 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
-        if self.path == "/api/data":
-            self.send_json(200, load_data())
+        if self.path.startswith("/api/data"):
+            game = self._parse_game()
+            self.send_json(200, load_data(game))
         else:
             self._serve_static(self.path)
 
     def do_POST(self):
-        if self.path == "/api/data":
+        if self.path.startswith("/api/data"):
+            game = self._parse_game()
             length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(length)
             try:
                 data = json.loads(body)
-                save_data(data)
+                save_data(game, data)
                 self.send_json(200, {"ok": True})
             except json.JSONDecodeError:
                 self.send_json(400, {"error": "invalid JSON"})

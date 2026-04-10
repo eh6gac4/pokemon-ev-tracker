@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import {
   DEFAULT_PARTY, STATS, MAX_STAT, MAX_TOTAL, initEVs, initIVs, COLORS, POKEMON_DATA
 } from './data-pokemon.js';
+import { POKEMON_DATA_BDSP, DEFAULT_PARTY_BDSP } from './data-pokemon-bdsp.js';
 import { getLearnableMoves, getLearnset, ALL_MOVES } from './data-moves.js';
 import { AutoTextarea, StatRow, Panel } from './components-base.jsx';
 import { AddMonModal, NaturePicker, ItemPicker, MovePicker, PartySlots, PartyPickerModal, IVPanel } from './components-ikusei.jsx';
@@ -10,6 +11,10 @@ const ChosaTab = React.lazy(() => import('./components-chosa.jsx'));
 const BokenTab = React.lazy(() => import('./components-boken.jsx'));
 
 const TABS = ["boken", "ikusei", "chosa"];
+
+// パスベースのゲームモード判定
+const GAME_MODE = window.location.pathname.startsWith('/bdsp') ? 'bdsp' : 'frlg';
+const API_URL = `/api/data?game=${GAME_MODE}`;
 
 const MonCard = React.memo(function MonCard({ mon, evTotal, isActive, inParty, onSelect }) {
   return (
@@ -33,10 +38,11 @@ const MonCard = React.memo(function MonCard({ mon, evTotal, isActive, inParty, o
 });
 
 export default function EVTracker() {
-  const [party,     setParty]    = useState(DEFAULT_PARTY);
-  const [allEVs,    setAllEVs]   = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initEVs()])));
-  const [allIVs,    setAllIVs]   = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, initIVs()])));
-  const [allMoves,  setAllMoves] = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, ["","","",""]])));
+  const defaultParty = GAME_MODE === 'bdsp' ? DEFAULT_PARTY_BDSP : DEFAULT_PARTY;
+  const [party,     setParty]    = useState(defaultParty);
+  const [allEVs,    setAllEVs]   = useState(() => Object.fromEntries(defaultParty.map(p => [p.name, initEVs()])));
+  const [allIVs,    setAllIVs]   = useState(() => Object.fromEntries(defaultParty.map(p => [p.name, initIVs()])));
+  const [allMoves,  setAllMoves] = useState(() => Object.fromEntries(defaultParty.map(p => [p.name, ["","","",""]])));
   const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
   const [loaded,       setLoaded]       = useState(false);
   const [macho,        setMacho]        = useState(false);
@@ -199,12 +205,13 @@ export default function EVTracker() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/data")
+    fetch(API_URL)
       .then(r => r.json())
       .then(saved => {
+        const pokemonData = GAME_MODE === 'bdsp' ? POKEMON_DATA_BDSP : POKEMON_DATA;
         if (saved.party)        setParty(saved.party.map(p => {
           if (p.dexId != null) return p;
-          const idx = POKEMON_DATA.findIndex(pd => pd[1] === p.name);
+          const idx = pokemonData.findIndex(pd => pd[1] === p.name);
           return { ...p, dexId: idx >= 0 ? idx : null };
         }));
         if (saved.allEVs)       setAllEVs(saved.allEVs);
@@ -228,7 +235,7 @@ export default function EVTracker() {
   useEffect(() => {
     if (!loaded) return;
     const timer = setTimeout(() => {
-      fetch("/api/data", {
+      fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ party, allEVs, allIVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, archivedParty }),
@@ -390,10 +397,12 @@ export default function EVTracker() {
   }, [newName, newIcon, newColor, newDexId, party]);
 
   const learnableMoves = useMemo(() => {
+    if (GAME_MODE === 'bdsp') return ALL_MOVES;
     const pd = mon.dexId != null ? POKEMON_DATA[mon.dexId] : null;
     return pd ? getLearnableMoves(pd[0]) : ALL_MOVES;
   }, [mon.dexId]);
   const learnset = useMemo(() => {
+    if (GAME_MODE === 'bdsp') return null;
     const pd = mon.dexId != null ? POKEMON_DATA[mon.dexId] : null;
     return pd ? getLearnset(pd[0]) : null;
   }, [mon.dexId]);
@@ -408,9 +417,32 @@ export default function EVTracker() {
     <div className="app-wrap" onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd}>
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: "18px" }}>
-        <div style={{ fontSize: "10px", letterSpacing: "4px", color: "#555", marginBottom: "2px" }}>FireRed · AUTO SAVE</div>
-        <div style={{ fontSize: "20px", letterSpacing: "2px", color: mon.color, textShadow: `0 0 20px ${mon.color}66` }}>
+        <div style={{ fontSize: "20px", letterSpacing: "2px", color: mon.color, textShadow: `0 0 20px ${mon.color}66`, marginBottom: "6px" }}>
           ポケログ
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: "6px" }}>
+          <a
+            href="/"
+            style={{
+              padding: "3px 12px", borderRadius: "12px", fontSize: "10px", letterSpacing: "1px", textDecoration: "none",
+              background: GAME_MODE === 'frlg' ? mon.color + "33" : "transparent",
+              border: `1px solid ${GAME_MODE === 'frlg' ? mon.color : "#333"}`,
+              color: GAME_MODE === 'frlg' ? mon.color : "#555",
+            }}
+          >
+            🔴 FR/LG
+          </a>
+          <a
+            href="/bdsp"
+            style={{
+              padding: "3px 12px", borderRadius: "12px", fontSize: "10px", letterSpacing: "1px", textDecoration: "none",
+              background: GAME_MODE === 'bdsp' ? mon.color + "33" : "transparent",
+              border: `1px solid ${GAME_MODE === 'bdsp' ? mon.color : "#333"}`,
+              color: GAME_MODE === 'bdsp' ? mon.color : "#555",
+            }}
+          >
+            💎 BDSP
+          </a>
         </div>
       </div>
 
@@ -499,7 +531,7 @@ export default function EVTracker() {
           {/* Stats */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "14px" }}>
             {STATS.map(stat => (
-              <StatRow key={stat.key} stat={stat} val={evs[stat.key] || 0} color={mon.color} macho={macho} onChange={changeCallbacks[stat.key]} />
+              <StatRow key={stat.key} stat={stat} val={evs[stat.key] || 0} color={mon.color} macho={macho} onChange={changeCallbacks[stat.key]} gameMode={GAME_MODE} />
             ))}
           </div>
 
@@ -513,7 +545,7 @@ export default function EVTracker() {
           <IVPanel ivs={allIVs[selected] || initIVs()} color={mon.color} onChange={updateIV} />
 
           {/* 持ち物 */}
-          <ItemPicker value={mon.item || ""} color={mon.color} onChange={updateItem} />
+          <ItemPicker value={mon.item || ""} color={mon.color} onChange={updateItem} gameMode={GAME_MODE} />
 
           {/* メモ */}
           <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: mon.color + "22" }}>
@@ -573,7 +605,7 @@ export default function EVTracker() {
           )}
 
           <div style={{ textAlign: "center", fontSize: "8px", color: "#2a2a4a", letterSpacing: "1px" }}>
-            GEN III · MAX 252/STAT · MAX 510/TOTAL · AUTO SAVE
+            {GAME_MODE === 'bdsp' ? 'GEN IV · BDSP' : 'GEN III · FR/LG'} · MAX 252/STAT · MAX 510/TOTAL · AUTO SAVE
           </div>
         </div>
 
@@ -590,6 +622,7 @@ export default function EVTracker() {
                 macho={macho}
                 ivs={allIVs[selected] || initIVs()}
                 onSave={saveIVs}
+                gameMode={GAME_MODE}
               />
             </React.Suspense>
           )}

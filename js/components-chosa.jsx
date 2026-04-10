@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { POKEMON_DATA, EV_YIELD, NATURES, ABILITY_DATA, STAT_JP, STAT_COL, EV_GUIDE, MAX_STAT, MAX_TOTAL, getEvoPaths, STATS, PD, EVOLUTION_DATA } from './data-pokemon.js';
+import { POKEMON_DATA_BDSP, EV_YIELD_BDSP, ABILITY_DATA_BDSP } from './data-pokemon-bdsp.js';
 import { ALL_MOVES, getLearnset, getLearnableMoves, TM_LIST, MOVE_DATA, TYPE_COLORS, TUTOR_LOCATIONS } from './data-moves.js';
 import { HOLD_ITEMS, LOCATION_DATA } from './data-items.js';
 import { Panel, PokemonSearch, MoveRow, VerBadge, tmItemName } from './components-base.jsx';
 import { natLabel } from './components-ikusei.jsx';
+
+const GAME_MODE = window.location.pathname.startsWith('/bdsp') ? 'bdsp' : 'frlg';
+const PD_DATA   = GAME_MODE === 'bdsp' ? POKEMON_DATA_BDSP : POKEMON_DATA;
+const EV_DATA   = GAME_MODE === 'bdsp' ? EV_YIELD_BDSP : EV_YIELD;
+const AB_DATA   = GAME_MODE === 'bdsp' ? ABILITY_DATA_BDSP : ABILITY_DATA;
 
 export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave }) {
   const [open,   setOpen]   = useState(false);
@@ -15,7 +21,7 @@ export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave }) {
 
   const lv     = Math.max(1, Math.min(100, parseInt(lvStr) || 1));
   const nature = NATURES[nat];
-  const pmon   = POKEMON_DATA[mon];
+  const pmon   = PD_DATA[mon];
 
   const calcIV = (statKey) => {
     const a = parseInt(actual[statKey]);
@@ -54,7 +60,7 @@ export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave }) {
   return (
     <Panel title="🔬 個体値チェッカー（Gen III）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
       <div style={{ marginBottom: "8px" }}>
-        <PokemonSearch value={mon} onSelect={setMon} color={color} />
+        <PokemonSearch value={mon} onSelect={setMon} color={color} pokemonData={POKEMON_DATA} />
       </div>
 
       <div style={{ display: "flex", gap: "6px", marginBottom: "10px" }}>
@@ -215,8 +221,8 @@ export const EVSearch = React.memo(function EVSearch({ macho, color }) {
 
   const STAT_KEYS = STATS.map(s => s.key);
 
-  const results = POKEMON_DATA.filter((p, i) => {
-    const y = EV_YIELD[i];
+  const results = PD_DATA.filter((p, i) => {
+    const y = EV_DATA[i];
     return (!query || p[1].includes(query))
       && (!filter || y[STAT_KEYS.indexOf(filter)] > 0)
       && y.some(v => v > 0);
@@ -243,7 +249,7 @@ export const EVSearch = React.memo(function EVSearch({ macho, color }) {
       <div style={{ maxHeight: "260px", overflowY: "auto" }}>
         {results.length === 0 && <div style={{ color: "#444", fontSize: "11px", textAlign: "center", padding: "12px 0" }}>該当なし</div>}
         {results.map(p => {
-          const y     = EV_YIELD[p[0] - 1];
+          const y     = EV_DATA[p[0] - 1];
           const parts = STAT_KEYS.map((k, ki) => y[ki] > 0 ? { key: k, val: y[ki] } : null).filter(Boolean);
           return (
             <div key={p[0]} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "5px 2px", borderBottom: "1px solid #1a1a2e" }}>
@@ -279,7 +285,7 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
     onDexTargetConsumed?.();
   }, [dexTarget]);
 
-  const p        = POKEMON_DATA[mon];
+  const p        = PD_DATA[mon];
   const { lv: learnset, tm: tmMoves, egg: eggMoves, tutor: tutorMoves } = getLearnset(p[0]);
   const total    = STATS.reduce((a, s) => a + p[PD[s.key]], 0);
 
@@ -294,7 +300,7 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
     <Panel title="📖 ポケモン図鑑" open={open} onToggle={() => setOpen(v => !v)} color={color}>
       {/* 検索 */}
       <div style={{ marginBottom: "12px" }}>
-        <PokemonSearch value={mon} onSelect={setMon} color={color} />
+        <PokemonSearch value={mon} onSelect={setMon} color={color} pokemonData={PD_DATA} />
       </div>
 
       {/* 種族値 */}
@@ -637,7 +643,7 @@ export const MoveReversePanel = React.memo(function MoveReversePanel({ color }) 
   const results = React.useMemo(() => {
     if (!chosen) return null;
     const list = [];
-    for (const p of POKEMON_DATA) {
+    for (const p of PD_DATA) {
       const dexId = p[0];
       const name  = p[1];
       const { lv, tm, egg, tutor } = getLearnset(dexId);
@@ -736,8 +742,8 @@ export const EVRankPanel = React.memo(function EVRankPanel({ color }) {
 
   const ranked = React.useMemo(() => {
     const si = statIdx[stat];
-    return POKEMON_DATA
-      .map(p => ({ dexId: p[0], name: p[1], ev: EV_YIELD[p[0] - 1][si] }))
+    return PD_DATA
+      .map(p => ({ dexId: p[0], name: p[1], ev: EV_DATA[p[0] - 1][si] }))
       .filter(e => e.ev > 0)
       .sort((a, b) => b.ev - a.ev || a.dexId - b.dexId);
   }, [stat]);
@@ -781,7 +787,7 @@ export const StatRankPanel = React.memo(function StatRankPanel({ color }) {
   const ALL_STATS = [{ key: "total", jp: "合計" }, ...STATS];
 
   const ranked = React.useMemo(() => {
-    return POKEMON_DATA.map(p => {
+    return PD_DATA.map(p => {
       const total = STATS.reduce((a, s) => a + p[PD[s.key]], 0);
       return { dexId: p[0], name: p[1], val: stat === "total" ? total : p[PD[stat]], total };
     }).sort((a, b) => b.val - a.val || a.dexId - b.dexId);
@@ -833,10 +839,10 @@ export const AbilitySearch = React.memo(function AbilitySearch({ color }) {
   // 特性名 → ポケモン一覧のマップを作成
   const abilityMap = React.useMemo(() => {
     const map = {};
-    ABILITY_DATA.forEach((abs, i) => {
+    AB_DATA.forEach((abs, i) => {
       abs.forEach(ab => {
         if (!map[ab]) map[ab] = [];
-        map[ab].push(POKEMON_DATA[i]);
+        map[ab].push(PD_DATA[i]);
       });
     });
     return map;
@@ -881,18 +887,19 @@ export const AbilitySearch = React.memo(function AbilitySearch({ color }) {
 
 
 export default function ChosaTab({ color, party, allIVs, dexTarget, onDexTargetConsumed, macho, ivs, onSave }) {
+  const isBdsp = GAME_MODE === 'bdsp';
   return (
     <>
       <IVCompare party={party} allIVs={allIVs} color={color} />
       <PokedexPanel color={color} dexTarget={dexTarget} onDexTargetConsumed={onDexTargetConsumed} />
       <TypeChart color={color} />
-      <LocationGuide color={color} />
-      <IVChecker color={color} ivs={ivs} onSave={onSave} />
+      {!isBdsp && <LocationGuide color={color} />}
+      {!isBdsp && <IVChecker color={color} ivs={ivs} onSave={onSave} />}
       <EVGuide color={color} />
       <AbilitySearch color={color} />
       <EVSearch macho={macho} color={color} />
-      <MoveTutorPanel color={color} />
-      <MoveReversePanel color={color} />
+      {!isBdsp && <MoveTutorPanel color={color} />}
+      {!isBdsp && <MoveReversePanel color={color} />}
       <EVRankPanel color={color} />
       <StatRankPanel color={color} />
     </>

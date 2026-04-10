@@ -186,6 +186,15 @@ export const HOLD_ITEMS = [
   // その他
   { name: "しあわせタマゴ",   cat: "その他",     note: "経験値×1.5" },
   { name: "やすらぎのすず",   cat: "その他",     note: "なつき度が上がりやすい" },
+  // EV強化（FR/LG）
+  { name: "きょうせいギプス", cat: "EV強化",     note: "倒したポケモンのEV×2（すばやさ半減）", games: ["frlg", "bdsp"] },
+  // EV強化（BDSP・パワー系）
+  { name: "パワーウェイト",   cat: "EV強化",     note: "倒すとHP+4（ポケルスで×2）",           games: ["bdsp"] },
+  { name: "パワーリスト",     cat: "EV強化",     note: "倒すとこうげき+4（ポケルスで×2）",     games: ["bdsp"] },
+  { name: "パワーベルト",     cat: "EV強化",     note: "倒すとぼうぎょ+4（ポケルスで×2）",     games: ["bdsp"] },
+  { name: "パワーレンズ",     cat: "EV強化",     note: "倒すととくこう+4（ポケルスで×2）",     games: ["bdsp"] },
+  { name: "パワーバンド",     cat: "EV強化",     note: "倒すととくぼう+4（ポケルスで×2）",     games: ["bdsp"] },
+  { name: "パワーアンクル",   cat: "EV強化",     note: "倒すとすばやさ+4（ポケルスで×2）",     games: ["bdsp"] },
 ];
 
 export const LOCATION_DATA = [

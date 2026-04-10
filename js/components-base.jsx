@@ -52,9 +52,12 @@ export const Panel = React.memo(function Panel({ title, open, onToggle, color, c
   );
 });
 
-export const StatRow = React.memo(function StatRow({ stat, val, color, macho, onChange }) {
+export const StatRow = React.memo(function StatRow({ stat, val, color, macho, onChange, gameMode = 'frlg' }) {
   const isMaxed = val >= MAX_STAT;
-  const vLeft   = vitaminLeft(val);
+  // BDSPはビタミン上限なし（252まで使用可能）、FR/LGは100まで
+  const vLeft   = gameMode === 'bdsp'
+    ? (val < MAX_STAT ? Math.ceil((MAX_STAT - val) / 10) : 0)
+    : vitaminLeft(val);
   const steps    = macho ? [[-1,"－"],[1,"＋2"],[2,"＋4"],[3,"＋6"]]   : [[-1,"－"],[1,"＋1"],[2,"＋2"],[3,"＋3"]];
   const bigSteps = macho ? [[10,"＋20"],[25,"＋50"]]                    : [[10,"＋10"],[25,"＋25"]];
   return (
@@ -110,16 +113,17 @@ export const StatRow = React.memo(function StatRow({ stat, val, color, macho, on
 
 // 共通ポケモン検索コンポーネント（AddMonModal・IVChecker・PokedexPanel で共用）
 
-export const PokemonSearch = React.memo(function PokemonSearch({ value, onSelect, color, placeholder = "ポケモン名・番号で検索…", maxHeight = "200px" }) {
+export const PokemonSearch = React.memo(function PokemonSearch({ value, onSelect, color, placeholder = "ポケモン名・番号で検索…", maxHeight = "200px", pokemonData }) {
   const [query, setQuery] = useState("");
   const [open,  setOpen]  = useState(false);
 
-  const p = value != null ? POKEMON_DATA[value] : null;
+  const DATA = pokemonData || POKEMON_DATA;
+  const p = value != null ? DATA[value] : null;
   const displayValue = p ? `${String(p[0]).padStart(3,"0")} ${p[1]}` : "";
   const results = open
     ? (query
-        ? POKEMON_DATA.filter(r => r[1].includes(query) || String(r[0]).padStart(3,"0").includes(query))
-        : POKEMON_DATA)
+        ? DATA.filter(r => r[1].includes(query) || String(r[0]).padStart(3,"0").includes(query))
+        : DATA)
     : [];
 
   return (
