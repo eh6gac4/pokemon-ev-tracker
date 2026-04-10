@@ -242,17 +242,6 @@ export default function EVTracker() {
   const toggleItem  = useCallback((id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] })), []);
   const resetItems  = useCallback(() => setCheckedItems({}), []);
 
-  const changeTrainerCount = useCallback((key, stat, ev, delta) => {
-    setTrainerBattleCounts(prev => ({ ...prev, [key]: Math.max(0, (prev[key] || 0) + delta) }));
-    change(stat, ev * delta);
-  }, [change]);
-  const resetTrainerCounts = useCallback((keys) => {
-    setTrainerBattleCounts(prev => {
-      const next = { ...prev };
-      keys.forEach(k => { next[k] = 0; });
-      return next;
-    });
-  }, []);
   const addCaptureGoal    = useCallback((name) => setCaptureGoals(prev => [...prev, { id: Date.now().toString(), name, done: false }]), []);
   const toggleCaptureGoal = useCallback((id)   => setCaptureGoals(prev => prev.map(g => g.id === id ? { ...g, done: !g.done } : g)), []);
   const deleteCaptureGoal = useCallback((id)   => setCaptureGoals(prev => prev.filter(g => g.id !== id)), []);
@@ -301,6 +290,18 @@ export default function EVTracker() {
       return { ...prev, [selected]: { ...(prev[selected] || initEVs()), [key]: Math.max(0, next) } };
     });
   }, [selected, macho]);
+
+  const changeTrainerCount = useCallback((key, stat, ev, delta) => {
+    setTrainerBattleCounts(prev => ({ ...prev, [key]: Math.max(0, (prev[key] || 0) + delta) }));
+    change(stat, ev * delta);
+  }, [change]);
+  const resetTrainerCounts = useCallback((keys) => {
+    setTrainerBattleCounts(prev => {
+      const next = { ...prev };
+      keys.forEach(k => { next[k] = 0; });
+      return next;
+    });
+  }, []);
 
   // stat ごとの安定した onChange を事前生成（StatRow の React.memo を有効にする）
   const changeCallbacks = useMemo(
