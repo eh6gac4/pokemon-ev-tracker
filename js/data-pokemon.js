@@ -381,26 +381,43 @@ export const EV_GUIDE = [
     { name: "パラス",     ev: 1, level: "Lv5-10",  note: "おつきみやまB1F 100%★" },
     { name: "マンキー",   ev: 1, level: "Lv2-5",   note: "22番道路 45%（FR）" },
     { name: "オコリザル", ev: 2, level: "Lv42",    note: "チャンピオンロード（FR）10%" },
+  ], trainers: [
+    { trainer: "つりびと",       ev: 7, location: "21番道路", note: "トサキント+キングドラ×3・VSシーカー再戦可 ⭐ なみのり必要" },
+    { trainer: "たんぱんこぞう", ev: 3, location: "11番道路", note: "ニドラン♂+ニドリーノ・VSシーカー再戦可" },
+    { trainer: "キューボール",   ev: 3, location: "16番道路", note: "ワンリキー×2+マンキー・VSシーカー再戦可（サイクリングロード）" },
   ]},
   { stat: "def", jp: "ぼうぎょ", spots: [
     { name: "モンジャラ", ev: 1, level: "Lv17-28", note: "21番道路 100%★" },
     { name: "サンド",     ev: 1, level: "Lv11-17", note: "4〜11番道路 25〜40%（LG）" },
     { name: "イシツブテ", ev: 1, level: "Lv7-10",  note: "おつきみやま / イワヤマトンネル 35%" },
+  ], trainers: [
+    { trainer: "バイクやろう", ev: 7, location: "17番道路", note: "ドガース×3+マタドガス×2・VSシーカー再戦可 ⭐ サイクリングロード" },
+    { trainer: "バイクやろう", ev: 5, location: "17番道路", note: "マタドガス×2+ドガース・VSシーカー再戦可（サイクリングロード）" },
+    { trainer: "バイクやろう", ev: 3, location: "13番道路", note: "ドガース×3・VSシーカー再戦可" },
   ]},
   { stat: "spa", jp: "とくこう", spots: [
     { name: "ゴース",     ev: 1, level: "Lv13-19", note: "ポケモンタワー3〜6F 85〜90%★" },
     { name: "ゴースト",   ev: 2, level: "Lv23-25", note: "ポケモンタワー7F 15%" },
     { name: "コダック",   ev: 1, level: "Lv20-40", note: "各所なみのり 100%（FR）★" },
+  ], trainers: [
+    { trainer: "エンジニア",       ev: 6, location: "11番道路", note: "レアコイル×3・VSシーカー再戦可 ⭐" },
+    { trainer: "ピクニックガール", ev: 4, location: "15番道路", note: "キレイハナ+ナゾノクサ×2・VSシーカー再戦可" },
   ]},
   { stat: "spd", jp: "とくぼう", spots: [
     { name: "メノクラゲ", ev: 1, level: "Lv5-40",  note: "なみのり全般 100%★（20〜21番道路ほか）" },
     { name: "ドククラゲ", ev: 2, level: "Lv30-40", note: "なみのり中に低確率で混在" },
     { name: "コンパン",   ev: 1, level: "Lv24-26", note: "12〜15番道路 30%（草むら）" },
+  ], trainers: [
+    { trainer: "スイマー", ev: 4, location: "19番道路", note: "メノクラゲ×2+スターユー+タッツー+ドククラゲ・VSシーカー再戦可（SpA/Spe混在あり）" },
   ]},
   { stat: "spe", jp: "すばやさ", spots: [
     { name: "ディグダ",   ev: 1, level: "Lv15-22", note: "ディグダのあな 95%★" },
     { name: "ダグトリオ", ev: 2, level: "Lv29-31", note: "ディグダのあな 5%" },
     { name: "コラッタ",   ev: 1, level: "Lv2-4",   note: "1番道路 50% / 22番道路 45%" },
+  ], trainers: [
+    { trainer: "とりつかい",   ev: 5, location: "13番道路", note: "スピアー×3+ポッポ×2・VSシーカー再戦可 ⭐" },
+    { trainer: "ミニスカート", ev: 4, location: "3番道路",  note: "ピジョット×2・VSシーカー再戦可（序盤から）" },
+    { trainer: "スイマー",    ev: 3, location: "19番道路", note: "スターユー×3・VSシーカー再戦可（なみのり必要）" },
   ]},
 ];
 
