@@ -434,7 +434,7 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
   );
 });
 
-export const EVGuide = React.memo(function EVGuide({ color }) {
+export const EVGuide = React.memo(function EVGuide({ color, trainerBattleCounts, onTrainerBattle, onResetTrainerCounts }) {
   const [open, setOpen] = useState(false);
   return (
     <Panel title="📖 EV稼ぎガイド（FR/LG）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
@@ -451,14 +451,38 @@ export const EVGuide = React.memo(function EVGuide({ color }) {
           ))}
           {trainers && trainers.length > 0 && (
             <div style={{ marginTop: "4px", paddingLeft: "4px", borderLeft: "2px solid #554400" }}>
-              <div style={{ fontSize: "9px", color: "#887700", marginBottom: "3px" }}>🎮 トレーナーバトル</div>
-              {trainers.map((t, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "10px", marginBottom: "3px", paddingLeft: "4px" }}>
-                  <span style={{ color: "#bbaa44", minWidth: "100px" }}>{t.location} {t.trainer}</span>
-                  <span style={{ color: "#7fff7f", minWidth: "24px", textAlign: "right" }}>+{t.ev}</span>
-                  <span style={{ color: "#555" }}>{t.note}</span>
-                </div>
-              ))}
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
+                <div style={{ fontSize: "9px", color: "#887700" }}>🎮 トレーナーバトル</div>
+                {onResetTrainerCounts && trainers.some((_, i) => (trainerBattleCounts?.[`${stat}_t${i}`] || 0) > 0) && (
+                  <button onClick={() => onResetTrainerCounts(trainers.map((_, i) => `${stat}_t${i}`))}
+                          style={{ fontSize: "9px", color: "#aa6655", background: "none", border: "1px solid #553322", borderRadius: "3px", padding: "0 4px", cursor: "pointer" }}>リセット</button>
+                )}
+              </div>
+              {trainers.map((t, i) => {
+                const key   = `${stat}_t${i}`;
+                const count = trainerBattleCounts?.[key] || 0;
+                return (
+                  <div key={i} style={{ marginBottom: "5px", paddingLeft: "4px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "10px" }}>
+                      <span style={{ color: "#bbaa44", minWidth: "100px" }}>{t.location} {t.trainer}</span>
+                      <span style={{ color: "#7fff7f", minWidth: "24px", textAlign: "right" }}>+{t.ev}</span>
+                      <span style={{ color: "#555" }}>{t.note}</span>
+                    </div>
+                    {onTrainerBattle && (
+                      <div style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "2px", paddingLeft: "4px" }}>
+                        <button onClick={() => onTrainerBattle(key, stat, t.ev, -1)} disabled={count === 0}
+                                style={{ fontSize: "11px", lineHeight: 1, padding: "1px 6px", background: "#222", border: "1px solid #444", borderRadius: "3px", color: count === 0 ? "#444" : "#ccc", cursor: count === 0 ? "default" : "pointer" }}>－</button>
+                        <span style={{ fontSize: "10px", minWidth: "30px", textAlign: "center", color: "#ccaa55" }}>{count}回</span>
+                        <button onClick={() => onTrainerBattle(key, stat, t.ev, 1)}
+                                style={{ fontSize: "11px", lineHeight: 1, padding: "1px 6px", background: "#222", border: "1px solid #444", borderRadius: "3px", color: "#ccc", cursor: "pointer" }}>＋</button>
+                        {count > 0 && (
+                          <span style={{ fontSize: "9px", color: "#7fff7f" }}>+{count * t.ev} EV</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -892,7 +916,8 @@ export const AbilitySearch = React.memo(function AbilitySearch({ color }) {
 });
 
 
-export default function ChosaTab({ color, party, allIVs, dexTarget, onDexTargetConsumed, macho, ivs, onSave }) {
+export default function ChosaTab({ color, party, allIVs, dexTarget, onDexTargetConsumed, macho, ivs, onSave,
+                                   trainerBattleCounts, onTrainerBattle, onResetTrainerCounts }) {
   return (
     <>
       <IVCompare party={party} allIVs={allIVs} color={color} />
@@ -900,7 +925,10 @@ export default function ChosaTab({ color, party, allIVs, dexTarget, onDexTargetC
       <TypeChart color={color} />
       <LocationGuide color={color} />
       <IVChecker color={color} ivs={ivs} onSave={onSave} />
-      <EVGuide color={color} />
+      <EVGuide color={color}
+               trainerBattleCounts={trainerBattleCounts}
+               onTrainerBattle={onTrainerBattle}
+               onResetTrainerCounts={onResetTrainerCounts} />
       <AbilitySearch color={color} />
       <EVSearch macho={macho} color={color} />
       <MoveTutorPanel color={color} />

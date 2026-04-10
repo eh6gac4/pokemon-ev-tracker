@@ -83,8 +83,9 @@ export default function EVTracker() {
   const [newIcon,      setNewIcon]      = useState("🐣");
   const [newColor,     setNewColor]     = useState(COLORS[0]);
   const [newDexId,     setNewDexId]     = useState(null);
-  const [checkedItems,  setCheckedItems]  = useState({});
-  const [captureCount,  setCaptureCount]  = useState(0);
+  const [checkedItems,         setCheckedItems]         = useState({});
+  const [trainerBattleCounts,  setTrainerBattleCounts]  = useState({});
+  const [captureCount,         setCaptureCount]         = useState(0);
   const [captureGoals,  setCaptureGoals]  = useState([]);
   const [todoList,      setTodoList]      = useState([]);
   const [renaming,     setRenaming]     = useState(false);
@@ -211,7 +212,8 @@ export default function EVTracker() {
         if (saved.allIVs)       setAllIVs(saved.allIVs);
         if (saved.allMoves)     setAllMoves(saved.allMoves);
         if (saved.selected)     setSelected(saved.selected);
-        if (saved.checkedItems)  setCheckedItems(saved.checkedItems);
+        if (saved.checkedItems)        setCheckedItems(saved.checkedItems);
+        if (saved.trainerBattleCounts) setTrainerBattleCounts(saved.trainerBattleCounts);
         if (saved.captureCount != null) setCaptureCount(saved.captureCount);
         if (saved.captureGoals)  setCaptureGoals(saved.captureGoals);
         if (saved.todoList)      setTodoList(saved.todoList);
@@ -231,14 +233,26 @@ export default function EVTracker() {
       fetch("/api/data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ party, allEVs, allIVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, archivedParty }),
+        body: JSON.stringify({ party, allEVs, allIVs, allMoves, selected, checkedItems, trainerBattleCounts, captureCount, captureGoals, todoList, activeParty, archivedParty }),
       }).catch(() => {});
     }, 800);
     return () => clearTimeout(timer);
-  }, [party, allEVs, allIVs, allMoves, selected, checkedItems, captureCount, captureGoals, todoList, activeParty, archivedParty, loaded]);
+  }, [party, allEVs, allIVs, allMoves, selected, checkedItems, trainerBattleCounts, captureCount, captureGoals, todoList, activeParty, archivedParty, loaded]);
 
   const toggleItem  = useCallback((id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] })), []);
   const resetItems  = useCallback(() => setCheckedItems({}), []);
+
+  const changeTrainerCount = useCallback((key, stat, ev, delta) => {
+    setTrainerBattleCounts(prev => ({ ...prev, [key]: Math.max(0, (prev[key] || 0) + delta) }));
+    change(stat, ev * delta);
+  }, [change]);
+  const resetTrainerCounts = useCallback((keys) => {
+    setTrainerBattleCounts(prev => {
+      const next = { ...prev };
+      keys.forEach(k => { next[k] = 0; });
+      return next;
+    });
+  }, []);
   const addCaptureGoal    = useCallback((name) => setCaptureGoals(prev => [...prev, { id: Date.now().toString(), name, done: false }]), []);
   const toggleCaptureGoal = useCallback((id)   => setCaptureGoals(prev => prev.map(g => g.id === id ? { ...g, done: !g.done } : g)), []);
   const deleteCaptureGoal = useCallback((id)   => setCaptureGoals(prev => prev.filter(g => g.id !== id)), []);
@@ -590,6 +604,9 @@ export default function EVTracker() {
                 macho={macho}
                 ivs={allIVs[selected] || initIVs()}
                 onSave={saveIVs}
+                trainerBattleCounts={trainerBattleCounts}
+                onTrainerBattle={changeTrainerCount}
+                onResetTrainerCounts={resetTrainerCounts}
               />
             </React.Suspense>
           )}
