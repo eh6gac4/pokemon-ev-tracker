@@ -438,7 +438,7 @@ export const EVGuide = React.memo(function EVGuide({ color }) {
   const [open, setOpen] = useState(false);
   return (
     <Panel title="📖 EV稼ぎガイド（FR/LG）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
-      {EV_GUIDE.map(({ stat, jp, spots }) => (
+      {EV_GUIDE.map(({ stat, jp, spots, trainers }) => (
         <div key={stat} style={{ marginBottom: "10px" }}>
           <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px", letterSpacing: "1px" }}>{jp}</div>
           {spots.map(s => (
@@ -449,6 +449,18 @@ export const EVGuide = React.memo(function EVGuide({ color }) {
               <span style={{ color: "#444" }}>{s.note}</span>
             </div>
           ))}
+          {trainers && trainers.length > 0 && (
+            <div style={{ marginTop: "4px", paddingLeft: "4px", borderLeft: "2px solid #554400" }}>
+              <div style={{ fontSize: "9px", color: "#887700", marginBottom: "3px" }}>🎮 トレーナーバトル</div>
+              {trainers.map((t, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "10px", marginBottom: "3px", paddingLeft: "4px" }}>
+                  <span style={{ color: "#bbaa44", minWidth: "100px" }}>{t.location} {t.trainer}</span>
+                  <span style={{ color: "#7fff7f", minWidth: "24px", textAlign: "right" }}>+{t.ev}</span>
+                  <span style={{ color: "#555" }}>{t.note}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ))}
       <div style={{ fontSize: "8px", color: "#333", marginTop: "4px" }}>強制ギプス装備で獲得EV×2</div>

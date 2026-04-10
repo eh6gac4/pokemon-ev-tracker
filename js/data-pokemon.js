@@ -371,6 +371,11 @@ export const EV_GUIDE = [
     { name: "マリル",     ev: 2, level: "Lv15",    note: "廃虚の谷 草むら 10%（LG）★ ※島4-6解放後" },
     { name: "プリン",     ev: 2, level: "Lv3-7",   note: "おつきみやま周辺・3番道路 10%" },
     { name: "ヤドン",     ev: 1, level: "Lv20-40", note: "22番道路ほかなみのり 100%（LG）★" },
+  ], trainers: [
+    { trainer: "ふたごちゃん",     ev: 4, location: "8番道路", note: "ピッピ+プリン Lv.22 ダブルバトル・VSシーカー再戦可 ⭐" },
+    { trainer: "ミニスカート",     ev: 4, location: "8番道路", note: "ピッピ Lv.22×2・VSシーカー再戦可" },
+    { trainer: "ミニスカート",     ev: 2, location: "3番道路", note: "プリン Lv.14・VSシーカー再戦可（序盤から）" },
+    { trainer: "ピクニックガール", ev: 2, location: "10番道路", note: "ピッピ Lv.20・VSシーカー再戦可" },
   ]},
   { stat: "atk", jp: "こうげき", spots: [
     { name: "パラス",     ev: 1, level: "Lv5-10",  note: "おつきみやまB1F 100%★" },
