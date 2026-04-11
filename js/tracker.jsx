@@ -40,6 +40,8 @@ export default function EVTracker() {
   const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
   const [loaded,       setLoaded]       = useState(false);
   const [macho,        setMacho]        = useState(false);
+  const [gakushuu,     setGakushuu]     = useState(false);
+  const [gakushuuMon,  setGakushuuMon]  = useState(null);
   const initialTab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "boken";
   const [activeTab,    setActiveTab]    = useState(initialTab);
   const [visitedTabs,  setVisitedTabs]  = useState(() => new Set([initialTab]));
@@ -283,13 +285,25 @@ export default function EVTracker() {
   const change = useCallback((key, delta) => {
     const d = delta > 0 ? delta * (macho ? 2 : 1) : delta;
     setAllEVs(prev => {
+      // 戦闘ポケモン（selected）への加算
       const cur      = (prev[selected] || initEVs())[key];
       const curTotal = Object.values(prev[selected] || initEVs()).reduce((a, b) => a + b, 0);
       let next = Math.max(0, Math.min(MAX_STAT, cur + d));
       if (curTotal - cur + next > MAX_TOTAL) next = cur + (MAX_TOTAL - curTotal);
-      return { ...prev, [selected]: { ...(prev[selected] || initEVs()), [key]: Math.max(0, next) } };
+      let newState = { ...prev, [selected]: { ...(prev[selected] || initEVs()), [key]: Math.max(0, next) } };
+
+      // がくしゅうそうち装備ポケモンへの加算（マッハ倍率なし、delta>0のみ）
+      if (gakushuu && gakushuuMon && gakushuuMon !== selected && delta > 0) {
+        const hCur   = (newState[gakushuuMon] || initEVs())[key];
+        const hTotal = Object.values(newState[gakushuuMon] || initEVs()).reduce((a, b) => a + b, 0);
+        let hNext = Math.max(0, Math.min(MAX_STAT, hCur + delta));
+        if (hTotal - hCur + hNext > MAX_TOTAL) hNext = hCur + (MAX_TOTAL - hTotal);
+        newState = { ...newState, [gakushuuMon]: { ...(newState[gakushuuMon] || initEVs()), [key]: Math.max(0, hNext) } };
+      }
+
+      return newState;
     });
-  }, [selected, macho]);
+  }, [selected, macho, gakushuu, gakushuuMon]);
 
   const changeTrainerCount = useCallback((key, stat, ev, delta) => {
     setTrainerBattleCounts(prev => ({ ...prev, [key]: Math.max(0, (prev[key] || 0) + delta) }));
@@ -505,11 +519,55 @@ export default function EVTracker() {
               background: macho ? "#3a1a1a" : "#16213e",
               border: `1px solid ${macho ? "#ff6b35aa" : "#2a2a4a"}`,
               borderRadius: "7px", color: macho ? "#ff6b35" : "#555",
-              fontSize: "11px", padding: "7px", marginBottom: "10px", letterSpacing: "1px",
+              fontSize: "11px", padding: "7px", marginBottom: "6px", letterSpacing: "1px",
             }}
           >
             {macho ? "🥊 強制ギプス装備中（EV×2）" : "🥊 強制ギプス　OFF"}
           </button>
+
+          {/* がくしゅうそうち */}
+          <button
+            onClick={() => { setGakushuu(v => { if (v) setGakushuuMon(null); return !v; }); }}
+            style={{
+              width: "100%", cursor: "pointer", fontFamily: "inherit",
+              background: gakushuu ? "#0d2a1a" : "#16213e",
+              border: `1px solid ${gakushuu ? "#4dff91aa" : "#2a2a4a"}`,
+              borderRadius: "7px", color: gakushuu ? "#4dff91" : "#555",
+              fontSize: "11px", padding: "7px", marginBottom: gakushuu ? "4px" : "10px", letterSpacing: "1px",
+            }}
+          >
+            {gakushuu ? "📚 がくしゅうそうち　ON" : "📚 がくしゅうそうち　OFF"}
+          </button>
+          {gakushuu && (() => {
+            const partyMembers = activeParty.filter(n => n && n !== selected);
+            return partyMembers.length > 0 ? (
+              <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", marginBottom: "10px" }}>
+                {partyMembers.map(name => {
+                  const p = party.find(p => p.name === name);
+                  const isSelected = gakushuuMon === name;
+                  return (
+                    <button
+                      key={name}
+                      onClick={() => setGakushuuMon(isSelected ? null : name)}
+                      style={{
+                        cursor: "pointer", fontFamily: "inherit",
+                        background: isSelected ? "#0d2a1a" : "#1a1a2e",
+                        border: `1px solid ${isSelected ? "#4dff91" : "#2a2a4a"}`,
+                        borderRadius: "6px", color: isSelected ? "#4dff91" : "#888",
+                        fontSize: "11px", padding: "4px 8px", letterSpacing: "0.5px",
+                      }}
+                    >
+                      {p?.icon || "?"} {name}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{ fontSize: "11px", color: "#555", marginBottom: "10px", textAlign: "center" }}>
+                パーティに他のポケモンを追加してください
+              </div>
+            );
+          })()}
 
           {/* Stats */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "14px" }}>
