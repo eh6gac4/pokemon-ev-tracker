@@ -224,6 +224,9 @@ export default function EVTracker() {
           setActiveParty([...ap, null, null, null, null, null, null].slice(0, 6));
         }
         if (saved.archivedParty) setArchivedParty(saved.archivedParty);
+        if (saved.macho != null)       setMacho(saved.macho);
+        if (saved.gakushuu != null)    setGakushuu(saved.gakushuu);
+        if (saved.gakushuuMon != null) setGakushuuMon(saved.gakushuuMon);
       })
       .catch(() => {})
       .finally(() => setLoaded(true));
@@ -235,11 +238,11 @@ export default function EVTracker() {
       fetch("/api/data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ party, allEVs, allIVs, allMoves, selected, checkedItems, trainerBattleCounts, captureCount, captureGoals, todoList, activeParty, archivedParty }),
+        body: JSON.stringify({ party, allEVs, allIVs, allMoves, selected, checkedItems, trainerBattleCounts, captureCount, captureGoals, todoList, activeParty, archivedParty, macho, gakushuu, gakushuuMon }),
       }).catch(() => {});
     }, 800);
     return () => clearTimeout(timer);
-  }, [party, allEVs, allIVs, allMoves, selected, checkedItems, trainerBattleCounts, captureCount, captureGoals, todoList, activeParty, archivedParty, loaded]);
+  }, [party, allEVs, allIVs, allMoves, selected, checkedItems, trainerBattleCounts, captureCount, captureGoals, todoList, activeParty, archivedParty, macho, gakushuu, gakushuuMon, loaded]);
 
   const toggleItem  = useCallback((id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] })), []);
   const resetItems  = useCallback(() => setCheckedItems({}), []);
