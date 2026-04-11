@@ -87,7 +87,7 @@ export const ITEM_DATA = [
     { id: "ya01", name: "マスターボール",      type: "gift",   note: "シルフカンパニー11F・社長からもらう（ジョバンニ撃破後）" },
     { id: "ya04", tmId: "TM01",               type: "field",  note: "ヤマブキシルフカンパニー・アイテムボール" },
     { id: "ya05", name: "ふしぎなアメ",        type: "field",  note: "シルフカンパニー10F・アイテムボール",                       img: "https://appmedia.jp/wp-content/uploads/2026/03/143114_3kf5j.webp" },
-    { id: "yk05", name: "ヒットモンリー または ヒットモンチャン", type: "gift", note: "ヤマブキ格闘道場・ルイを倒した後どちらかを選択" },
+    { id: "yk05", name: "サワムラー または エビワラー", type: "gift", note: "ヤマブキ格闘道場・ルイを倒した後どちらかを選択" },
   ]},
   { area: "セキチクシティ・サファリゾーン", items: [
     { id: "se01", tmId: "TM06",               type: "gym",    note: "セキチクジム・キョウを倒す" },
