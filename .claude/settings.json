@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 120,
+            "statusMessage": "Playwrightテスト実行中…",
+            "command": "python3 -c \"\nimport json, sys, re, subprocess\nd = json.load(sys.stdin)\nf = d.get('tool_input', {}).get('file_path', '')\nif re.search(r'/pokemon-ev-tracker/(js/[^/]+\\.jsx?|server\\.py)$', f):\n    r = subprocess.run(['npm', 'run', 'test:e2e', '--', '--reporter=line'], cwd='/home/ctoshiki/projects/pokemon-ev-tracker')\n    sys.exit(r.returncode)\n\""
+          }
+        ]
+      }
+    ]
+  }
+}
