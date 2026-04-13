@@ -572,6 +572,42 @@ export default function EVTracker() {
             );
           })()}
 
+          {/* がくしゅうそうちEV確認パネル */}
+          {gakushuu && gakushuuMon && (() => {
+            const gMon   = party.find(p => p.name === gakushuuMon);
+            const gEVs   = allEVs[gakushuuMon] || initEVs();
+            const gTotal = Object.values(gEVs).reduce((a, b) => a + b, 0);
+            const accent = gMon?.color || "#4dff91";
+            return (
+              <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: accent + "44" }}>
+                <div style={{ fontSize: "10px", color: accent, marginBottom: "8px", letterSpacing: "1px" }}>
+                  {gMon?.icon || "📚"} {gakushuuMon} の努力値
+                </div>
+                {STATS.map(stat => {
+                  const val     = gEVs[stat.key] || 0;
+                  const isMaxed = val >= MAX_STAT;
+                  return (
+                    <div key={stat.key} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
+                      <span style={{ fontSize: "10px", minWidth: "52px", color: isMaxed ? "#7fff7f" : "#666" }}>
+                        {stat.jp}
+                      </span>
+                      <div className="bar-bg" style={{ flex: 1, height: "4px" }}>
+                        <div className="bar-fill" style={{ height: "100%", width: `${(val / MAX_STAT) * 100}%`, background: isMaxed ? "#7fff7f" : accent, borderRadius: "3px" }} />
+                      </div>
+                      <span style={{ fontSize: "11px", minWidth: "28px", textAlign: "right", color: isMaxed ? "#7fff7f" : "#aaa", fontWeight: isMaxed ? "bold" : "normal" }}>
+                        {val}
+                      </span>
+                      {isMaxed && <span className="badge-max" style={{ fontSize: "7px", padding: "1px 3px" }}>MAX</span>}
+                    </div>
+                  );
+                })}
+                <div style={{ fontSize: "10px", color: "#555", textAlign: "right", marginTop: "4px", borderTop: "1px solid #2a2a4a", paddingTop: "5px" }}>
+                  合計 <span style={{ color: gTotal >= MAX_TOTAL ? "#7fff7f" : "#aaa" }}>{gTotal}</span> / {MAX_TOTAL}
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Stats */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "14px" }}>
             {STATS.map(stat => (
