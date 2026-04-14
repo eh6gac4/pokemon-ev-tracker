@@ -4,7 +4,7 @@ import {
 } from './data-pokemon.js';
 import { getLearnableMoves, getLearnset, ALL_MOVES } from './data-moves.js';
 import { AutoTextarea, StatRow, Panel } from './components-base.jsx';
-import { AddMonModal, NaturePicker, ItemPicker, MovePicker, PartySlots, PartyPickerModal, IVPanel } from './components-ikusei.jsx';
+import { AddMonModal, NaturePicker, ItemPicker, MovePicker, PartySlots, PartyPickerModal, IVPanel, EVGuide } from './components-ikusei.jsx';
 
 const ChosaTab = React.lazy(() => import('./components-chosa.jsx'));
 const BokenTab = React.lazy(() => import('./components-boken.jsx'));
@@ -633,6 +633,11 @@ export default function EVTracker() {
             <AutoTextarea value={mon.memo || ""} onChange={updateMemo} placeholder="自由メモ…" />
           </div>
 
+          <EVGuide color={mon.color}
+                   trainerBattleCounts={trainerBattleCounts}
+                   onTrainerBattle={changeTrainerCount}
+                   onResetTrainerCounts={resetTrainerCounts} />
+
           <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
             <button onClick={reset} style={{ flex: 1, background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
               EV リセット
@@ -702,9 +707,6 @@ export default function EVTracker() {
                 macho={macho}
                 ivs={allIVs[selected] || initIVs()}
                 onSave={saveIVs}
-                trainerBattleCounts={trainerBattleCounts}
-                onTrainerBattle={changeTrainerCount}
-                onResetTrainerCounts={resetTrainerCounts}
               />
             </React.Suspense>
           )}
