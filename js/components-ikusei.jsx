@@ -545,10 +545,10 @@ export const EVGuide = React.memo(function EVGuide({ color, trainerBattleCounts,
                     {onTrainerBattle && (
                       <div style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "2px", paddingLeft: "4px" }}>
                         <button onClick={() => onTrainerBattle(key, stat, t.ev, -1)} disabled={count === 0}
-                                style={{ fontSize: "11px", lineHeight: 1, padding: "1px 6px", background: "#222", border: "1px solid #444", borderRadius: "3px", color: count === 0 ? "#444" : "#ccc", cursor: count === 0 ? "default" : "pointer" }}>－</button>
+                                style={{ fontSize: "14px", lineHeight: 1, padding: "5px 12px", background: "#222", border: "1px solid #444", borderRadius: "5px", color: count === 0 ? "#444" : "#ccc", cursor: count === 0 ? "default" : "pointer" }}>－</button>
                         <span style={{ fontSize: "10px", minWidth: "30px", textAlign: "center", color: "#ccaa55" }}>{count}回</span>
                         <button onClick={() => onTrainerBattle(key, stat, t.ev, 1)}
-                                style={{ fontSize: "11px", lineHeight: 1, padding: "1px 6px", background: "#222", border: "1px solid #444", borderRadius: "3px", color: "#ccc", cursor: "pointer" }}>＋</button>
+                                style={{ fontSize: "14px", lineHeight: 1, padding: "5px 12px", background: "#222", border: "1px solid #444", borderRadius: "5px", color: "#ccc", cursor: "pointer" }}>＋</button>
                         {count > 0 && (
                           <span style={{ fontSize: "9px", color: "#7fff7f" }}>+{count * t.ev} EV</span>
                         )}
