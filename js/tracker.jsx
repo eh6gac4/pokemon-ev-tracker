@@ -203,32 +203,47 @@ export default function EVTracker() {
   }, []);
 
   useEffect(() => {
+    const applyData = (saved) => {
+      if (saved.party)        setParty(saved.party.map(p => {
+        if (p.dexId != null) return p;
+        const idx = POKEMON_DATA.findIndex(pd => pd[1] === p.name);
+        return { ...p, dexId: idx >= 0 ? idx : null };
+      }));
+      if (saved.allEVs)       setAllEVs(saved.allEVs);
+      if (saved.allIVs)       setAllIVs(saved.allIVs);
+      if (saved.allMoves)     setAllMoves(saved.allMoves);
+      if (saved.selected)     setSelected(saved.selected);
+      if (saved.checkedItems)        setCheckedItems(saved.checkedItems);
+      if (saved.trainerBattleCounts) setTrainerBattleCounts(saved.trainerBattleCounts);
+      if (saved.captureCount != null) setCaptureCount(saved.captureCount);
+      if (saved.captureGoals)  setCaptureGoals(saved.captureGoals);
+      if (saved.todoList)      setTodoList(saved.todoList);
+      if (saved.activeParty) {
+        const ap = saved.activeParty;
+        setActiveParty([...ap, null, null, null, null, null, null].slice(0, 6));
+      }
+      if (saved.archivedParty) setArchivedParty(saved.archivedParty);
+      if (saved._dev)                setIsDev(true);
+      if (saved.macho != null)       setMacho(saved.macho);
+      if (saved.gakushuu != null)    setGakushuu(saved.gakushuu);
+      if (saved.gakushuuMon != null) setGakushuuMon(saved.gakushuuMon);
+    };
+
+    // ① localStorage に前回データがあれば即座に表示
+    const cached = localStorage.getItem('pokelog-data');
+    if (cached) {
+      try {
+        applyData(JSON.parse(cached));
+        setLoaded(true);
+      } catch (e) {}
+    }
+
+    // ② バックグラウンドでサーバーと同期（最新データで上書き + キャッシュ更新）
     fetch("/api/data")
       .then(r => r.json())
       .then(saved => {
-        if (saved.party)        setParty(saved.party.map(p => {
-          if (p.dexId != null) return p;
-          const idx = POKEMON_DATA.findIndex(pd => pd[1] === p.name);
-          return { ...p, dexId: idx >= 0 ? idx : null };
-        }));
-        if (saved.allEVs)       setAllEVs(saved.allEVs);
-        if (saved.allIVs)       setAllIVs(saved.allIVs);
-        if (saved.allMoves)     setAllMoves(saved.allMoves);
-        if (saved.selected)     setSelected(saved.selected);
-        if (saved.checkedItems)        setCheckedItems(saved.checkedItems);
-        if (saved.trainerBattleCounts) setTrainerBattleCounts(saved.trainerBattleCounts);
-        if (saved.captureCount != null) setCaptureCount(saved.captureCount);
-        if (saved.captureGoals)  setCaptureGoals(saved.captureGoals);
-        if (saved.todoList)      setTodoList(saved.todoList);
-        if (saved.activeParty) {
-          const ap = saved.activeParty;
-          setActiveParty([...ap, null, null, null, null, null, null].slice(0, 6));
-        }
-        if (saved.archivedParty) setArchivedParty(saved.archivedParty);
-        if (saved._dev)                setIsDev(true);
-        if (saved.macho != null)       setMacho(saved.macho);
-        if (saved.gakushuu != null)    setGakushuu(saved.gakushuu);
-        if (saved.gakushuuMon != null) setGakushuuMon(saved.gakushuuMon);
+        applyData(saved);
+        localStorage.setItem('pokelog-data', JSON.stringify(saved));
       })
       .catch(() => {})
       .finally(() => setLoaded(true));
