@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-努力値トラッカー - サーバー
+努力値トラッカー - devサーバー（ダミーデータ返却）
 標準ライブラリのみ使用（追加インストール不要）
 """
 
@@ -9,40 +9,20 @@ import hashlib
 import http.server
 import json
 import os
-import sqlite3
 import sys
 from pathlib import Path
 
 PORT = int(os.environ.get("PORT", 8080))
-DB_PATH = Path(os.environ.get("DB_PATH", Path(__file__).parent / "ev_data.db"))
 _dist = Path(__file__).parent / "dist"
 STATIC_DIR = _dist if _dist.is_dir() else Path(__file__).parent
 
-
-def init_db():
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS ev_data (
-                id    INTEGER PRIMARY KEY CHECK (id = 1),
-                data  TEXT NOT NULL
-            )
-        """)
-        conn.commit()
-
-
-def load_data():
-    with sqlite3.connect(DB_PATH) as conn:
-        row = conn.execute("SELECT data FROM ev_data WHERE id = 1").fetchone()
-        return json.loads(row[0]) if row else {}
-
-
-def save_data(data: dict):
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute("""
-            INSERT INTO ev_data (id, data) VALUES (1, ?)
-            ON CONFLICT(id) DO UPDATE SET data = excluded.data
-        """, (json.dumps(data, ensure_ascii=False),))
-        conn.commit()
+DUMMY_DATA = {
+    "party": [], "allEVs": {}, "allIVs": {}, "allMoves": {},
+    "selected": None, "activeParty": [], "archivedParty": [],
+    "checkedItems": {}, "captureCount": 0, "captureGoals": [],
+    "todoList": [], "macho": False, "gakushuu": False, "gakushuuMon": None,
+    "trainerBattleCounts": {}
+}
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -87,11 +67,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         }.get(file_path.suffix, "application/octet-stream")
         raw_body = file_path.read_bytes()
         etag = f'"{hashlib.md5(raw_body).hexdigest()}"'
-        # Vite がハッシュを付与するアセット（dist/assets/*）は長期キャッシュ可
         is_hashed_asset = file_path.parent == STATIC_DIR / "assets"
         cache_control = "public, max-age=31536000, immutable" if is_hashed_asset else "no-cache"
 
-        # ETagが一致すれば 304 を返してボディ送信をスキップ
         if self.headers.get("If-None-Match") == etag:
             self.send_response(304)
             self.send_header("ETag", etag)
@@ -118,7 +96,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/api/data":
-            self.send_json(200, load_data())
+            self.send_json(200, DUMMY_DATA)
         else:
             self._serve_static(self.path)
 
@@ -127,8 +105,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(length)
             try:
-                data = json.loads(body)
-                save_data(data)
+                json.loads(body)
                 self.send_json(200, {"ok": True})
             except json.JSONDecodeError:
                 self.send_json(400, {"error": "invalid JSON"})
@@ -137,9 +114,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    init_db()
     server = http.server.ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
-    print(f"サーバー起動: http://localhost:{PORT}")
+    print(f"devサーバー起動: http://localhost:{PORT}")
     print(f"LAN内からは: http://<このPCのIP>:{PORT}")
     print("停止: Ctrl+C")
     try:
