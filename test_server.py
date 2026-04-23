@@ -8,73 +8,15 @@ import gzip
 import http.client
 import http.server
 import json
-import os
 import sys
-import tempfile
 import threading
 import unittest
 import urllib.error
 import urllib.request
 from pathlib import Path
-from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parent))
 import server
-
-
-# ---------------------------------------------------------------------------
-# DB ユニットテスト
-# ---------------------------------------------------------------------------
-
-class TestDatabase(unittest.TestCase):
-    """init_db / load_data / save_data のユニットテスト"""
-
-    def setUp(self):
-        fd, path = tempfile.mkstemp(suffix=".db")
-        os.close(fd)
-        self.db_path = Path(path)
-
-    def tearDown(self):
-        self.db_path.unlink(missing_ok=True)
-
-    def test_load_empty_db_returns_empty_dict(self):
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            self.assertEqual(server.load_data(), {})
-
-    def test_save_and_load_roundtrip(self):
-        data = {
-            "party": [{"name": "リザードン", "icon": "🔥", "color": "#FF6B35"}],
-            "allEVs": {
-                "リザードン": {"hp": 0, "atk": 252, "def": 0, "spa": 252, "spd": 0, "spe": 4}
-            },
-            "selected": "リザードン",
-        }
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data(data)
-            self.assertEqual(server.load_data(), data)
-
-    def test_save_overwrites_existing(self):
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data({"selected": "A"})
-            server.save_data({"selected": "B"})
-            self.assertEqual(server.load_data()["selected"], "B")
-
-    def test_unicode_preserved(self):
-        data = {"selected": "ピカチュウ", "note": "てすと"}
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data(data)
-            self.assertEqual(server.load_data(), data)
-
-    def test_init_db_is_idempotent(self):
-        """init_db() を複数回呼んでもエラーにならない"""
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.init_db()
-            self.assertEqual(server.load_data(), {})
 
 
 # ---------------------------------------------------------------------------
@@ -86,14 +28,6 @@ class TestHTTPServer(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        fd, path = tempfile.mkstemp(suffix=".db")
-        os.close(fd)
-        cls.db_path = Path(path)
-
-        cls._patcher = patch.object(server, "DB_PATH", cls.db_path)
-        cls._patcher.start()
-        server.init_db()
-
         cls.httpd = http.server.HTTPServer(("127.0.0.1", 0), server.Handler)
         cls.port = cls.httpd.server_address[1]
         cls._thread = threading.Thread(target=cls.httpd.serve_forever)
@@ -103,8 +37,6 @@ class TestHTTPServer(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.httpd.shutdown()
-        cls._patcher.stop()
-        cls.db_path.unlink(missing_ok=True)
 
     def url(self, path):
         return f"http://127.0.0.1:{self.port}{path}"
@@ -129,6 +61,13 @@ class TestHTTPServer(unittest.TestCase):
         with urllib.request.urlopen(self.url("/api/data")) as res:
             self.assertEqual(res.headers.get("Access-Control-Allow-Origin"), "*")
 
+    def test_get_api_data_returns_dummy_data(self):
+        with urllib.request.urlopen(self.url("/api/data")) as res:
+            body = json.loads(res.read())
+        self.assertIn("party", body)
+        self.assertIn("allEVs", body)
+        self.assertIsInstance(body["party"], list)
+
     # --- POST /api/data ---
 
     def test_post_valid_json_returns_ok(self):
@@ -143,19 +82,6 @@ class TestHTTPServer(unittest.TestCase):
             self.assertEqual(res.status, 200)
             body = json.loads(res.read())
         self.assertTrue(body.get("ok"))
-
-    def test_post_then_get_reflects_saved_data(self):
-        data = {"party": [], "allEVs": {}, "selected": "ゲンガー"}
-        req = urllib.request.Request(
-            self.url("/api/data"),
-            data=json.dumps(data).encode(),
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        urllib.request.urlopen(req).close()
-        with urllib.request.urlopen(self.url("/api/data")) as res:
-            saved = json.loads(res.read())
-        self.assertEqual(saved["selected"], "ゲンガー")
 
     def test_post_invalid_json_returns_400(self):
         req = urllib.request.Request(
@@ -466,9 +392,7 @@ class TestEVRules(unittest.TestCase):
         self.assertEqual(result["spe"], 4)
 
     def test_remaining_budget_correctly_limits_addition(self):
-        # 残り6しか入らない状況で10振ろうとする
         evs = {**self._zero_evs(), "hp": 252, "atk": 252, "def": 0, "spa": 0, "spd": 0, "spe": 0}
-        # total=504, remaining=6
         result = self._change(evs, "def", 10)
         self.assertEqual(result["def"], 6)
         self.assertEqual(sum(result.values()), self.MAX_TOTAL)
@@ -515,12 +439,10 @@ class TestMachoBrace(unittest.TestCase):
         return {"hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}
 
     def test_plus1_becomes_plus2_with_macho(self):
-        # ＋ボタン(d=1) → ×2 → +2
         evs = self._change(self._zero_evs(), "hp", 1, macho=True)
         self.assertEqual(evs["hp"], 2)
 
     def test_plus4_becomes_plus8_with_macho(self):
-        # ＋4ボタン(d=4) → ×2 → +8
         evs = self._change(self._zero_evs(), "hp", 4, macho=True)
         self.assertEqual(evs["hp"], 8)
 
@@ -536,12 +458,12 @@ class TestMachoBrace(unittest.TestCase):
 
     def test_macho_still_caps_at_252(self):
         evs = {**self._zero_evs(), "hp": 248}
-        result = self._change(evs, "hp", 4, macho=True)  # +8 → capped at 252
+        result = self._change(evs, "hp", 4, macho=True)
         self.assertEqual(result["hp"], 252)
 
     def test_macho_still_caps_at_510_total(self):
         evs = {**self._zero_evs(), "hp": 252, "atk": 252, "def": 4}
-        result = self._change(evs, "spa", 4, macho=True)  # total=508, +8 → capped
+        result = self._change(evs, "spa", 4, macho=True)
         self.assertLessEqual(sum(result.values()), self.MAX_TOTAL)
 
     def test_without_macho_plus4_is_4(self):
@@ -561,7 +483,6 @@ class TestMachoBrace(unittest.TestCase):
 class TestVitamins(unittest.TestCase):
 
     def setUp(self):
-        # シンプルな実装で再定義
         import math
         self._vl = lambda ev: math.ceil((100 - ev) / 10) if ev < 100 else 0
 
@@ -569,7 +490,6 @@ class TestVitamins(unittest.TestCase):
         self.assertEqual(self._vl(0), 10)
 
     def test_4ev_can_use_10_vitamins(self):
-        # 4→14→24→…→94→104, 94<100なので10本使える
         self.assertEqual(self._vl(4), 10)
 
     def test_95ev_can_use_1_vitamin(self):
@@ -588,175 +508,22 @@ class TestVitamins(unittest.TestCase):
         self.assertEqual(self._vl(89), 2)
 
     def test_1ev_can_use_10_vitamins(self):
-        # ceil((100-1)/10) = ceil(9.9) = 10
         self.assertEqual(self._vl(1), 10)
 
     def test_50ev_can_use_5_vitamins(self):
-        # ceil((100-50)/10) = ceil(5.0) = 5
         self.assertEqual(self._vl(50), 5)
 
     def test_99ev_can_use_1_vitamin(self):
-        # ceil((100-99)/10) = ceil(0.1) = 1
         self.assertEqual(self._vl(99), 1)
 
     def test_91ev_can_use_1_vitamin(self):
-        # ceil((100-91)/10) = ceil(0.9) = 1
         self.assertEqual(self._vl(91), 1)
 
     def test_10ev_can_use_9_vitamins(self):
-        # ceil((100-10)/10) = ceil(9.0) = 9
         self.assertEqual(self._vl(10), 9)
 
     def test_9ev_can_use_10_vitamins(self):
-        # ceil((100-9)/10) = ceil(9.1) = 10
         self.assertEqual(self._vl(9), 10)
-
-
-# ---------------------------------------------------------------------------
-# メモ欄: DB保存テスト（party に memo フィールドが保存・復元される）
-# ---------------------------------------------------------------------------
-
-class TestMemo(unittest.TestCase):
-
-    def setUp(self):
-        fd, path = tempfile.mkstemp(suffix=".db")
-        os.close(fd)
-        self.db_path = Path(path)
-
-    def tearDown(self):
-        self.db_path.unlink(missing_ok=True)
-
-    def test_memo_saved_and_loaded(self):
-        data = {
-            "party": [{"name": "ゲンガー", "icon": "👻", "color": "#C97AE0", "memo": "おくびょう　めがねゲンガー"}],
-            "allEVs": {"ゲンガー": {"hp": 0, "atk": 0, "def": 0, "spa": 252, "spd": 4, "spe": 252}},
-            "selected": "ゲンガー",
-        }
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data(data)
-            result = server.load_data()
-        self.assertEqual(result["party"][0]["memo"], "おくびょう　めがねゲンガー")
-
-    def test_empty_memo_preserved(self):
-        data = {
-            "party": [{"name": "リザードン", "icon": "🔥", "color": "#FF6B35", "memo": ""}],
-            "allEVs": {"リザードン": {"hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}},
-            "selected": "リザードン",
-        }
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data(data)
-            result = server.load_data()
-        self.assertEqual(result["party"][0]["memo"], "")
-
-    def test_memo_updated(self):
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data({"party": [{"name": "A", "memo": "before"}], "allEVs": {}, "selected": "A"})
-            server.save_data({"party": [{"name": "A", "memo": "after"}],  "allEVs": {}, "selected": "A"})
-            result = server.load_data()
-        self.assertEqual(result["party"][0]["memo"], "after")
-
-
-# ---------------------------------------------------------------------------
-# パーティメンバー拡張フィールドのテスト（nature / dexId / allMoves）
-# ---------------------------------------------------------------------------
-
-class TestExtendedFields(unittest.TestCase):
-    """第3世代追加フィールド（性格・図鑑番号・技セット）の保存・復元テスト"""
-
-    def setUp(self):
-        fd, path = tempfile.mkstemp(suffix=".db")
-        os.close(fd)
-        self.db_path = Path(path)
-
-    def tearDown(self):
-        self.db_path.unlink(missing_ok=True)
-
-    def _full_data(self):
-        return {
-            "party": [
-                {
-                    "name":   "ゲンガー",
-                    "icon":   "👻",
-                    "color":  "#C97AE0",
-                    "memo":   "おくびょう　めがね",
-                    "nature": "おくびょう",
-                    "dexId":  93,
-                }
-            ],
-            "allEVs": {
-                "ゲンガー": {"hp": 0, "atk": 0, "def": 0, "spa": 252, "spd": 4, "spe": 252}
-            },
-            "allMoves": {
-                "ゲンガー": ["シャドーボール", "サイコキネシス", "でんじは", ""]
-            },
-            "selected": "ゲンガー",
-        }
-
-    def test_nature_field_preserved(self):
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data(self._full_data())
-            result = server.load_data()
-        self.assertEqual(result["party"][0]["nature"], "おくびょう")
-
-    def test_dex_id_field_preserved(self):
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data(self._full_data())
-            result = server.load_data()
-        self.assertEqual(result["party"][0]["dexId"], 93)
-
-    def test_all_moves_preserved(self):
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data(self._full_data())
-            result = server.load_data()
-        self.assertEqual(result["allMoves"]["ゲンガー"], ["シャドーボール", "サイコキネシス", "でんじは", ""])
-
-    def test_empty_move_slot_preserved(self):
-        """空文字列の技スロットがそのまま返ること"""
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data(self._full_data())
-            result = server.load_data()
-        self.assertEqual(result["allMoves"]["ゲンガー"][3], "")
-
-    def test_multiple_party_members(self):
-        data = {
-            "party": [
-                {"name": "ピカチュウ", "icon": "⚡", "color": "#F5D020", "memo": "", "nature": "ようき", "dexId": 24},
-                {"name": "リザードン", "icon": "🔥", "color": "#FF6B35", "memo": "", "nature": "ひかえめ", "dexId": 5},
-            ],
-            "allEVs": {
-                "ピカチュウ": {"hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 4, "spe": 252},
-                "リザードン": {"hp": 0, "atk": 0, "def": 0, "spa": 252, "spd": 4, "spe": 252},
-            },
-            "allMoves": {
-                "ピカチュウ":  ["10まんボルト", "", "", ""],
-                "リザードン": ["だいもんじ", "かえんほうしゃ", "", ""],
-            },
-            "selected": "ピカチュウ",
-        }
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data(data)
-            result = server.load_data()
-        self.assertEqual(len(result["party"]), 2)
-        self.assertEqual(result["party"][1]["nature"], "ひかえめ")
-        self.assertEqual(result["allMoves"]["リザードン"][0], "だいもんじ")
-
-    def test_update_moves_overwrites_correctly(self):
-        with patch.object(server, "DB_PATH", self.db_path):
-            server.init_db()
-            server.save_data(self._full_data())
-            updated = self._full_data()
-            updated["allMoves"]["ゲンガー"] = ["なみのり", "", "", ""]
-            server.save_data(updated)
-            result = server.load_data()
-        self.assertEqual(result["allMoves"]["ゲンガー"][0], "なみのり")
 
 
 if __name__ == "__main__":
