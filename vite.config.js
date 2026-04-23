@@ -23,7 +23,7 @@ const DUMMY_DATA = {
   archivedParty: [],
   checkedItems: {}, captureCount: 0, captureGoals: [],
   todoList: [], macho: false, gakushuu: false, gakushuuMon: null,
-  trainerBattleCounts: {}
+  trainerBattleCounts: {}, _dev: true
 };
 
 function apiMockPlugin() {

@@ -37,7 +37,7 @@ DUMMY_DATA = {
     "archivedParty": [],
     "checkedItems": {}, "captureCount": 0, "captureGoals": [],
     "todoList": [], "macho": False, "gakushuu": False, "gakushuuMon": None,
-    "trainerBattleCounts": {}
+    "trainerBattleCounts": {}, "_dev": True
 }
 
 
