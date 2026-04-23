@@ -88,10 +88,83 @@ ports:
   - "9000:8080"  # 例：9000番で公開
 ```
 
+## Cloudflare 本番デプロイ
+
+### 初回セットアップ（ダッシュボード + CLI）
+
+#### 1. D1 データベースを作成
+
+```bash
+npx wrangler d1 create ev-tracker
+```
+
+出力された `database_id` を `wrangler.toml` の `REPLACE_WITH_YOUR_D1_DATABASE_ID` に記入。
+
+#### 2. D1 にスキーマを適用
+
+```bash
+npx wrangler d1 execute ev-tracker --remote --file=schema.sql
+```
+
+#### 3. Cloudflare Pages プロジェクトを作成
+
+Cloudflare ダッシュボード → **Pages** → **Connect to Git** → このリポジトリを選択。
+
+| 設定項目 | 値 |
+|----------|---|
+| ビルドコマンド | `npm run build` |
+| 出力ディレクトリ | `dist` |
+
+#### 4. D1 バインディングを設定
+
+Cloudflare ダッシュボード → Pages プロジェクト → **Settings** → **Bindings** → **D1 databases** を追加。
+
+| 変数名 | D1 データベース |
+|--------|----------------|
+| `DB` | `ev-tracker` |
+
+#### 5. デプロイ
+
+```bash
+git push origin main
+```
+
+GitHub push で Cloudflare Pages が自動ビルド＆デプロイ。
+
+### ローカル Dev（変更なし）
+
+```bash
+python3 server.py  # APIサーバー（ポート8080）
+npm run dev        # Vite dev server（ポート5173）→ /api は自動プロキシ
+```
+
+または Docker Compose：
+
+```bash
+docker compose up -d
+```
+
+### データ移行（既存 SQLite → D1）
+
+```bash
+python3 -c "
+import sqlite3, json
+row = sqlite3.connect('data/ev_data.db').execute('SELECT data FROM ev_data WHERE id=1').fetchone()
+if row: print(row[0])
+" > /tmp/ev_data.json
+```
+
+`/tmp/ev_data.json` の内容を Cloudflare ダッシュボードの D1 クエリエディタから投入するか、Wrangler CLI で実行。
+
 ## ファイル構成
 
 ```
 .
+├── functions/
+│   └── api/
+│       └── data.js     # Cloudflare Pages Function（GET/POST /api/data）
+├── schema.sql          # D1 スキーマ定義
+├── wrangler.toml       # Cloudflare Workers/Pages 設定
 ├── index.html          # Vite エントリHTML（<div id="root">のみ）
 ├── src/
 │   └── main.jsx        # React マウントエントリポイント
