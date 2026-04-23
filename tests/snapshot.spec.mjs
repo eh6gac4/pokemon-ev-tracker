@@ -27,7 +27,7 @@ test('育成タブ 初期表示', async ({ page }) => {
 });
 
 const waitForChosa = async (page) => {
-  await page.locator('.panel-toggle', { hasText: 'EV稼ぎガイド' }).waitFor({ state: 'visible' });
+  await page.locator('.panel-toggle', { hasText: '個体値チェッカー' }).waitFor({ state: 'visible' });
 };
 
 test('調査タブ 初期表示', async ({ page }) => {
@@ -43,9 +43,9 @@ test('調査タブ 個体値チェッカー展開', async ({ page }) => {
   await expect(page).toHaveScreenshot('chosa-iv-checker.png');
 });
 
-test('調査タブ EV稼ぎガイド展開', async ({ page }) => {
-  await page.goto('/#chosa');
-  await waitForChosa(page);
+test('育成タブ EV稼ぎガイド展開', async ({ page }) => {
+  await page.goto('/#ikusei');
+  await page.waitForSelector('.step-btn');
   await openPanel(page, 'EV稼ぎガイド');
-  await expect(page).toHaveScreenshot('chosa-ev-guide.png');
+  await expect(page).toHaveScreenshot('ikusei-ev-guide.png');
 });

@@ -24,7 +24,7 @@ test('データタブボタンでタブが切り替わる', async ({ page }) => 
 
   await page.locator('.bottom-nav button', { hasText: 'データ' }).click();
   // chosa 固有パネルが visible になるまで待つ（他タブの非表示 .panel-toggle を避ける）
-  await page.locator('.panel-toggle', { hasText: 'EV稼ぎガイド' }).waitFor({ state: 'visible' });
+  await page.locator('.panel-toggle', { hasText: '個体値チェッカー' }).waitFor({ state: 'visible' });
 
   expect(page.url()).toContain('#chosa');
 });
@@ -46,8 +46,8 @@ test('ブラウザバックで前のタブに戻る', async ({ page }) => {
 
 test('URLハッシュ直接指定で対応タブが開く（調査タブ）', async ({ page }) => {
   await page.goto('/#chosa');
-  await page.locator('.panel-toggle', { hasText: 'EV稼ぎガイド' }).waitFor({ state: 'visible' });
+  await page.locator('.panel-toggle', { hasText: '個体値チェッカー' }).waitFor({ state: 'visible' });
 
   expect(page.url()).toContain('#chosa');
-  await expect(page.locator('.panel-toggle', { hasText: 'EV稼ぎガイド' })).toBeVisible();
+  await expect(page.locator('.panel-toggle', { hasText: '個体値チェッカー' })).toBeVisible();
 });
