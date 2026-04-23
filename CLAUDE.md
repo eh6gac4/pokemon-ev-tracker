@@ -99,12 +99,14 @@ GET https://pokeapi.co/api/v2/move/{英語スラッグ}
 
 新機能・修正の実装は必ず以下の順序で行う：
 
-1. **[[PLAN]] で計画作成** → `plan.md` に実装計画を記述
-2. **GitHub Issue を自動作成** → `eh6gac4/pokemon-ev-tracker` に issue を作成し、計画内容を記載
-3. **ユーザーの承認後に実装着手** → 「実装して」などの指示があるまでコードは書かない
-4. **実装完了後に Issue を自動クローズ** → コミットメッセージに `Closes #X` を含めてプッシュ時に自動クローズ
+1. **最新 main からブランチを切る** → `git checkout main && git pull && git checkout -b <branch-name>`
+2. **[[PLAN]] で計画作成** → `plan.md` に実装計画を記述
+3. **GitHub Issue を自動作成** → `eh6gac4/pokemon-ev-tracker` に issue を作成し、計画内容を記載
+4. **ユーザーの承認後に実装着手** → 「実装して」などの指示があるまでコードは書かない
+5. **実装完了後に Issue を自動クローズ** → コミットメッセージに `Closes #X` を含めてプッシュ時に自動クローズ
 
-Issue はユーザーに番号を共有してから実装を開始する。
+- main ブランチには直接コミットしない
+- Issue はユーザーに番号を共有してから実装を開始する
 
 ## よくある作業
 
