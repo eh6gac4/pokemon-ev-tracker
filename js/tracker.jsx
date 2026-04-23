@@ -39,6 +39,7 @@ export default function EVTracker() {
   const [allMoves,  setAllMoves] = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, ["","","",""]])));
   const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
   const [loaded,       setLoaded]       = useState(false);
+  const [isDev,        setIsDev]        = useState(false);
   const [macho,        setMacho]        = useState(false);
   const [gakushuu,     setGakushuu]     = useState(false);
   const [gakushuuMon,  setGakushuuMon]  = useState(null);
@@ -224,6 +225,7 @@ export default function EVTracker() {
           setActiveParty([...ap, null, null, null, null, null, null].slice(0, 6));
         }
         if (saved.archivedParty) setArchivedParty(saved.archivedParty);
+        if (saved._dev)                setIsDev(true);
         if (saved.macho != null)       setMacho(saved.macho);
         if (saved.gakushuu != null)    setGakushuu(saved.gakushuu);
         if (saved.gakushuuMon != null) setGakushuuMon(saved.gakushuuMon);
@@ -739,6 +741,10 @@ export default function EVTracker() {
           )}
         </div>
       </div>
+
+      {isDev && (
+        <div style={{ position: "fixed", bottom: "56px", left: "8px", fontSize: "9px", color: "#444", background: "#111", border: "1px solid #333", borderRadius: "3px", padding: "2px 5px", letterSpacing: "1px", fontFamily: "monospace", zIndex: 101 }}>DEV</div>
+      )}
 
       {/* Bottom nav（モバイルのみ） */}
       <nav className="bottom-nav">
