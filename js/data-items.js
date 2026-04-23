@@ -97,6 +97,15 @@ export const ITEM_DATA = [
     { id: "sc05", name: "いいつりざお",        type: "gift",   note: "セキチクシティ・南東の家の釣り人からもらう" },
     { id: "se05", name: "ふしぎなアメ",        type: "field",  note: "セキチクシティ・動物園の園長の家（かいりき必要）",           img: "https://appmedia.jp/wp-content/uploads/2026/03/143105_szgyi.webp" },
   ]},
+  { area: "ふたごじま", items: [
+    { id: "ft01", name: "げんきのかけら",      type: "field",  note: "ふたごじま B1F・アイテムボール" },
+    { id: "ft02", name: "みずのいし",          type: "field",  note: "ふたごじま B2F・アイテムボール" },
+    { id: "ft03", name: "おおきなしんじゅ",    type: "field",  note: "ふたごじま B2F・アイテムボール" },
+    { id: "ft04", name: "みずのいし",          type: "hidden", note: "ふたごじま B2F・ダウジングマシンで発見" },
+    { id: "ft05", name: "ハイパーボール",      type: "field",  note: "ふたごじま B4F・アイテムボール" },
+    { id: "ft06", name: "みずのいし",          type: "hidden", note: "ふたごじま B4F・ダウジングマシンで発見" },
+    { id: "ft07", name: "フリーザー",          type: "field",  note: "ふたごじま B4F（1匹のみ）" },
+  ]},
   { area: "グレンじま・グレンタウン・ポケモン屋敷", items: [
     { id: "gl02", name: "ひみつのカギ",        type: "field",  note: "ポケモン屋敷B1F・アイテムボール（グレンジム入場に必須）" },
     { id: "gr01", tmId: "TM38",               type: "gym",    note: "グレンジム・カツラを倒す" },
@@ -121,7 +130,6 @@ export const ITEM_DATA = [
     { id: "r23a", name: "サンダー",            type: "field",  note: "はつでんしょ B1F（1匹のみ）" },
   ]},
   { area: "ハナダの洞窟（クリア後）", items: [
-    { id: "ce01", name: "フリーザー",          type: "field",  note: "ふたごじま B4F（1匹のみ）" },
     { id: "ce02", name: "ミュウツー",          type: "field",  note: "ハナダの洞窟 最深部（1匹のみ）" },
   ]},
   { area: "島1（クリア後）", items: [
