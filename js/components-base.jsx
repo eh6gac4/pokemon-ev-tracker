@@ -66,7 +66,7 @@ export const StatRow = React.memo(function StatRow({ stat, val, color, macho, on
           ? <span className="badge-max">MAX</span>
           : vLeft > 0 && <span style={{ fontSize: "8px", color: "#aaa" }}>💊×{vLeft}</span>
         }
-        <div style={{ display: "flex", gap: "3px", marginLeft: "auto" }}>
+        <div style={{ display: "flex", gap: "3px", marginLeft: "auto", flexWrap: "wrap", justifyContent: "flex-end" }}>
           {steps.map(([d, label], i) => (
             <button
               key={d}
@@ -80,24 +80,20 @@ export const StatRow = React.memo(function StatRow({ stat, val, color, macho, on
               }}
             >{label}</button>
           ))}
+          {bigSteps.map(([d, label], i) => (
+            <button
+              key={d}
+              className="step-btn"
+              onClick={() => onChange(d)}
+              style={{
+                background: `${color}22`,
+                border: `1px solid ${color}44`,
+                color: color,
+                marginLeft: i === 0 ? "10px" : undefined,
+              }}
+            >{label}</button>
+          ))}
         </div>
-      </div>
-      <div style={{ display: "flex", gap: "4px", marginBottom: "6px" }}>
-        {bigSteps.map(([d, label]) => (
-          <button
-            key={d}
-            className="step-btn"
-            onClick={() => onChange(d)}
-            style={{
-              flex: 1,
-              background: `${color}22`,
-              border: `1px solid ${color}44`,
-              color: color,
-              fontSize: "12px",
-              padding: "4px 0",
-            }}
-          >{label}</button>
-        ))}
       </div>
       <div className="bar-bg" style={{ height: "4px" }}>
         <div className="bar-fill" style={{ height: "100%", width: `${(val / MAX_STAT) * 100}%`, background: isMaxed ? "#7fff7f" : color, borderRadius: "3px" }} />

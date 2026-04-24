@@ -475,7 +475,7 @@ export default function EVTracker() {
 
       <div className="app-layout">
         {/* ===== 育成カラム ===== */}
-        <div className={activeTab === "ikusei" ? "" : "col-hidden"}>
+        <div className={`col-ikusei${activeTab === "ikusei" ? "" : " col-hidden"}`}>
 
           {/* 現在のパーティ */}
           <PartySlots
@@ -500,7 +500,7 @@ export default function EVTracker() {
 
           {/* 育成リスト */}
           <div style={{ fontSize: "10px", color: "#444", letterSpacing: "1px", marginBottom: "6px" }}>育成リスト</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "7px", marginBottom: "16px" }}>
+          <div className="mon-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "7px", marginBottom: "16px" }}>
             {party.map(p => (
               <MonCard
                 key={p.name}
@@ -541,33 +541,35 @@ export default function EVTracker() {
             </div>
           </div>
 
-          {/* 強制ギプス */}
-          <button
-            onClick={() => setMacho(v => !v)}
-            style={{
-              width: "100%", cursor: "pointer", fontFamily: "inherit",
-              background: macho ? "#3a1a1a" : "#16213e",
-              border: `1px solid ${macho ? "#ff6b35aa" : "#2a2a4a"}`,
-              borderRadius: "7px", color: macho ? "#ff6b35" : "#555",
-              fontSize: "11px", padding: "7px", marginBottom: "6px", letterSpacing: "1px",
-            }}
-          >
-            {macho ? "🥊 強制ギプス装備中（EV×2）" : "🥊 強制ギプス　OFF"}
-          </button>
-
-          {/* がくしゅうそうち */}
-          <button
-            onClick={() => { setGakushuu(v => { if (v) setGakushuuMon(null); return !v; }); }}
-            style={{
-              width: "100%", cursor: "pointer", fontFamily: "inherit",
-              background: gakushuu ? "#0d2a1a" : "#16213e",
-              border: `1px solid ${gakushuu ? "#4dff91aa" : "#2a2a4a"}`,
-              borderRadius: "7px", color: gakushuu ? "#4dff91" : "#555",
-              fontSize: "11px", padding: "7px", marginBottom: gakushuu ? "4px" : "10px", letterSpacing: "1px",
-            }}
-          >
-            {gakushuu ? "📚 がくしゅうそうち　ON" : "📚 がくしゅうそうち　OFF"}
-          </button>
+          {/* 強制ギプス・がくしゅうそうち */}
+          <div className="toggle-row" style={{ marginBottom: gakushuu ? "4px" : "10px" }}>
+            <button
+              className="toggle-btn"
+              onClick={() => setMacho(v => !v)}
+              style={{
+                width: "100%", cursor: "pointer", fontFamily: "inherit",
+                background: macho ? "#3a1a1a" : "#16213e",
+                border: `1px solid ${macho ? "#ff6b35aa" : "#2a2a4a"}`,
+                borderRadius: "7px", color: macho ? "#ff6b35" : "#555",
+                fontSize: "11px", padding: "7px", letterSpacing: "1px",
+              }}
+            >
+              {macho ? "🥊 強制ギプス装備中（EV×2）" : "🥊 強制ギプス　OFF"}
+            </button>
+            <button
+              className="toggle-btn"
+              onClick={() => { setGakushuu(v => { if (v) setGakushuuMon(null); return !v; }); }}
+              style={{
+                width: "100%", cursor: "pointer", fontFamily: "inherit",
+                background: gakushuu ? "#0d2a1a" : "#16213e",
+                border: `1px solid ${gakushuu ? "#4dff91aa" : "#2a2a4a"}`,
+                borderRadius: "7px", color: gakushuu ? "#4dff91" : "#555",
+                fontSize: "11px", padding: "7px", letterSpacing: "1px",
+              }}
+            >
+              {gakushuu ? "📚 がくしゅうそうち　ON" : "📚 がくしゅうそうち　OFF"}
+            </button>
+          </div>
           {gakushuu && (() => {
             const partyMembers = activeParty.filter(n => n && n !== selected);
             return partyMembers.length > 0 ? (
@@ -722,7 +724,7 @@ export default function EVTracker() {
         </div>
 
         {/* ===== データカラム ===== */}
-        <div className={activeTab === "chosa" ? "" : "col-hidden"}>
+        <div className={`col-chosa${activeTab === "chosa" ? "" : " col-hidden"}`}>
           {visitedTabs.has("chosa") && (
             <React.Suspense fallback={<div style={{ textAlign: "center", padding: "24px", color: "#555" }}>読み込み中…</div>}>
               <ChosaTab
@@ -741,7 +743,7 @@ export default function EVTracker() {
         </div>
 
         {/* ===== 冒険カラム ===== */}
-        <div className={activeTab === "boken" ? "" : "col-hidden"}>
+        <div className={`col-boken${activeTab === "boken" ? "" : " col-hidden"}`}>
           {visitedTabs.has("boken") && (
             <React.Suspense fallback={<div style={{ textAlign: "center", padding: "24px", color: "#555" }}>読み込み中…</div>}>
               <BokenTab
