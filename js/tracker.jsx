@@ -438,6 +438,16 @@ export default function EVTracker() {
     setNewDexId(null);
   }, [newName, newIcon, newColor, newDexId, party]);
 
+  const addMonFromChosa = useCallback((name, dexId, ivsObj, natureName) => {
+    if (!name || party.find(p => p.name === name)) return;
+    setParty(prev => [...prev, { name, icon: "❓", color: "#888888", memo: "", nature: natureName || "", dexId }]);
+    setAllEVs(prev => ({ ...prev, [name]: initEVs() }));
+    setAllIVs(prev => ({ ...prev, [name]: ivsObj }));
+    setAllMoves(prev => ({ ...prev, [name]: ["","","",""] }));
+    setSelected(name);
+    navigateTab("ikusei");
+  }, [party, navigateTab]);
+
   const learnableMoves = useMemo(() => {
     const pd = mon.dexId != null ? POKEMON_DATA[mon.dexId] : null;
     return pd ? getLearnableMoves(pd[0]) : ALL_MOVES;
@@ -724,6 +734,7 @@ export default function EVTracker() {
                 macho={macho}
                 ivs={allIVs[selected] || initIVs()}
                 onSave={saveIVs}
+                onAddToParty={addMonFromChosa}
               />
             </React.Suspense>
           )}
