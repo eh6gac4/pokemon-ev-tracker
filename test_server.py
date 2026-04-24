@@ -68,6 +68,12 @@ class TestHTTPServer(unittest.TestCase):
         self.assertIn("allEVs", body)
         self.assertIsInstance(body["party"], list)
 
+    def test_get_api_data_has_checked_items_key(self):
+        with urllib.request.urlopen(self.url("/api/data")) as res:
+            body = json.loads(res.read())
+        self.assertIn("checkedItems", body)
+        self.assertIsInstance(body["checkedItems"], dict)
+
     # --- POST /api/data ---
 
     def test_post_valid_json_returns_ok(self):
@@ -80,6 +86,24 @@ class TestHTTPServer(unittest.TestCase):
         )
         with urllib.request.urlopen(req) as res:
             self.assertEqual(res.status, 200)
+            body = json.loads(res.read())
+        self.assertTrue(body.get("ok"))
+
+    def test_post_accepts_full_data_structure(self):
+        """CLAUDE.md に定義された全フィールドを含む JSON を POST できること"""
+        data = {
+            "party": [], "allEVs": {}, "allIVs": {}, "allMoves": {},
+            "selected": None, "activeParty": [None] * 6,
+            "checkedItems": {"ft01": True, "ft07": True},
+            "captureCount": 0, "captureGoals": [], "todoList": [],
+        }
+        req = urllib.request.Request(
+            self.url("/api/data"),
+            data=json.dumps(data).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req) as res:
             body = json.loads(res.read())
         self.assertTrue(body.get("ok"))
 
@@ -175,6 +199,29 @@ class TestHTTPServer(unittest.TestCase):
     def test_get_index_html_explicit(self):
         with urllib.request.urlopen(self.url("/index.html")) as res:
             self.assertEqual(res.status, 200)
+
+    def _sw_available(self):
+        return (server.STATIC_DIR / "sw.js").exists()
+
+    def test_get_sw_js_returns_200(self):
+        if not self._sw_available():
+            self.skipTest("dist/sw.js が見つかりません（Vite ビルド前）")
+        with urllib.request.urlopen(self.url("/sw.js")) as res:
+            self.assertEqual(res.status, 200)
+
+    def test_get_sw_js_content_type(self):
+        if not self._sw_available():
+            self.skipTest("dist/sw.js が見つかりません（Vite ビルド前）")
+        with urllib.request.urlopen(self.url("/sw.js")) as res:
+            self.assertIn("javascript", res.headers.get("Content-Type", ""))
+
+    def test_get_sw_js_cache_control_not_immutable(self):
+        """Service Worker は更新可能でなければならないため immutable キャッシュを設定しない"""
+        if not self._sw_available():
+            self.skipTest("dist/sw.js が見つかりません（Vite ビルド前）")
+        with urllib.request.urlopen(self.url("/sw.js")) as res:
+            cc = res.headers.get("Cache-Control", "")
+        self.assertNotIn("immutable", cc)
 
     def _asset_path(self, suffix):
         """dist/assets/ 内の指定拡張子のファイルパスを返す（Vite ビルド後）"""
