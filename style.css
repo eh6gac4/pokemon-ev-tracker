@@ -136,4 +136,8 @@ textarea.input-dark { resize: none; overflow: hidden; }
   .col-boken  { order: 1; }
   .col-ikusei { order: 2; }
   .col-chosa  { order: 3; }
+  .mon-grid { grid-template-columns: repeat(4, 1fr) !important; }
+  .toggle-row { flex-direction: row; }
+  .toggle-btn { flex: 1; width: auto !important; }
 }
+.toggle-row { display: flex; flex-direction: column; gap: 6px; }
