@@ -5,7 +5,7 @@ import { HOLD_ITEMS, LOCATION_DATA } from './data-items.js';
 import { Panel, PokemonSearch, MoveRow, VerBadge, tmItemName } from './components-base.jsx';
 import { natLabel } from './components-ikusei.jsx';
 
-export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave }) {
+export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave, party, onAddToParty }) {
   const [open,   setOpen]   = useState(false);
   const [mon,    setMon]    = useState(0);
   const [lvStr,  setLvStr]  = useState("50");
@@ -137,6 +137,34 @@ export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave }) {
             }}
           >✅ 全ステータスの個体値を登録</button>
         ) : null;
+      })()}
+      {onAddToParty && (() => {
+        const name = POKEMON_DATA[mon][1];
+        const alreadyIn = party && party.find(p => p.name === name);
+        if (alreadyIn) return (
+          <div style={{ fontSize: "10px", color: "#555", textAlign: "center", marginTop: "6px" }}>
+            ✅ {name} は育成パーティに登録済み
+          </div>
+        );
+        const ivsToRegister = Object.fromEntries(
+          STATS.map(s => {
+            const r = calcIV(s.key);
+            if (r && r.length === 1) return [s.key, r[0]];
+            if (r && r.length > 1)  return [s.key, Math.round((r[0] + r[r.length - 1]) / 2)];
+            return [s.key, 15];
+          })
+        );
+        return (
+          <button
+            onClick={() => onAddToParty(name, mon, ivsToRegister, NATURES[nat].name)}
+            style={{
+              width: "100%", marginTop: "6px", background: "#1a1a3a",
+              border: `1px solid ${color}55`, borderRadius: "6px",
+              color: color, fontSize: "11px", padding: "7px", cursor: "pointer",
+              fontFamily: "inherit", letterSpacing: "1px",
+            }}
+          >＋ 育成パーティに追加</button>
+        );
       })()}
       <div style={{ fontSize: "8px", color: "#333", marginTop: "6px" }}>「？」は実数値・努力値・レベルを確認　各値クリックで個別登録</div>
     </Panel>
@@ -859,14 +887,14 @@ export const AbilitySearch = React.memo(function AbilitySearch({ color }) {
 });
 
 
-export default function ChosaTab({ color, party, allIVs, dexTarget, onDexTargetConsumed, macho, ivs, onSave }) {
+export default function ChosaTab({ color, party, allIVs, dexTarget, onDexTargetConsumed, macho, ivs, onSave, onAddToParty }) {
   return (
     <>
       <IVCompare party={party} allIVs={allIVs} color={color} />
       <PokedexPanel color={color} dexTarget={dexTarget} onDexTargetConsumed={onDexTargetConsumed} />
       <TypeChart color={color} />
       <LocationGuide color={color} />
-      <IVChecker color={color} ivs={ivs} onSave={onSave} />
+      <IVChecker color={color} ivs={ivs} onSave={onSave} party={party} onAddToParty={onAddToParty} />
       <AbilitySearch color={color} />
       <EVSearch macho={macho} color={color} />
       <MoveTutorPanel color={color} />
