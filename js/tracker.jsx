@@ -475,7 +475,7 @@ export default function EVTracker() {
 
       <div className="app-layout">
         {/* ===== 育成カラム ===== */}
-        <div className={activeTab === "ikusei" ? "" : "col-hidden"}>
+        <div className={`col-ikusei${activeTab === "ikusei" ? "" : " col-hidden"}`}>
 
           {/* 現在のパーティ */}
           <PartySlots
@@ -722,7 +722,7 @@ export default function EVTracker() {
         </div>
 
         {/* ===== データカラム ===== */}
-        <div className={activeTab === "chosa" ? "" : "col-hidden"}>
+        <div className={`col-chosa${activeTab === "chosa" ? "" : " col-hidden"}`}>
           {visitedTabs.has("chosa") && (
             <React.Suspense fallback={<div style={{ textAlign: "center", padding: "24px", color: "#555" }}>読み込み中…</div>}>
               <ChosaTab
@@ -741,7 +741,7 @@ export default function EVTracker() {
         </div>
 
         {/* ===== 冒険カラム ===== */}
-        <div className={activeTab === "boken" ? "" : "col-hidden"}>
+        <div className={`col-boken${activeTab === "boken" ? "" : " col-hidden"}`}>
           {visitedTabs.has("boken") && (
             <React.Suspense fallback={<div style={{ textAlign: "center", padding: "24px", color: "#555" }}>読み込み中…</div>}>
               <BokenTab

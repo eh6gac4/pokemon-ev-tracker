@@ -128,3 +128,12 @@ textarea.input-dark { resize: none; overflow: hidden; }
   .col-hidden { display: block !important; }
   .bottom-nav { display: none !important; }
 }
+@media (min-width: 1024px) {
+  .app-layout {
+    grid-template-columns: 300px 1fr 320px;
+    max-width: 1400px;
+  }
+  .col-boken  { order: 1; }
+  .col-ikusei { order: 2; }
+  .col-chosa  { order: 3; }
+}
