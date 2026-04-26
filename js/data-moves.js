@@ -500,7 +500,7 @@ export const TP_NO_CTR  = ["のしかかり", "メガトンパンチ", "メガ�
 export const TP_CHAN    = ["のしかかり", "カウンター", "メガトンパンチ", "メガトンキック", "ゆめくい", "タマゴうみ"];
 
 // FR/LG 教え技（一回限り）（Bulbapedia Gen III準拠）
-export const TUTOR_MOVES = [
+export let TUTOR_MOVES = [
 null,  // 0-indexed placeholder
   TP_FULL,  // フシギダネ
   TP_FULL,  // フシギソウ
@@ -1105,6 +1105,7 @@ export async function loadMovesFromAPI() {
       const lvMoves = [];
       const machineMoves = [];
       const eggMoves = [];
+      const tutorMoves = [];
 
       for (const entry of r.value.moves) {
         for (const vgd of entry.version_group_details) {
@@ -1115,10 +1116,11 @@ export async function loadMovesFromAPI() {
           if (method === 'level-up') lvMoves.push({ level: vgd.level_learned_at, slug });
           else if (method === 'machine') machineMoves.push(slug);
           else if (method === 'egg') eggMoves.push(slug);
+          else if (method === 'tutor') tutorMoves.push(slug);
         }
       }
       lvMoves.sort((a, b) => a.level - b.level);
-      pokeMovesMap[id] = { lvMoves, machineMoves, eggMoves };
+      pokeMovesMap[id] = { lvMoves, machineMoves, eggMoves, tutorMoves };
     }
 
     // Fetch all unique move data
@@ -1163,9 +1165,10 @@ export async function loadMovesFromAPI() {
     );
 
     // Build new arrays (1-indexed: index 0 = null placeholder)
-    const newLearnset = [null];
-    const newTmMoves = [null];
-    const newEggMoves = [null];
+    const newLearnset   = [null];
+    const newTmMoves    = [null];
+    const newEggMoves   = [null];
+    const newTutorMoves = [null];
 
     for (let i = 0; i < 151; i++) {
       const id = ids[i];
@@ -1174,6 +1177,7 @@ export async function loadMovesFromAPI() {
         newLearnset.push(LEARNSET[id] || []);
         newTmMoves.push(TM_MOVES[id] || []);
         newEggMoves.push(EGG_MOVES[id] || []);
+        newTutorMoves.push(TUTOR_MOVES[id] || []);
         continue;
       }
       newLearnset.push(
@@ -1188,20 +1192,24 @@ export async function loadMovesFromAPI() {
       newEggMoves.push(
         md.eggMoves.map(slug => slugToJa[slug]).filter(Boolean)
       );
+      newTutorMoves.push(
+        md.tutorMoves.map(slug => slugToJa[slug]).filter(Boolean)
+      );
     }
 
     const newAllMoves = [...new Set([
       ...newLearnset.filter(Boolean).flat().map(([, n]) => n),
       ...newTmMoves.filter(Boolean).flat().map(c => TM_LIST[c]).filter(Boolean),
       ...newEggMoves.filter(Boolean).flat(),
-      ...TUTOR_MOVES.filter(Boolean).flat(),
+      ...newTutorMoves.filter(Boolean).flat(),
     ])].sort((a, b) => a.localeCompare(b, 'ja'));
 
-    MOVE_DATA = newMoveData;
-    LEARNSET  = newLearnset;
-    TM_MOVES  = newTmMoves;
-    EGG_MOVES = newEggMoves;
-    ALL_MOVES = newAllMoves;
+    MOVE_DATA    = newMoveData;
+    LEARNSET     = newLearnset;
+    TM_MOVES     = newTmMoves;
+    EGG_MOVES    = newEggMoves;
+    TUTOR_MOVES  = newTutorMoves;
+    ALL_MOVES    = newAllMoves;
 
     persistCache();
   } catch (e) {
