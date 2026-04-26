@@ -4,6 +4,7 @@ import {
 } from './data-pokemon.js';
 import { getLearnableMoves, getLearnset, ALL_MOVES, loadMovesFromAPI } from './data-moves.js';
 import { loadPokemonFromAPI } from './data-pokemon.js';
+import { loadItemsFromAPI } from './data-items.js';
 import { AutoTextarea, StatRow, Panel } from './components-base.jsx';
 import { AddMonModal, NaturePicker, ItemPicker, MovePicker, PartySlots, PartyPickerModal, IVPanel, EVGuide } from './components-ikusei.jsx';
 
@@ -239,7 +240,7 @@ export default function EVTracker() {
       // ② PokeAPI からポケモン・わざデータをロード（並行）
       try {
         setLoadMsg('PokeAPIからデータ取得中…');
-        await Promise.all([loadPokemonFromAPI(), loadMovesFromAPI()]);
+        await Promise.all([loadPokemonFromAPI(), loadMovesFromAPI(), loadItemsFromAPI()]);
       } catch (e) {
         console.warn('PokeAPI load failed, using static data:', e);
       }
