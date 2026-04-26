@@ -57,28 +57,28 @@ export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave, par
         <PokemonSearch value={mon} onSelect={setMon} color={color} />
       </div>
 
-      <div style={{ display: "flex", gap: "6px", marginBottom: "10px" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-          <div style={{ fontSize: "9px", color: "#555" }}>レベル</div>
+      <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div style={{ fontSize: "8px", color: "#555" }}>レベル</div>
           <input
             type="number" min="1" max="100" value={lvStr}
             onChange={e => setLvStr(e.target.value)}
             onBlur={() => setLvStr(String(lv))}
             className="input-dark"
-            style={{ width: "54px", fontSize: "13px", padding: "5px 6px", textAlign: "center" }}
+            style={{ width: "56px", fontSize: "12px", padding: "4px 8px", textAlign: "center" }}
           />
         </div>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "3px" }}>
-          <div style={{ fontSize: "9px", color: "#555" }}>性格</div>
-          <select value={nat} onChange={e => setNat(Number(e.target.value))} className="input-dark" style={{ width: "100%", fontSize: "11px", padding: "5px 6px" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div style={{ fontSize: "8px", color: "#555" }}>性格</div>
+          <select value={nat} onChange={e => setNat(Number(e.target.value))} className="input-dark" style={{ width: "100%", fontSize: "12px", padding: "4px 8px" }}>
             {NATURES.map((n, i) => <option key={i} value={i}>{natLabel(n)}</option>)}
           </select>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "62px 52px 1fr 44px", gap: "3px 6px", alignItems: "center", marginBottom: "4px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "62px 52px 1fr 44px", gap: "4px 8px", alignItems: "center", marginBottom: "4px" }}>
         {["ステータス","努力値","実数値","個体値"].map((h, i) => (
-          <div key={h} style={{ fontSize: "9px", color: "#444", textAlign: i > 0 ? "center" : undefined }}>{h}</div>
+          <div key={h} style={{ fontSize: "8px", color: "#444", textAlign: i > 0 ? "center" : undefined }}>{h}</div>
         ))}
       </div>
       {STATS.map(stat => {
@@ -87,22 +87,22 @@ export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave, par
         const calcResult = calcIV(stat.key);
         const isSingle = calcResult && calcResult.length === 1;
         return (
-          <div key={stat.key} style={{ display: "grid", gridTemplateColumns: "62px 52px 1fr 44px", gap: "3px 6px", alignItems: "center", marginBottom: "4px" }}>
-            <div style={{ fontSize: "11px", color: isUp ? "#f5d020" : isDn ? "#ff6b6b" : "#888" }}>
+          <div key={stat.key} style={{ display: "grid", gridTemplateColumns: "62px 52px 1fr 44px", gap: "4px 8px", alignItems: "center", marginBottom: "4px" }}>
+            <div style={{ fontSize: "12px", color: isUp ? "#f5d020" : isDn ? "#ff6b6b" : "#888" }}>
               {stat.jp}{isUp ? "↑" : isDn ? "↓" : ""}
             </div>
             <input
               type="number" min="0" max="255" value={ev[stat.key]}
               onChange={e => setEV(prev => ({ ...prev, [stat.key]: Math.max(0, Math.min(255, parseInt(e.target.value) || 0)) }))}
               className="input-dark"
-              style={{ fontSize: "11px", padding: "4px 5px", textAlign: "center", width: "100%", color: "#aaa" }}
+              style={{ fontSize: "12px", padding: "4px", textAlign: "center", width: "100%", color: "#aaa" }}
             />
             <input
               type="number" min="1" value={actual[stat.key]}
               onChange={e => setActual(prev => ({ ...prev, [stat.key]: e.target.value }))}
               placeholder="実数値"
               className="input-dark"
-              style={{ fontSize: "11px", padding: "4px 5px", textAlign: "center", width: "100%" }}
+              style={{ fontSize: "12px", padding: "4px", textAlign: "center", width: "100%" }}
             />
             <div
               title={isSingle && onSave ? "クリックで登録" : undefined}
@@ -111,7 +111,7 @@ export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave, par
                 onSave({ ...(ivs || {}), [stat.key]: calcResult[0] });
               }}
               style={{
-                fontSize: "13px", fontWeight: "bold", color: ivColor(stat.key), textAlign: "center",
+                fontSize: "12px", fontWeight: "bold", color: ivColor(stat.key), textAlign: "center",
                 cursor: isSingle && onSave ? "pointer" : "default",
                 background: isSingle && onSave ? "#ffffff11" : "transparent",
                 borderRadius: "4px", padding: "2px 0",
@@ -131,8 +131,8 @@ export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave, par
               onSave(newIVs);
             }}
             style={{
-              width: "100%", marginTop: "6px", background: "#1a3a1a", border: "1px solid #7fff7f55",
-              borderRadius: "6px", color: "#7fff7f", fontSize: "11px", padding: "7px", cursor: "pointer",
+              width: "100%", marginTop: "8px", background: "#1a3a1a", border: "1px solid #7fff7f55",
+              borderRadius: "8px", color: "#7fff7f", fontSize: "12px", padding: "8px", cursor: "pointer",
               fontFamily: "inherit", letterSpacing: "1px",
             }}
           >✅ 全ステータスの個体値を登録</button>
@@ -142,7 +142,7 @@ export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave, par
         const name = POKEMON_DATA[mon][1];
         const alreadyIn = party && party.find(p => p.name === name);
         if (alreadyIn) return (
-          <div style={{ fontSize: "10px", color: "#555", textAlign: "center", marginTop: "6px" }}>
+          <div style={{ fontSize: "8px", color: "#555", textAlign: "center", marginTop: "8px" }}>
             ✅ {name} は育成パーティに登録済み
           </div>
         );
@@ -158,15 +158,15 @@ export const IVChecker = React.memo(function IVChecker({ color, ivs, onSave, par
           <button
             onClick={() => onAddToParty(name, mon, ivsToRegister, NATURES[nat].name)}
             style={{
-              width: "100%", marginTop: "6px", background: "#1a1a3a",
-              border: `1px solid ${color}55`, borderRadius: "6px",
-              color: color, fontSize: "11px", padding: "7px", cursor: "pointer",
+              width: "100%", marginTop: "8px", background: "#1a1a3a",
+              border: `1px solid ${color}55`, borderRadius: "8px",
+              color: color, fontSize: "12px", padding: "8px", cursor: "pointer",
               fontFamily: "inherit", letterSpacing: "1px",
             }}
           >＋ 育成パーティに追加</button>
         );
       })()}
-      <div style={{ fontSize: "8px", color: "#333", marginTop: "6px" }}>「？」は実数値・努力値・レベルを確認　各値クリックで個別登録</div>
+      <div style={{ fontSize: "8px", color: "#333", marginTop: "8px" }}>「？」は実数値・努力値・レベルを確認　各値クリックで個別登録</div>
     </Panel>
   );
 });
@@ -189,26 +189,26 @@ export const IVCompare = React.memo(function IVCompare({ party, allIVs, color })
   return (
     <Panel title="🧬 個体値比較" open={open} onToggle={() => setOpen(v => !v)} color={color}>
       {!hasAny && (
-        <div style={{ fontSize: "11px", color: "#444", textAlign: "center", padding: "10px 0" }}>
+        <div style={{ fontSize: "12px", color: "#444", textAlign: "center", padding: "8px 0" }}>
           育成タブで個体値を登録するとここに表示されます
         </div>
       )}
       {hasAny && (
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
             <thead>
               <tr>
-                <th style={{ fontSize: "9px", color: "#444", padding: "4px 6px 2px 0", textAlign: "left" }} />
+                <th style={{ fontSize: "8px", color: "#444", padding: "4px 8px 2px 0", textAlign: "left" }} />
                 {party.map(p => (
-                  <th key={p.name} style={{ fontSize: "14px", color: p.color, padding: "4px 6px 2px", textAlign: "center" }}>
+                  <th key={p.name} style={{ fontSize: "16px", color: p.color, padding: "4px 8px 2px", textAlign: "center" }}>
                     {p.icon}
                   </th>
                 ))}
               </tr>
               <tr>
-                <th style={{ padding: "0 6px 6px 0" }} />
+                <th style={{ padding: "0 8px 8px 0" }} />
                 {party.map(p => (
-                  <th key={p.name} style={{ fontSize: "8px", color: "#555", padding: "0 4px 6px", textAlign: "center" }}>
+                  <th key={p.name} style={{ fontSize: "8px", color: "#555", padding: "0 4px 8px", textAlign: "center" }}>
                     {p.name.length > 5 ? p.name.slice(0, 4) + "…" : p.name}
                   </th>
                 ))}
@@ -217,7 +217,7 @@ export const IVCompare = React.memo(function IVCompare({ party, allIVs, color })
             <tbody>
               {STATS.map(stat => (
                 <tr key={stat.key} style={{ borderTop: "1px solid #1a1a2e" }}>
-                  <td style={{ fontSize: "11px", color: "#666", padding: "4px 10px 4px 0", whiteSpace: "nowrap" }}>{stat.jp}</td>
+                  <td style={{ fontSize: "12px", color: "#666", padding: "4px 8px 4px 0", whiteSpace: "nowrap" }}>{stat.jp}</td>
                   {party.map(p => {
                     const val = (allIVs[p.name] || {})[stat.key];
                     return (
@@ -253,9 +253,9 @@ export const EVSearch = React.memo(function EVSearch({ macho, color }) {
   return (
     <Panel title="🔍 もらえるEVを調べる" open={open} onToggle={() => setOpen(v => !v)} color={color}>
       <div style={{ display: "flex", gap: "4px", marginBottom: "8px", flexWrap: "wrap" }}>
-        <button onClick={() => setFilter(null)} style={{ background: filter === null ? "#2a2a4a" : "transparent", border: "1px solid #3a3a5a", borderRadius: "4px", color: filter === null ? "#e8e8e8" : "#555", fontSize: "9px", padding: "3px 7px", cursor: "pointer", fontFamily: "inherit" }}>すべて</button>
+        <button onClick={() => setFilter(null)} style={{ background: filter === null ? "#2a2a4a" : "transparent", border: "1px solid #3a3a5a", borderRadius: "4px", color: filter === null ? "#e8e8e8" : "#555", fontSize: "8px", padding: "4px 8px", cursor: "pointer", fontFamily: "inherit" }}>すべて</button>
         {STAT_KEYS.map(k => (
-          <button key={k} onClick={() => setFilter(filter === k ? null : k)} style={{ background: filter === k ? STAT_COL[k]+"44" : "transparent", border: `1px solid ${filter === k ? STAT_COL[k] : "#3a3a5a"}`, borderRadius: "4px", color: filter === k ? STAT_COL[k] : "#555", fontSize: "9px", padding: "3px 7px", cursor: "pointer", fontFamily: "inherit" }}>
+          <button key={k} onClick={() => setFilter(filter === k ? null : k)} style={{ background: filter === k ? STAT_COL[k]+"44" : "transparent", border: `1px solid ${filter === k ? STAT_COL[k] : "#3a3a5a"}`, borderRadius: "4px", color: filter === k ? STAT_COL[k] : "#555", fontSize: "8px", padding: "4px 8px", cursor: "pointer", fontFamily: "inherit" }}>
             {STAT_JP[k]}
           </button>
         ))}
@@ -269,17 +269,17 @@ export const EVSearch = React.memo(function EVSearch({ macho, color }) {
       />
 
       <div style={{ maxHeight: "260px", overflowY: "auto" }}>
-        {results.length === 0 && <div style={{ color: "#444", fontSize: "11px", textAlign: "center", padding: "12px 0" }}>該当なし</div>}
+        {results.length === 0 && <div style={{ color: "#444", fontSize: "12px", textAlign: "center", padding: "12px 0" }}>該当なし</div>}
         {results.map(p => {
           const y     = EV_YIELD[p[0] - 1];
           const parts = STAT_KEYS.map((k, ki) => y[ki] > 0 ? { key: k, val: y[ki] } : null).filter(Boolean);
           return (
-            <div key={p[0]} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "5px 2px", borderBottom: "1px solid #1a1a2e" }}>
-              <span style={{ fontSize: "9px", color: "#444", minWidth: "24px" }}>{String(p[0]).padStart(3,"0")}</span>
-              <span style={{ fontSize: "11px", color: "#ccc", minWidth: "80px" }}>{p[1]}</span>
-              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+            <div key={p[0]} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 2px", borderBottom: "1px solid #1a1a2e" }}>
+              <span style={{ fontSize: "8px", color: "#444", minWidth: "24px" }}>{String(p[0]).padStart(3,"0")}</span>
+              <span style={{ fontSize: "12px", color: "#ccc", minWidth: "80px" }}>{p[1]}</span>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 {parts.map(({ key, val }) => (
-                  <span key={key} style={{ fontSize: "10px", background: STAT_COL[key]+"22", color: STAT_COL[key], border: `1px solid ${STAT_COL[key]}44`, borderRadius: "3px", padding: "1px 5px" }}>
+                  <span key={key} style={{ fontSize: "8px", background: STAT_COL[key]+"22", color: STAT_COL[key], border: `1px solid ${STAT_COL[key]}44`, borderRadius: "4px", padding: "1px 4px" }}>
                     {STAT_JP[key]} +{macho ? val * 2 : val}{macho && <span style={{ fontSize: "8px", opacity: 0.7 }}>（×2）</span>}
                   </span>
                 ))}
@@ -288,7 +288,7 @@ export const EVSearch = React.memo(function EVSearch({ macho, color }) {
           );
         })}
       </div>
-      {macho && <div style={{ fontSize: "8px", color: "#ff6b35", marginTop: "6px" }}>🥊 強制ギプス装備中：EV×2表示</div>}
+      {macho && <div style={{ fontSize: "8px", color: "#ff6b35", marginTop: "8px" }}>🥊 強制ギプス装備中：EV×2表示</div>}
     </Panel>
   );
 });
@@ -326,22 +326,22 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
       </div>
 
       {/* 種族値 */}
-      <div style={{ marginBottom: "14px" }}>
-        <div style={{ fontSize: "10px", color: "#555", marginBottom: "5px", letterSpacing: "1px" }}>種族値</div>
+      <div style={{ marginBottom: "16px" }}>
+        <div style={{ fontSize: "8px", color: "#555", marginBottom: "4px", letterSpacing: "1px" }}>種族値</div>
         {STATS.map(stat => {
           const val = p[PD[stat.key]];
           return (
-            <div key={stat.key} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-              <span style={{ fontSize: "10px", color: "#666", minWidth: "54px" }}>{stat.jp}</span>
-              <div style={{ flex: 1, background: "#0d0d1a", borderRadius: "3px", height: "6px", overflow: "hidden" }}>
-                <div style={{ width: `${val/255*100}%`, height: "100%", background: STAT_COL[stat.key], borderRadius: "3px" }} />
+            <div key={stat.key} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+              <span style={{ fontSize: "8px", color: "#666", minWidth: "56px" }}>{stat.jp}</span>
+              <div style={{ flex: 1, background: "#0d0d1a", borderRadius: "4px", height: "8px", overflow: "hidden" }}>
+                <div style={{ width: `${val/255*100}%`, height: "100%", background: STAT_COL[stat.key], borderRadius: "4px" }} />
               </div>
-              <span style={{ fontSize: "11px", fontWeight: "bold", minWidth: "28px", textAlign: "right",
+              <span style={{ fontSize: "12px", fontWeight: "bold", minWidth: "28px", textAlign: "right",
                 color: val >= 120 ? "#7fff7f" : val >= 80 ? "#ccc" : "#555" }}>{val}</span>
             </div>
           );
         })}
-        <div style={{ textAlign: "right", fontSize: "9px", color: "#444", marginTop: "2px" }}>合計 {total}</div>
+        <div style={{ textAlign: "right", fontSize: "8px", color: "#444", marginTop: "4px" }}>合計 {total}</div>
       </div>
 
       {/* 進化 */}
@@ -349,20 +349,20 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
         const paths = getEvoPaths(p[0]);
         const hasEvo = EVOLUTION_DATA[p[0]] !== undefined;
         return (
-          <div style={{ marginBottom: "14px" }}>
-            <div style={{ fontSize: "10px", color: "#555", marginBottom: "5px", letterSpacing: "1px" }}>進化</div>
+          <div style={{ marginBottom: "16px" }}>
+            <div style={{ fontSize: "8px", color: "#555", marginBottom: "4px", letterSpacing: "1px" }}>進化</div>
             {!hasEvo
-              ? <div style={{ fontSize: "10px", color: "#333" }}>進化なし</div>
+              ? <div style={{ fontSize: "8px", color: "#333" }}>進化なし</div>
               : <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                   {paths.map((path, pi) => (
                     <div key={pi} style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "2px" }}>
                       {path.map((step, si) =>
                         step.type === "cond"
-                          ? <span key={si} style={{ fontSize: "9px", color: "#444", padding: "0 1px" }}>→ {step.cond} →</span>
+                          ? <span key={si} style={{ fontSize: "8px", color: "#444", padding: "0 1px" }}>→ {step.cond} →</span>
                           : <span key={si}
                               onClick={() => step.id !== p[0] && setMon(step.id - 1)}
                               style={{
-                                fontSize: "11px", padding: "1px 5px", borderRadius: "4px",
+                                fontSize: "12px", padding: "1px 4px", borderRadius: "4px",
                                 background: step.id === p[0] ? "#ffffff22" : "transparent",
                                 color: step.id === p[0] ? "#fff" : "#666",
                                 border: step.id === p[0] ? "1px solid #ffffff33" : "1px solid transparent",
@@ -387,17 +387,17 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
             .map(pk => ({ locName: loc.name, locVer: loc.ver, pkVer: pk.ver || "", rate: pk.rate }))
         );
         return (
-          <div style={{ marginBottom: "14px" }}>
-            <div style={{ fontSize: "10px", color: "#555", marginBottom: "5px", letterSpacing: "1px" }}>出現場所（FR/LG）</div>
+          <div style={{ marginBottom: "16px" }}>
+            <div style={{ fontSize: "8px", color: "#555", marginBottom: "4px", letterSpacing: "1px" }}>出現場所（FR/LG）</div>
             {locations.length === 0
-              ? <div style={{ fontSize: "10px", color: "#333" }}>出現しない（FR/LG）</div>
+              ? <div style={{ fontSize: "8px", color: "#333" }}>出現しない（FR/LG）</div>
               : locations.map((loc, i) => {
                   const ver = loc.pkVer || loc.locVer;
                   return (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "2px 0", borderBottom: "1px solid #14142a" }}>
-                      <div style={{ fontSize: "11px", color: "#bbb", flex: 1 }}>{loc.locName}</div>
-                      {ver && <div style={{ fontSize: "8px", color: "#fff", background: ver === "FR" ? "#883030cc" : "#303088cc", borderRadius: "3px", padding: "1px 4px", flexShrink: 0 }}>{ver}</div>}
-                      <div style={{ fontSize: "9px", color: "#666", flexShrink: 0 }}>{loc.rate}</div>
+                      <div style={{ fontSize: "12px", color: "#bbb", flex: 1 }}>{loc.locName}</div>
+                      {ver && <div style={{ fontSize: "8px", color: "#fff", background: ver === "FR" ? "#883030cc" : "#303088cc", borderRadius: "4px", padding: "1px 4px", flexShrink: 0 }}>{ver}</div>}
+                      <div style={{ fontSize: "8px", color: "#666", flexShrink: 0 }}>{loc.rate}</div>
                     </div>
                   );
                 })
@@ -411,7 +411,7 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
         <div style={{ display: "flex", gap: "4px", marginBottom: "8px" }}>
           {MOVE_TABS.map(t => (
             <button key={t.key} onClick={() => setMoveTab(t.key)}
-              style={{ flex: 1, fontSize: "10px", padding: "4px 0", borderRadius: "5px", cursor: "pointer", fontFamily: "inherit",
+              style={{ flex: 1, fontSize: "8px", padding: "4px 0", borderRadius: "4px", cursor: "pointer", fontFamily: "inherit",
                 background: moveTab === t.key ? color + "33" : "transparent",
                 border: `1px solid ${moveTab === t.key ? color + "88" : "#3a3a5a"}`,
                 color: moveTab === t.key ? color : "#555" }}>
@@ -422,7 +422,7 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
 
         {moveTab === "lv" && (
           learnset.length === 0
-            ? <div style={{ fontSize: "10px", color: "#333" }}>データなし</div>
+            ? <div style={{ fontSize: "8px", color: "#333" }}>データなし</div>
             : <div style={{ maxHeight: "240px", overflowY: "auto" }}>
                 {learnset.map(([lv, move], i) => (
                   <MoveRow key={i} move={move} prefix={{ text: `Lv${lv}`, minWidth: "28px" }} />
@@ -432,7 +432,7 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
 
         {moveTab === "tm" && (
           tmMoves.length === 0
-            ? <div style={{ fontSize: "10px", color: "#333" }}>データなし</div>
+            ? <div style={{ fontSize: "8px", color: "#333" }}>データなし</div>
             : <div style={{ maxHeight: "240px", overflowY: "auto" }}>
                 {tmMoves.map((id, i) => (
                   <MoveRow key={i} move={TM_LIST[id] || id} prefix={{ text: id, minWidth: "36px" }} />
@@ -442,7 +442,7 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
 
         {moveTab === "egg" && (
           eggMoves.length === 0
-            ? <div style={{ fontSize: "10px", color: "#333" }}>遺伝技なし</div>
+            ? <div style={{ fontSize: "8px", color: "#333" }}>遺伝技なし</div>
             : <div style={{ maxHeight: "240px", overflowY: "auto" }}>
                 {eggMoves.map((move, i) => <MoveRow key={i} move={move} />)}
               </div>
@@ -450,13 +450,13 @@ export const PokedexPanel = React.memo(function PokedexPanel({ color, dexTarget,
 
         {moveTab === "tutor" && (
           tutorMoves.length === 0
-            ? <div style={{ fontSize: "10px", color: "#333" }}>教え技なし</div>
+            ? <div style={{ fontSize: "8px", color: "#333" }}>教え技なし</div>
             : <div style={{ maxHeight: "240px", overflowY: "auto" }}>
                 {tutorMoves.map((move, i) => <MoveRow key={i} move={move} />)}
               </div>
         )}
 
-        <div style={{ fontSize: "8px", color: "#333", marginTop: "5px" }}>※わざデータはFR/LG準拠（PokéAPI確認済み）</div>
+        <div style={{ fontSize: "8px", color: "#333", marginTop: "4px" }}>※わざデータはFR/LG準拠（PokéAPI確認済み）</div>
       </div>
     </Panel>
   );
@@ -498,14 +498,14 @@ export const TypeChart = React.memo(function TypeChart({ color }) {
 
   return (
     <Panel title="⚔ タイプ相性表（Gen III）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
-      <div style={{ fontSize: "8px", color: "#555", marginBottom: "6px" }}>縦＝攻撃タイプ　横＝防御タイプ</div>
+      <div style={{ fontSize: "8px", color: "#555", marginBottom: "8px" }}>縦＝攻撃タイプ　横＝防御タイプ</div>
       <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         <table style={{ borderCollapse: "collapse", fontSize: "8px", width: "max-content", tableLayout: "fixed" }}>
           <thead>
             <tr>
               <td style={{ width: "44px" }} />
               {TYPES.map(t => (
-                <th key={t} style={{ width: "14px", padding: "1px", textAlign: "center",
+                <th key={t} style={{ width: "16px", padding: "1px", textAlign: "center",
                   color: TYPE_COLORS[t] || "#888", fontWeight: "normal",
                   writingMode: "vertical-rl", height: "48px", verticalAlign: "bottom" }}>
                   {t}
@@ -560,10 +560,10 @@ export const LocationGuide = React.memo(function LocationGuide({ color }) {
 
   return (
     <Panel title="🗺 場所別出現ポケモン（FR/LG）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
-      <div style={{ display: "flex", gap: "5px", marginBottom: "12px" }}>
+      <div style={{ display: "flex", gap: "4px", marginBottom: "12px" }}>
         {[["all","すべて"],["fr","FR"],["lg","LG"]].map(([v, label]) => (
           <button key={v} onClick={() => setVer(v)}
-            style={{ fontSize: "10px", padding: "3px 10px", borderRadius: "4px", cursor: "pointer", border: "1px solid", fontFamily: "inherit",
+            style={{ fontSize: "8px", padding: "4px 8px", borderRadius: "4px", cursor: "pointer", border: "1px solid", fontFamily: "inherit",
               background: ver === v ? "#1a1a3e" : "transparent",
               borderColor: ver === v ? "#5555cc" : "#333",
               color: ver === v ? "#aaaaff" : "#555" }}>
@@ -572,23 +572,23 @@ export const LocationGuide = React.memo(function LocationGuide({ color }) {
         ))}
       </div>
       {list.map(loc => (
-        <div key={loc.name + loc.ver} style={{ marginBottom: "10px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "4px" }}>
-            <span style={{ fontSize: "10px", color: "#bbb" }}>{loc.name}</span>
+        <div key={loc.name + loc.ver} style={{ marginBottom: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "4px" }}>
+            <span style={{ fontSize: "8px", color: "#bbb" }}>{loc.name}</span>
             <VerBadge v={loc.ver} />
             {loc.note && <span style={{ fontSize: "8px", color: "#555" }}>{loc.note}</span>}
           </div>
           {loc.pokemon.map(p => (
-            <div key={p.name + (p.ver||"")} style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "10px", marginBottom: "3px", paddingLeft: "8px" }}>
+            <div key={p.name + (p.ver||"")} style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "8px", marginBottom: "4px", paddingLeft: "8px" }}>
               <span style={{ color: "#ccc", minWidth: "72px" }}>{p.name}</span>
               {ver === "all" && <VerBadge v={p.ver} />}
               {Object.entries(p.evs).map(([st, val]) => (
-                <span key={st} style={{ fontSize: "9px", padding: "1px 5px", borderRadius: "3px",
+                <span key={st} style={{ fontSize: "8px", padding: "1px 4px", borderRadius: "4px",
                   background: STAT_COL[st] + "22", color: STAT_COL[st], border: `1px solid ${STAT_COL[st]}44` }}>
                   {STAT_JP[st]} +{val}
                 </span>
               ))}
-              <span style={{ fontSize: "9px", color: p.best ? "#7fff7f" : "#555", marginLeft: "auto" }}>{p.rate}{p.best ? "★" : ""}</span>
+              <span style={{ fontSize: "8px", color: p.best ? "#7fff7f" : "#555", marginLeft: "auto" }}>{p.rate}{p.best ? "★" : ""}</span>
             </div>
           ))}
         </div>
@@ -610,17 +610,17 @@ export const MoveTutorPanel = React.memo(function MoveTutorPanel({ color }) {
         const tc = md ? (TYPE_COLORS[md[0]] || "#555") : "#555";
         return (
           <div key={t.move} style={{
-            padding: "5px 2px",
+            padding: "4px 2px",
             borderBottom: i < TUTOR_LOCATIONS.length - 1 ? "1px solid #1a2a3a" : "none",
           }}>
             <span style={{
-              fontSize: "9px", padding: "1px 5px", borderRadius: "3px",
+              fontSize: "8px", padding: "1px 4px", borderRadius: "4px",
               background: tc + "22", color: tc, border: `1px solid ${tc}44`,
               whiteSpace: "nowrap",
             }}>{md ? md[0] : "？"}</span>
-            <div style={{ fontSize: "11px", color: "#e8e8e8", marginTop: "2px" }}>{t.move}</div>
-            <div style={{ fontSize: "9px", color: color + "cc", marginTop: "1px" }}>{t.location}</div>
-            <div style={{ fontSize: "9px", color: "#555", marginTop: "1px" }}>{t.note}</div>
+            <div style={{ fontSize: "12px", color: "#e8e8e8", marginTop: "4px" }}>{t.move}</div>
+            <div style={{ fontSize: "8px", color: color + "cc", marginTop: "1px" }}>{t.location}</div>
+            <div style={{ fontSize: "8px", color: "#555", marginTop: "1px" }}>{t.note}</div>
           </div>
         );
       })}
@@ -670,7 +670,7 @@ export const MoveReversePanel = React.memo(function MoveReversePanel({ color }) 
 
   return (
     <Panel title="🔍 わざ逆引き" open={open} onToggle={() => setOpen(v => !v)} color={color}>
-      <div style={{ position: "relative", marginBottom: "10px" }}>
+      <div style={{ position: "relative", marginBottom: "8px" }}>
         <input
           value={query}
           onChange={e => { setQuery(e.target.value); setChosen(""); setShowSug(true); }}
@@ -678,16 +678,16 @@ export const MoveReversePanel = React.memo(function MoveReversePanel({ color }) 
           onBlur={() => setTimeout(() => setShowSug(false), 150)}
           placeholder="わざ名を入力…"
           style={{ width: "100%", background: "#0e0e1e", border: "1px solid #2a2a4a",
-            borderRadius: showSug && suggestions.length > 0 ? "6px 6px 0 0" : "6px",
-            color: "#ddd", fontSize: "12px", padding: "7px 10px",
+            borderRadius: showSug && suggestions.length > 0 ? "8px 8px 0 0" : "8px",
+            color: "#ddd", fontSize: "12px", padding: "8px",
             fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
         />
         {showSug && suggestions.length > 0 && (
           <div style={{ position: "absolute", zIndex: 10, width: "100%", background: "#0d1a2e",
-            border: "1px solid #2a2a4a", borderTop: "none", borderRadius: "0 0 6px 6px", maxHeight: "160px", overflowY: "auto" }}>
+            border: "1px solid #2a2a4a", borderTop: "none", borderRadius: "0 0 8px 8px", maxHeight: "160px", overflowY: "auto" }}>
             {suggestions.map(m => (
               <div key={m} onMouseDown={() => select(m)}
-                style={{ padding: "6px 10px", cursor: "pointer", fontSize: "11px", color: "#ccc", borderBottom: "1px solid #1a2a3a" }}
+                style={{ padding: "8px", cursor: "pointer", fontSize: "12px", color: "#ccc", borderBottom: "1px solid #1a2a3a" }}
                 onMouseEnter={e => e.currentTarget.style.background = color + "22"}
                 onMouseLeave={e => e.currentTarget.style.background = "transparent"}
               >{m}</div>
@@ -698,19 +698,19 @@ export const MoveReversePanel = React.memo(function MoveReversePanel({ color }) 
 
       {chosen && results !== null && (
         results.length === 0
-          ? <div style={{ fontSize: "10px", color: "#444", textAlign: "center", padding: "8px 0" }}>覚えるポケモンなし</div>
+          ? <div style={{ fontSize: "8px", color: "#444", textAlign: "center", padding: "8px 0" }}>覚えるポケモンなし</div>
           : <div>
-              <div style={{ fontSize: "9px", color: "#444", marginBottom: "6px" }}>{results.length}匹が習得</div>
+              <div style={{ fontSize: "8px", color: "#444", marginBottom: "8px" }}>{results.length}匹が習得</div>
               <div style={{ maxHeight: "280px", overflowY: "auto" }}>
                 {results.map(({ dexId, name, methods }) => (
-                  <div key={dexId} style={{ display: "flex", alignItems: "center", gap: "6px",
+                  <div key={dexId} style={{ display: "flex", alignItems: "center", gap: "8px",
                     padding: "4px 2px", borderBottom: "1px solid #111" }}>
-                    <span style={{ fontSize: "9px", color: "#333", minWidth: "22px" }}>#{dexId}</span>
-                    <span style={{ fontSize: "11px", color: "#ccc", flex: 1 }}>{name}</span>
-                    <div style={{ display: "flex", gap: "3px", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                    <span style={{ fontSize: "8px", color: "#333", minWidth: "24px" }}>#{dexId}</span>
+                    <span style={{ fontSize: "12px", color: "#ccc", flex: 1 }}>{name}</span>
+                    <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", justifyContent: "flex-end" }}>
                       {methods.map(m => (
                         <span key={m} style={{
-                          fontSize: "8px", padding: "1px 4px", borderRadius: "3px",
+                          fontSize: "8px", padding: "1px 4px", borderRadius: "4px",
                           background: m.startsWith("Lv") ? color + "22" : m.startsWith("TM") || m.startsWith("HM") ? "#1a2a3a" : m === "遺伝" ? "#1a1a3a" : "#2a1a2a",
                           color: m.startsWith("Lv") ? color : m.startsWith("TM") || m.startsWith("HM") ? "#7bb8e8" : m === "遺伝" ? "#a87ee8" : "#e87eb8",
                           border: `1px solid ${m.startsWith("Lv") ? color + "44" : "#2a2a4a"}`,
@@ -723,7 +723,7 @@ export const MoveReversePanel = React.memo(function MoveReversePanel({ color }) 
             </div>
       )}
       {!chosen && (
-        <div style={{ fontSize: "10px", color: "#2a2a4a", textAlign: "center", padding: "6px 0" }}>
+        <div style={{ fontSize: "8px", color: "#2a2a4a", textAlign: "center", padding: "8px 0" }}>
           わざ名を入力して検索
         </div>
       )}
@@ -751,23 +751,23 @@ export const EVRankPanel = React.memo(function EVRankPanel({ color }) {
 
   return (
     <Panel title="📊 EV獲得ランキング" open={open} onToggle={() => setOpen(v => !v)} color={color}>
-      <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "10px" }}>
+      <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "8px" }}>
         {STATS.map(s => (
           <button key={s.key} onClick={() => setStat(s.key)} style={{
-            fontSize: "9px", padding: "3px 7px", borderRadius: "4px", cursor: "pointer",
+            fontSize: "8px", padding: "4px 8px", borderRadius: "4px", cursor: "pointer",
             fontFamily: "inherit", border: `1px solid ${stat === s.key ? STAT_COL[s.key] : "#2a2a4a"}`,
             background: stat === s.key ? STAT_COL[s.key] + "22" : "transparent",
             color: stat === s.key ? STAT_COL[s.key] : "#555",
           }}>{s.jp}</button>
         ))}
       </div>
-      <div style={{ fontSize: "9px", color: "#333", marginBottom: "6px" }}>{ranked.length}匹が{STATS.find(s=>s.key===stat).jp}EV付与</div>
+      <div style={{ fontSize: "8px", color: "#333", marginBottom: "8px" }}>{ranked.length}匹が{STATS.find(s=>s.key===stat).jp}EV付与</div>
       <div style={{ maxHeight: "280px", overflowY: "auto" }}>
         {ranked.map(({ dexId, name, ev }) => (
-          <div key={dexId} style={{ display: "flex", alignItems: "center", gap: "6px",
+          <div key={dexId} style={{ display: "flex", alignItems: "center", gap: "8px",
             padding: "4px 2px", borderBottom: "1px solid #111" }}>
-            <span style={{ fontSize: "9px", color: "#333", minWidth: "22px" }}>#{dexId}</span>
-            <span style={{ fontSize: "11px", color: "#ccc", flex: 1 }}>{name}</span>
+            <span style={{ fontSize: "8px", color: "#333", minWidth: "24px" }}>#{dexId}</span>
+            <span style={{ fontSize: "12px", color: "#ccc", flex: 1 }}>{name}</span>
             <span style={{ fontSize: "12px", fontWeight: "bold", color: STAT_COL[stat], minWidth: "20px", textAlign: "right" }}>+{ev}</span>
           </div>
         ))}
@@ -799,10 +799,10 @@ export const StatRankPanel = React.memo(function StatRankPanel({ color }) {
 
   return (
     <Panel title="🏆 種族値ランキング" open={open} onToggle={() => setOpen(v => !v)} color={color}>
-      <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "10px" }}>
+      <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "8px" }}>
         {ALL_STATS.map(s => (
           <button key={s.key} onClick={() => setStat(s.key)} style={{
-            fontSize: "9px", padding: "3px 7px", borderRadius: "4px", cursor: "pointer",
+            fontSize: "8px", padding: "4px 8px", borderRadius: "4px", cursor: "pointer",
             fontFamily: "inherit", border: `1px solid ${stat === s.key ? (s.key === "total" ? "#aaaaff" : STAT_COL[s.key]) : "#2a2a4a"}`,
             background: stat === s.key ? (s.key === "total" ? "#aaaaff22" : STAT_COL[s.key] + "22") : "transparent",
             color: stat === s.key ? (s.key === "total" ? "#aaaaff" : STAT_COL[s.key]) : "#555",
@@ -811,17 +811,17 @@ export const StatRankPanel = React.memo(function StatRankPanel({ color }) {
       </div>
       <div style={{ maxHeight: "320px", overflowY: "auto" }}>
         {ranked.map(({ dexId, name, val }, rank) => (
-          <div key={dexId} style={{ display: "flex", alignItems: "center", gap: "5px",
-            padding: "3px 2px", borderBottom: "1px solid #0d0d1a" }}>
-            <span style={{ fontSize: "9px", color: rank < 3 ? statColor : "#2a2a4a", minWidth: "16px", textAlign: "right" }}>
+          <div key={dexId} style={{ display: "flex", alignItems: "center", gap: "4px",
+            padding: "4px 2px", borderBottom: "1px solid #0d0d1a" }}>
+            <span style={{ fontSize: "8px", color: rank < 3 ? statColor : "#2a2a4a", minWidth: "16px", textAlign: "right" }}>
               {rank + 1}
             </span>
-            <span style={{ fontSize: "10px", color: "#999", minWidth: "22px" }}>#{dexId}</span>
-            <span style={{ fontSize: "11px", color: "#ccc", minWidth: "72px" }}>{name}</span>
-            <div style={{ flex: 1, background: "#0d0d1a", borderRadius: "2px", height: "5px", overflow: "hidden" }}>
+            <span style={{ fontSize: "8px", color: "#999", minWidth: "24px" }}>#{dexId}</span>
+            <span style={{ fontSize: "12px", color: "#ccc", minWidth: "72px" }}>{name}</span>
+            <div style={{ flex: 1, background: "#0d0d1a", borderRadius: "2px", height: "4px", overflow: "hidden" }}>
               <div style={{ width: `${val / maxVal * 100}%`, height: "100%", background: statColor, borderRadius: "2px" }} />
             </div>
-            <span style={{ fontSize: "11px", fontWeight: "bold", minWidth: "28px", textAlign: "right",
+            <span style={{ fontSize: "12px", fontWeight: "bold", minWidth: "28px", textAlign: "right",
               color: rank === 0 ? statColor : val >= maxVal * 0.85 ? "#ccc" : "#555" }}>{val}</span>
           </div>
         ))}
@@ -865,16 +865,16 @@ export const AbilitySearch = React.memo(function AbilitySearch({ color }) {
       />
       <div style={{ maxHeight: "320px", overflowY: "auto" }}>
         {filtered.length === 0 && (
-          <div style={{ color: "#444", fontSize: "11px", textAlign: "center", padding: "12px 0" }}>該当なし</div>
+          <div style={{ color: "#444", fontSize: "12px", textAlign: "center", padding: "12px 0" }}>該当なし</div>
         )}
         {filtered.map(ab => (
-          <div key={ab} style={{ marginBottom: "10px" }}>
-            <div style={{ fontSize: "11px", color: color, fontWeight: "bold", marginBottom: "3px", borderBottom: "1px solid #1a1a2e", paddingBottom: "2px" }}>
+          <div key={ab} style={{ marginBottom: "8px" }}>
+            <div style={{ fontSize: "12px", color: color, fontWeight: "bold", marginBottom: "4px", borderBottom: "1px solid #1a1a2e", paddingBottom: "2px" }}>
               {ab}
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
               {abilityMap[ab].map(p => (
-                <span key={p[0]} style={{ fontSize: "10px", color: "#aaa", background: "#1a1a2e", borderRadius: "3px", padding: "1px 5px" }}>
+                <span key={p[0]} style={{ fontSize: "8px", color: "#aaa", background: "#1a1a2e", borderRadius: "4px", padding: "1px 4px" }}>
                   {p[1]}
                 </span>
               ))}
