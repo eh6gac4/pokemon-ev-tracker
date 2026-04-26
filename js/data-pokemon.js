@@ -628,7 +628,7 @@ export async function loadPokemonFromAPI() {
       const poke = pr.value;
       const species = sr.value;
 
-      const jaEntry = species.names.find(n => n.language.name === 'ja-Hrkt');
+      const jaEntry = species.names.find(n => n.language.name === 'ja-hrkt') || species.names.find(n => n.language.name === 'ja');
       const jaName = jaEntry ? jaEntry.name : POKEMON_DATA[i][1];
 
       const statsObj = {};
@@ -662,7 +662,7 @@ export async function loadPokemonFromAPI() {
     for (let i = 0; i < abilitySlugArr.length; i++) {
       const r = abilityResults[i];
       if (r.status === 'fulfilled') {
-        const ja = r.value.names.find(n => n.language.name === 'ja-Hrkt');
+        const ja = r.value.names.find(n => n.language.name === 'ja-hrkt') || r.value.names.find(n => n.language.name === 'ja');
         if (ja) abilitySlugToJa[abilitySlugArr[i]] = ja.name;
       }
     }

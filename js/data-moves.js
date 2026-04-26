@@ -1135,7 +1135,7 @@ export async function loadMovesFromAPI() {
       if (r.status === 'rejected') continue;
       const data = r.value;
 
-      const jaEntry = data.names.find(n => n.language.name === 'ja-Hrkt');
+      const jaEntry = data.names.find(n => n.language.name === 'ja-hrkt') || data.names.find(n => n.language.name === 'ja');
       if (!jaEntry) continue;
       const jaName = jaEntry.name;
       slugToJa[slug] = jaName;

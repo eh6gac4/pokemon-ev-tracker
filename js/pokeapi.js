@@ -1,5 +1,5 @@
 const BASE = 'https://pokeapi.co/api/v2';
-const CACHE_KEY = 'pokeapi_cache_v1';
+const CACHE_KEY = 'pokeapi_cache_v2';
 const TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 const memCache = new Map();
