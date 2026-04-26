@@ -1,4 +1,4 @@
-export const LEARNSET = [
+export let LEARNSET = [
   null,
   [[1,"たいあたり"],[4,"なきごえ"],[7,"やどりぎのタネ"],[10,"つるのムチ"],[15,"どくのこな"],[15,"ねむりごな"],[20,"はっぱカッター"],[25,"あまいかおり"],[32,"せいちょう"],[39,"こうごうせい"],[46,"ソーラービーム"]],
   [[1,"なきごえ"],[1,"やどりぎのタネ"],[1,"たいあたり"],[4,"なきごえ"],[7,"やどりぎのタネ"],[10,"つるのムチ"],[15,"どくのこな"],[15,"ねむりごな"],[22,"はっぱカッター"],[29,"あまいかおり"],[38,"せいちょう"],[47,"こうごうせい"],[56,"ソーラービーム"]],
@@ -177,7 +177,7 @@ export const TM_LIST = {
 };
 
 // FR/LG わざマシン・ひでんマシン習得わざ（TM/HM番号付き、PokéAPI確認済み）
-export const TM_MOVES = [
+export let TM_MOVES = [
 null,  // 0-indexed placeholder
   ["TM06", "TM09", "TM10", "TM11", "TM17", "TM19", "TM21", "TM22", "TM27", "TM32", "TM36", "TM42", "TM43", "TM44", "TM45", "HM01", "HM04", "HM05", "HM06"],  // フシギダネ
   ["TM06", "TM09", "TM10", "TM11", "TM17", "TM19", "TM21", "TM22", "TM27", "TM32", "TM36", "TM42", "TM43", "TM44", "TM45", "HM01", "HM04", "HM05", "HM06"],  // フシギソウ
@@ -334,7 +334,7 @@ null,  // 0-indexed placeholder
 
 // FR/LG 遺伝技（タマゴわざ）
 // 進化形や伝説ポケモンなど遺伝技がないポケモンは空配列 []
-export const EGG_MOVES = [
+export let EGG_MOVES = [
 null,  // 0-indexed placeholder
   ["あまえる", "のろい", "くさぶえ", "ひかりのかべ", "マジカルリーフ", "はなびらのまい", "しんぴのまもり", "ロケットずつき"],  // フシギダネ
   [],  // フシギソウ
@@ -658,6 +658,7 @@ null,  // 0-indexed placeholder
 // 進化チェーンデータ（循環import回避のためここで定義）
 // EVOLUTION_DATA[国家図鑑ID] = { pre:[{id,cond}], next:[{id,cond}] }
 import { EVOLUTION_DATA, POKEMON_DATA } from './data-pokemon.js';
+import { batchFetch, persistCache } from './pokeapi.js';
 
 // 進化前ポケモンの国家図鑑ID列を返す（最初の祖先→直前の進化前の順）
 function getPreEvoChain(dexId) {
@@ -719,7 +720,7 @@ export function getLearnableMoves(dexId) {
 }
 
 // 全技一覧（レベルアップ・TM/HM・遺伝技・教え技から収集、重複なし・五十音順）
-export const ALL_MOVES = [...new Set([
+export let ALL_MOVES = [...new Set([
   ...LEARNSET.filter(Boolean).flat().map(([, name]) => name),
   ...TM_MOVES.filter(Boolean).flat().map(id => TM_LIST[id]).filter(Boolean),
   ...EGG_MOVES.filter(Boolean).flat(),
@@ -735,7 +736,7 @@ export const TYPE_COLORS = {
 };
 
 // わざデータ [タイプ, 威力(null=変動/なし), 命中率(null=必中/変動), PP]（FR/LG Gen III準拠）
-export const MOVE_DATA = {
+export let MOVE_DATA = {
   "あくび": ["ノーマル", null, 100, 10],
   "あくまのキッス": ["ノーマル", null, 75, 10],
   "あくむ": ["ゴースト", null, 100, 15],
@@ -1078,4 +1079,133 @@ export const TUTOR_LOCATIONS = [
   { move: "ブラストバーン", location: "きわのみさき",       note: "リザードンを手持ち左上で民家（要：たきのぼり）" },
   { move: "ハイドロカノン", location: "きわのみさき",       note: "カメックスを手持ち左上で民家（要：たきのぼり）" },
 ];
+
+export async function loadMovesFromAPI() {
+  const TYPE_EN_TO_JA = {
+    'normal': 'ノーマル', 'fire': 'ほのお', 'water': 'みず', 'electric': 'でんき',
+    'grass': 'くさ', 'ice': 'こおり', 'fighting': 'かくとう', 'poison': 'どく',
+    'ground': 'じめん', 'flying': 'ひこう', 'psychic': 'エスパー', 'bug': 'むし',
+    'rock': 'いわ', 'ghost': 'ゴースト', 'dragon': 'りゅう', 'dark': 'あく', 'steel': 'はがね',
+  };
+  const GEN3_VERSION_GROUPS = new Set(['ruby-sapphire', 'emerald', 'firered-leafgreen']);
+
+  try {
+    const ids = Array.from({ length: 151 }, (_, i) => i + 1);
+    const pokeResults = await batchFetch(ids.map(id => `/pokemon/${id}`));
+
+    // Collect all move slugs per Pokemon, filtered to firered-leafgreen
+    const allSlugSet = new Set();
+    const pokeMovesMap = {};
+
+    for (let i = 0; i < 151; i++) {
+      const id = ids[i];
+      const r = pokeResults[i];
+      if (r.status === 'rejected') { pokeMovesMap[id] = null; continue; }
+
+      const lvMoves = [];
+      const machineMoves = [];
+      const eggMoves = [];
+
+      for (const entry of r.value.moves) {
+        for (const vgd of entry.version_group_details) {
+          if (vgd.version_group.name !== 'firered-leafgreen') continue;
+          const slug = entry.move.name;
+          allSlugSet.add(slug);
+          const method = vgd.move_learn_method.name;
+          if (method === 'level-up') lvMoves.push({ level: vgd.level_learned_at, slug });
+          else if (method === 'machine') machineMoves.push(slug);
+          else if (method === 'egg') eggMoves.push(slug);
+        }
+      }
+      lvMoves.sort((a, b) => a.level - b.level);
+      pokeMovesMap[id] = { lvMoves, machineMoves, eggMoves };
+    }
+
+    // Fetch all unique move data
+    const allSlugs = [...allSlugSet];
+    const moveResults = await batchFetch(allSlugs.map(s => `/move/${s}`));
+
+    // Build slug→Japanese name map and MOVE_DATA
+    const slugToJa = {};
+    const newMoveData = { ...MOVE_DATA };
+
+    for (let i = 0; i < allSlugs.length; i++) {
+      const slug = allSlugs[i];
+      const r = moveResults[i];
+      if (r.status === 'rejected') continue;
+      const data = r.value;
+
+      const jaEntry = data.names.find(n => n.language.name === 'ja-Hrkt');
+      if (!jaEntry) continue;
+      const jaName = jaEntry.name;
+      slugToJa[slug] = jaName;
+
+      let power = data.power;
+      let accuracy = data.accuracy;
+      let pp = data.pp;
+      for (const pv of data.past_values || []) {
+        if (GEN3_VERSION_GROUPS.has(pv.version_group?.name)) {
+          if (pv.power != null) power = pv.power;
+          if (pv.accuracy != null) accuracy = pv.accuracy;
+          if (pv.pp != null) pp = pv.pp;
+          break;
+        }
+      }
+
+      const jaType = TYPE_EN_TO_JA[data.type?.name];
+      if (!jaType) continue;
+      newMoveData[jaName] = [jaType, power || null, accuracy || null, pp];
+    }
+
+    // TM code reverse lookup (Japanese name → TM code)
+    const jaToTmCode = Object.fromEntries(
+      Object.entries(TM_LIST).map(([code, jaName]) => [jaName, code])
+    );
+
+    // Build new arrays (1-indexed: index 0 = null placeholder)
+    const newLearnset = [null];
+    const newTmMoves = [null];
+    const newEggMoves = [null];
+
+    for (let i = 0; i < 151; i++) {
+      const id = ids[i];
+      const md = pokeMovesMap[id];
+      if (!md) {
+        newLearnset.push(LEARNSET[id] || []);
+        newTmMoves.push(TM_MOVES[id] || []);
+        newEggMoves.push(EGG_MOVES[id] || []);
+        continue;
+      }
+      newLearnset.push(
+        md.lvMoves.map(({ level, slug }) => slugToJa[slug] ? [level, slugToJa[slug]] : null).filter(Boolean)
+      );
+      newTmMoves.push(
+        md.machineMoves.map(slug => {
+          const ja = slugToJa[slug];
+          return ja ? jaToTmCode[ja] : null;
+        }).filter(Boolean)
+      );
+      newEggMoves.push(
+        md.eggMoves.map(slug => slugToJa[slug]).filter(Boolean)
+      );
+    }
+
+    const newAllMoves = [...new Set([
+      ...newLearnset.filter(Boolean).flat().map(([, n]) => n),
+      ...newTmMoves.filter(Boolean).flat().map(c => TM_LIST[c]).filter(Boolean),
+      ...newEggMoves.filter(Boolean).flat(),
+      ...TUTOR_MOVES.filter(Boolean).flat(),
+    ])].sort((a, b) => a.localeCompare(b, 'ja'));
+
+    MOVE_DATA = newMoveData;
+    LEARNSET  = newLearnset;
+    TM_MOVES  = newTmMoves;
+    EGG_MOVES = newEggMoves;
+    ALL_MOVES = newAllMoves;
+
+    persistCache();
+  } catch (e) {
+    console.warn('loadMovesFromAPI failed:', e);
+  }
+}
 
