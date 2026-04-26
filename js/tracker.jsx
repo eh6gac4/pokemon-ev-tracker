@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import {
   DEFAULT_PARTY, STATS, MAX_STAT, MAX_TOTAL, initEVs, initIVs, COLORS, POKEMON_DATA
 } from './data-pokemon.js';
-import { getLearnableMoves, getLearnset, ALL_MOVES } from './data-moves.js';
+import { getLearnableMoves, getLearnset, ALL_MOVES, loadMovesFromAPI } from './data-moves.js';
+import { loadPokemonFromAPI } from './data-pokemon.js';
 import { AutoTextarea, StatRow, Panel } from './components-base.jsx';
 import { AddMonModal, NaturePicker, ItemPicker, MovePicker, PartySlots, PartyPickerModal, IVPanel, EVGuide } from './components-ikusei.jsx';
 
@@ -39,6 +40,7 @@ export default function EVTracker() {
   const [allMoves,  setAllMoves] = useState(() => Object.fromEntries(DEFAULT_PARTY.map(p => [p.name, ["","","",""]])));
   const [selected,  setSelected] = useState(DEFAULT_PARTY[0].name);
   const [loaded,       setLoaded]       = useState(false);
+  const [loadMsg,      setLoadMsg]      = useState('読み込み中…');
   const [isDev,        setIsDev]        = useState(false);
   const [macho,        setMacho]        = useState(false);
   const [gakushuu,     setGakushuu]     = useState(false);
@@ -229,24 +231,31 @@ export default function EVTracker() {
       if (saved.gakushuuMon != null) setGakushuuMon(saved.gakushuuMon);
     };
 
-    // ① localStorage に前回データがあれば即座に表示
-    const cached = localStorage.getItem('pokelog-data');
-    if (cached) {
-      try {
-        applyData(JSON.parse(cached));
-        setLoaded(true);
-      } catch (e) {}
-    }
+    const initApp = async () => {
+      // ① localStorage に前回データがあれば即座に適用
+      const cached = localStorage.getItem('pokelog-data');
+      if (cached) try { applyData(JSON.parse(cached)); } catch (e) {}
 
-    // ② バックグラウンドでサーバーと同期（最新データで上書き + キャッシュ更新）
-    fetch("/api/data")
-      .then(r => r.json())
-      .then(saved => {
-        applyData(saved);
-        localStorage.setItem('pokelog-data', JSON.stringify(saved));
-      })
-      .catch(() => {})
-      .finally(() => setLoaded(true));
+      // ② PokeAPI からポケモン・わざデータをロード（並行）
+      try {
+        setLoadMsg('PokeAPIからデータ取得中…');
+        await Promise.all([loadPokemonFromAPI(), loadMovesFromAPI()]);
+      } catch (e) {
+        console.warn('PokeAPI load failed, using static data:', e);
+      }
+
+      // ③ サーバーと同期（バックグラウンド、非ブロッキング）
+      fetch("/api/data")
+        .then(r => r.json())
+        .then(saved => {
+          applyData(saved);
+          localStorage.setItem('pokelog-data', JSON.stringify(saved));
+        })
+        .catch(() => {});
+
+      setLoaded(true);
+    };
+    initApp();
   }, []);
 
   useEffect(() => {
@@ -458,8 +467,9 @@ export default function EVTracker() {
   }, [mon.dexId]);
 
   if (!loaded) return (
-    <div style={{ minHeight: "100vh", background: "#1a1a2e", display: "flex", alignItems: "center", justifyContent: "center", color: "#888", fontFamily: "monospace" }}>
-      ロード中…
+    <div style={{ minHeight: "100vh", background: "#1a1a2e", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#888", fontFamily: "monospace", gap: "8px" }}>
+      <div style={{ fontSize: "18px", color: "#4a90d9" }}>ポケログ</div>
+      <div style={{ fontSize: "11px" }}>{loadMsg}</div>
     </div>
   );
 

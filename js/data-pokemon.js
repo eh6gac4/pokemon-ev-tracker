@@ -1,3 +1,5 @@
+import { batchFetch, persistCache } from './pokeapi.js';
+
 export const DEFAULT_PARTY = [
   { name: "リザードン", icon: "🔥", color: "#FF6B35", memo: "", nature: "", dexId: 5   },
   { name: "ガラガラ",   icon: "💀", color: "#A0A0A0", memo: "", nature: "", dexId: 104 },
@@ -59,7 +61,7 @@ export const NATURES = [
 ];
 
 // カントー151匹の種族値 [id, 日本語名, HP, こうげき, ぼうぎょ, とくこう, とくぼう, すばやさ]
-export const POKEMON_DATA = [
+export let POKEMON_DATA = [
   [1,"フシギダネ",45,49,49,65,65,45],[2,"フシギソウ",60,62,63,80,80,60],[3,"フシギバナ",80,82,83,100,100,80],
   [4,"ヒトカゲ",39,52,43,60,50,65],[5,"リザード",58,64,58,80,65,80],[6,"リザードン",78,84,78,109,85,100],
   [7,"ゼニガメ",44,48,65,50,64,43],[8,"カメール",59,63,80,65,80,58],[9,"カメックス",79,83,100,85,105,78],
@@ -136,7 +138,7 @@ export const PD = { hp:2, atk:3, def:4, spa:5, spd:6, spe:7 };
 
 // 進化データ（FR/LG 第1世代 151匹）
 // EVOLUTION_DATA[dexId] = { pre:[{id,cond}], next:[{id,cond}] }
-export const EVOLUTION_DATA = {
+export let EVOLUTION_DATA = {
   1:{next:[{id:2,cond:"Lv.16"}]},
   2:{pre:[{id:1,cond:"Lv.16"}],next:[{id:3,cond:"Lv.32"}]},
   3:{pre:[{id:2,cond:"Lv.32"}]},
@@ -294,7 +296,7 @@ export function getEvoPaths(dexId) {
 }
 
 // 倒した時に得られるEV [hp,atk,def,spa,spd,spe]（Bulbapedia Gen III）
-export const EV_YIELD = [
+export let EV_YIELD = [
   [0,0,0,1,0,0],[0,0,0,1,1,0],[0,0,0,2,1,0], // 001-003
   [0,0,0,0,0,1],[0,0,0,1,0,1],[0,0,0,3,0,0], // 004-006
   [0,0,1,0,0,0],[0,0,1,0,1,0],[0,0,0,0,3,0], // 007-009
@@ -421,7 +423,7 @@ export const EV_GUIDE = [
   ]},
 ];
 
-export const ABILITY_DATA = [
+export let ABILITY_DATA = [
   ["しんりょく"],
   ["しんりょく"],
   ["しんりょく"],
@@ -574,3 +576,143 @@ export const ABILITY_DATA = [
   ["プレッシャー"],
   ["シンクロ"]
 ];
+
+export async function loadPokemonFromAPI() {
+  const STAT_KEY_MAP = {
+    'hp': 'hp', 'attack': 'atk', 'defense': 'def',
+    'special-attack': 'spa', 'special-defense': 'spd', 'speed': 'spe',
+  };
+  const STAT_ORDER = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
+  const ITEM_STONE_MAP = {
+    'fire-stone': 'ほのおのいし', 'water-stone': 'みずのいし',
+    'thunder-stone': 'かみなりのいし', 'leaf-stone': 'はっぱのいし', 'moon-stone': 'つきのいし',
+  };
+
+  function deriveCond(detail) {
+    if (!detail) return '';
+    const trigger = detail.trigger?.name;
+    if (trigger === 'level-up' && detail.min_level) return `Lv.${detail.min_level}`;
+    if (trigger === 'use-item' && detail.item?.name) return ITEM_STONE_MAP[detail.item.name] || detail.item.name;
+    if (trigger === 'trade') return '通信交換';
+    if (trigger === 'level-up' && detail.min_happiness) return 'なつき度';
+    return '';
+  }
+
+  try {
+    const ids = Array.from({ length: 151 }, (_, i) => i + 1);
+
+    // Fetch pokemon + species concurrently
+    const [pokeResults, speciesResults] = await Promise.all([
+      batchFetch(ids.map(id => `/pokemon/${id}`)),
+      batchFetch(ids.map(id => `/pokemon-species/${id}`)),
+    ]);
+
+    const newPokemonData = [];
+    const newEvYield = [];
+    const abilitySlugsNeeded = new Set();
+    const chainIds = new Set();
+    const idToChainId = {};
+
+    for (let i = 0; i < 151; i++) {
+      const id = ids[i];
+      const pr = pokeResults[i];
+      const sr = speciesResults[i];
+
+      if (pr.status === 'rejected' || sr.status === 'rejected') {
+        newPokemonData.push(POKEMON_DATA[i]);
+        newEvYield.push(EV_YIELD[i]);
+        console.warn(`PokeAPI: pokemon ${id} fetch failed`);
+        continue;
+      }
+
+      const poke = pr.value;
+      const species = sr.value;
+
+      const jaEntry = species.names.find(n => n.language.name === 'ja-hrkt') || species.names.find(n => n.language.name === 'ja');
+      const jaName = jaEntry ? jaEntry.name : POKEMON_DATA[i][1];
+
+      const statsObj = {};
+      const effortObj = {};
+      for (const s of poke.stats) {
+        const key = STAT_KEY_MAP[s.stat.name];
+        if (key) { statsObj[key] = s.base_stat; effortObj[key] = s.effort; }
+      }
+
+      newPokemonData.push([id, jaName,
+        statsObj.hp, statsObj.atk, statsObj.def,
+        statsObj.spa, statsObj.spd, statsObj.spe,
+      ]);
+      newEvYield.push(STAT_ORDER.map(k => effortObj[k] ?? 0));
+
+      for (const a of poke.abilities) {
+        if (!a.is_hidden) abilitySlugsNeeded.add(a.ability.name);
+      }
+
+      const chainUrl = species.evolution_chain?.url;
+      if (chainUrl) {
+        const m = chainUrl.match(/\/(\d+)\/$/);
+        if (m) { const cid = parseInt(m[1]); chainIds.add(cid); idToChainId[id] = cid; }
+      }
+    }
+
+    // Fetch ability Japanese names
+    const abilitySlugArr = [...abilitySlugsNeeded];
+    const abilityResults = await batchFetch(abilitySlugArr.map(s => `/ability/${s}`));
+    const abilitySlugToJa = {};
+    for (let i = 0; i < abilitySlugArr.length; i++) {
+      const r = abilityResults[i];
+      if (r.status === 'fulfilled') {
+        const ja = r.value.names.find(n => n.language.name === 'ja-hrkt') || r.value.names.find(n => n.language.name === 'ja');
+        if (ja) abilitySlugToJa[abilitySlugArr[i]] = ja.name;
+      }
+    }
+
+    const newAbilityData = [];
+    for (let i = 0; i < 151; i++) {
+      const pr = pokeResults[i];
+      if (pr.status === 'rejected') { newAbilityData.push(ABILITY_DATA[i]); continue; }
+      const abilities = pr.value.abilities
+        .filter(a => !a.is_hidden)
+        .sort((a, b) => a.slot - b.slot)
+        .map(a => abilitySlugToJa[a.ability.name] || null)
+        .filter(Boolean);
+      newAbilityData.push(abilities.length > 0 ? abilities : ABILITY_DATA[i]);
+    }
+
+    // Fetch evolution chains
+    const chainIdArr = [...chainIds];
+    const chainResults = await batchFetch(chainIdArr.map(cid => `/evolution-chain/${cid}`));
+
+    const newEvoData = {};
+
+    function walkChain(node, parentId, parentCond) {
+      const m = node.species.url.match(/\/(\d+)\/$/);
+      if (!m) return;
+      const id = parseInt(m[1]);
+      if (id > 151) return;
+      if (parentId !== null) {
+        if (!newEvoData[id]) newEvoData[id] = {};
+        (newEvoData[id].pre ??= []).push({ id: parentId, cond: parentCond });
+        if (!newEvoData[parentId]) newEvoData[parentId] = {};
+        (newEvoData[parentId].next ??= []).push({ id, cond: parentCond });
+      }
+      for (const evo of node.evolves_to) {
+        walkChain(evo, id, deriveCond(evo.evolution_details[0]));
+      }
+    }
+
+    for (let i = 0; i < chainIdArr.length; i++) {
+      const r = chainResults[i];
+      if (r.status === 'fulfilled') walkChain(r.value.chain, null, null);
+    }
+
+    POKEMON_DATA    = newPokemonData;
+    EV_YIELD        = newEvYield;
+    ABILITY_DATA    = newAbilityData;
+    EVOLUTION_DATA  = newEvoData;
+
+    persistCache();
+  } catch (e) {
+    console.warn('loadPokemonFromAPI failed:', e);
+  }
+}
