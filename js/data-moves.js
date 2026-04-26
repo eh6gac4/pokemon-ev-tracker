@@ -658,7 +658,7 @@ null,  // 0-indexed placeholder
 // 進化チェーンデータ（循環import回避のためここで定義）
 // EVOLUTION_DATA[国家図鑑ID] = { pre:[{id,cond}], next:[{id,cond}] }
 import { EVOLUTION_DATA, POKEMON_DATA } from './data-pokemon.js';
-import { batchFetch, persistCache } from './pokeapi.js';
+import { batchFetch, saveProcessed, loadProcessed } from './pokeapi.js';
 
 // 進化前ポケモンの国家図鑑ID列を返す（最初の祖先→直前の進化前の順）
 function getPreEvoChain(dexId) {
@@ -1081,6 +1081,17 @@ export const TUTOR_LOCATIONS = [
 ];
 
 export async function loadMovesFromAPI() {
+  const cached = loadProcessed('moves');
+  if (cached) {
+    MOVE_DATA   = cached.moveData;
+    LEARNSET    = cached.learnset;
+    TM_MOVES    = cached.tmMoves;
+    EGG_MOVES   = cached.eggMoves;
+    TUTOR_MOVES = cached.tutorMoves;
+    ALL_MOVES   = cached.allMoves;
+    return;
+  }
+
   const TYPE_EN_TO_JA = {
     'normal': 'ノーマル', 'fire': 'ほのお', 'water': 'みず', 'electric': 'でんき',
     'grass': 'くさ', 'ice': 'こおり', 'fighting': 'かくとう', 'poison': 'どく',
@@ -1211,7 +1222,14 @@ export async function loadMovesFromAPI() {
     TUTOR_MOVES  = newTutorMoves;
     ALL_MOVES    = newAllMoves;
 
-    persistCache();
+    saveProcessed('moves', {
+      moveData:   MOVE_DATA,
+      learnset:   LEARNSET,
+      tmMoves:    TM_MOVES,
+      eggMoves:   EGG_MOVES,
+      tutorMoves: TUTOR_MOVES,
+      allMoves:   ALL_MOVES,
+    });
   } catch (e) {
     console.warn('loadMovesFromAPI failed:', e);
   }

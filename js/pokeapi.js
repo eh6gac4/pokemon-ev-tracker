@@ -1,17 +1,10 @@
 const BASE = 'https://pokeapi.co/api/v2';
-const CACHE_KEY = 'pokeapi_cache_v2';
+const CACHE_PREFIX = 'pokeapi_processed_v1_';
 const TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
+// In-session deduplication: same path → same Promise, no duplicate network requests
 const memCache = new Map();
 const inFlight = new Map();
-
-// Load from localStorage on module init
-try {
-  const stored = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-  if (stored && stored.expires > Date.now()) {
-    for (const [k, v] of Object.entries(stored.data)) memCache.set(k, v);
-  }
-} catch (e) {}
 
 async function apiFetch(path) {
   if (memCache.has(path)) return memCache.get(path);
@@ -34,11 +27,27 @@ export async function batchFetch(paths, concurrency = 20) {
   return results;
 }
 
-export function persistCache() {
+// Save normalized (post-processed) data to localStorage. Much smaller than raw API responses.
+export function saveProcessed(key, data) {
   try {
-    const data = Object.fromEntries(memCache);
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ expires: Date.now() + TTL_MS, data }));
+    localStorage.setItem(
+      CACHE_PREFIX + key,
+      JSON.stringify({ expires: Date.now() + TTL_MS, data })
+    );
   } catch (e) {
-    console.warn('PokeAPI cache write failed:', e);
+    console.warn('PokeAPI processed cache write failed:', e);
+  }
+}
+
+// Load normalized data. Returns null if missing or expired.
+export function loadProcessed(key) {
+  try {
+    const raw = localStorage.getItem(CACHE_PREFIX + key);
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    if (!stored || typeof stored.expires !== 'number' || stored.expires <= Date.now()) return null;
+    return stored.data;
+  } catch (e) {
+    return null;
   }
 }
