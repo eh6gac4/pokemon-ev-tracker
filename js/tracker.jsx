@@ -20,14 +20,14 @@ const MonCard = React.memo(function MonCard({ mon, evTotal, isActive, inParty, o
         width: "100%", cursor: "pointer", color: "#e8e8e8", textAlign: "center",
         background: isActive ? `${mon.color}22` : "#16213e",
         border: `2px solid ${isActive ? mon.color : "#2a2a4a"}`,
-        borderRadius: "10px", padding: "10px 6px 8px",
+        borderRadius: "8px", padding: "8px",
         position: "relative",
       }}
     >
-      {inParty && <div style={{ position: "absolute", top: "4px", right: "5px", fontSize: "7px", color: mon.color, lineHeight: 1 }}>▲</div>}
-      <div style={{ fontSize: "20px", marginBottom: "3px" }}>{mon.icon}</div>
-      <div style={{ fontSize: "10px", color: isActive ? mon.color : "#aaa", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{mon.name}</div>
-      <div style={{ fontSize: "9px", color: evTotal >= MAX_TOTAL ? "#7fff7f" : "#555", marginTop: "2px" }}>{evTotal}/{MAX_TOTAL}</div>
+      {inParty && <div style={{ position: "absolute", top: "4px", right: "4px", fontSize: "8px", color: mon.color, lineHeight: 1 }}>▲</div>}
+      <div style={{ fontSize: "20px", marginBottom: "4px" }}>{mon.icon}</div>
+      <div style={{ fontSize: "8px", color: isActive ? mon.color : "#aaa", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{mon.name}</div>
+      <div style={{ fontSize: "8px", color: evTotal >= MAX_TOTAL ? "#7fff7f" : "#555", marginTop: "4px" }}>{evTotal}/{MAX_TOTAL}</div>
     </button>
   );
 });
@@ -466,8 +466,8 @@ export default function EVTracker() {
   return (
     <div className="app-wrap" onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd}>
       {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: "18px" }}>
-        <div style={{ fontSize: "10px", letterSpacing: "4px", color: "#555", marginBottom: "2px" }}>FireRed · AUTO SAVE</div>
+      <div style={{ textAlign: "center", marginBottom: "16px" }}>
+        <div style={{ fontSize: "8px", letterSpacing: "4px", color: "#555", marginBottom: "2px" }}>FireRed · AUTO SAVE</div>
         <div style={{ fontSize: "20px", letterSpacing: "2px", color: mon.color, textShadow: `0 0 20px ${mon.color}66` }}>
           ポケログ
         </div>
@@ -499,8 +499,8 @@ export default function EVTracker() {
           )}
 
           {/* 育成リスト */}
-          <div style={{ fontSize: "10px", color: "#444", letterSpacing: "1px", marginBottom: "6px" }}>育成リスト</div>
-          <div className="mon-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "7px", marginBottom: "16px" }}>
+          <div style={{ fontSize: "8px", color: "#444", letterSpacing: "1px", marginBottom: "8px" }}>育成リスト</div>
+          <div className="mon-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "16px" }}>
             {party.map(p => (
               <MonCard
                 key={p.name}
@@ -513,10 +513,10 @@ export default function EVTracker() {
             ))}
             <button
               onClick={() => setAdding(true)}
-              style={{ background: "#16213e", border: "2px dashed #2a2a4a", borderRadius: "10px", padding: "10px 6px", cursor: "pointer", color: "#555", fontSize: "20px", textAlign: "center", lineHeight: 1 }}
+              style={{ background: "#16213e", border: "2px dashed #2a2a4a", borderRadius: "8px", padding: "8px", cursor: "pointer", color: "#555", fontSize: "20px", textAlign: "center", lineHeight: 1 }}
             >
               <div>＋</div>
-              <div style={{ fontSize: "9px", marginTop: "4px" }}>追加</div>
+              <div style={{ fontSize: "8px", marginTop: "4px" }}>追加</div>
             </button>
           </div>
 
@@ -531,18 +531,18 @@ export default function EVTracker() {
           )}
 
           {/* Total bar */}
-          <div className="card" style={{ padding: "10px 14px", marginBottom: "10px", borderColor: mon.color + "33" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "5px" }}>
+          <div className="card" style={{ padding: "8px 16px", marginBottom: "8px", borderColor: mon.color + "33" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "4px" }}>
               <span style={{ color: mon.color }}>合計努力値</span>
               <span>{total}/{MAX_TOTAL}　残り<span style={{ color: remaining < 50 ? "#ff6b6b" : "#aaa" }}>{remaining}</span></span>
             </div>
-            <div className="bar-bg" style={{ height: "7px" }}>
+            <div className="bar-bg" style={{ height: "8px" }}>
               <div className="bar-fill" style={{ height: "100%", width: `${(total / MAX_TOTAL) * 100}%`, background: total >= MAX_TOTAL ? "#7fff7f" : `linear-gradient(90deg, ${mon.color}88, ${mon.color})`, borderRadius: "4px" }} />
             </div>
           </div>
 
           {/* 強制ギプス・がくしゅうそうち */}
-          <div className="toggle-row" style={{ marginBottom: gakushuu ? "4px" : "10px" }}>
+          <div className="toggle-row" style={{ marginBottom: gakushuu ? "4px" : "8px" }}>
             <button
               className="toggle-btn"
               onClick={() => setMacho(v => !v)}
@@ -550,8 +550,8 @@ export default function EVTracker() {
                 width: "100%", cursor: "pointer", fontFamily: "inherit",
                 background: macho ? "#3a1a1a" : "#16213e",
                 border: `1px solid ${macho ? "#ff6b35aa" : "#2a2a4a"}`,
-                borderRadius: "7px", color: macho ? "#ff6b35" : "#555",
-                fontSize: "11px", padding: "7px", letterSpacing: "1px",
+                borderRadius: "8px", color: macho ? "#ff6b35" : "#555",
+                fontSize: "12px", padding: "8px", letterSpacing: "1px",
               }}
             >
               {macho ? "🥊 強制ギプス装備中（EV×2）" : "🥊 強制ギプス　OFF"}
@@ -563,8 +563,8 @@ export default function EVTracker() {
                 width: "100%", cursor: "pointer", fontFamily: "inherit",
                 background: gakushuu ? "#0d2a1a" : "#16213e",
                 border: `1px solid ${gakushuu ? "#4dff91aa" : "#2a2a4a"}`,
-                borderRadius: "7px", color: gakushuu ? "#4dff91" : "#555",
-                fontSize: "11px", padding: "7px", letterSpacing: "1px",
+                borderRadius: "8px", color: gakushuu ? "#4dff91" : "#555",
+                fontSize: "12px", padding: "8px", letterSpacing: "1px",
               }}
             >
               {gakushuu ? "📚 がくしゅうそうち　ON" : "📚 がくしゅうそうち　OFF"}
@@ -573,7 +573,7 @@ export default function EVTracker() {
           {gakushuu && (() => {
             const partyMembers = activeParty.filter(n => n && n !== selected);
             return partyMembers.length > 0 ? (
-              <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", marginBottom: "10px" }}>
+              <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "8px" }}>
                 {partyMembers.map(name => {
                   const p = party.find(p => p.name === name);
                   const isSelected = gakushuuMon === name;
@@ -585,8 +585,8 @@ export default function EVTracker() {
                         cursor: "pointer", fontFamily: "inherit",
                         background: isSelected ? "#0d2a1a" : "#1a1a2e",
                         border: `1px solid ${isSelected ? "#4dff91" : "#2a2a4a"}`,
-                        borderRadius: "6px", color: isSelected ? "#4dff91" : "#888",
-                        fontSize: "11px", padding: "4px 8px", letterSpacing: "0.5px",
+                        borderRadius: "8px", color: isSelected ? "#4dff91" : "#888",
+                        fontSize: "12px", padding: "4px 8px", letterSpacing: "0.5px",
                       }}
                     >
                       {p?.icon || "?"} {name}
@@ -595,7 +595,7 @@ export default function EVTracker() {
                 })}
               </div>
             ) : (
-              <div style={{ fontSize: "11px", color: "#555", marginBottom: "10px", textAlign: "center" }}>
+              <div style={{ fontSize: "12px", color: "#555", marginBottom: "8px", textAlign: "center" }}>
                 パーティに他のポケモンを追加してください
               </div>
             );
@@ -608,29 +608,29 @@ export default function EVTracker() {
             const gTotal = Object.values(gEVs).reduce((a, b) => a + b, 0);
             const accent = gMon?.color || "#4dff91";
             return (
-              <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: accent + "44" }}>
-                <div style={{ fontSize: "10px", color: accent, marginBottom: "8px", letterSpacing: "1px" }}>
+              <div className="card" style={{ padding: "8px 12px", marginBottom: "8px", borderColor: accent + "44" }}>
+                <div style={{ fontSize: "8px", color: accent, marginBottom: "8px", letterSpacing: "1px" }}>
                   {gMon?.icon || "📚"} {gakushuuMon} の努力値
                 </div>
                 {STATS.map(stat => {
                   const val     = gEVs[stat.key] || 0;
                   const isMaxed = val >= MAX_STAT;
                   return (
-                    <div key={stat.key} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
-                      <span style={{ fontSize: "10px", minWidth: "52px", color: isMaxed ? "#7fff7f" : "#666" }}>
+                    <div key={stat.key} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                      <span style={{ fontSize: "8px", minWidth: "52px", color: isMaxed ? "#7fff7f" : "#666" }}>
                         {stat.jp}
                       </span>
                       <div className="bar-bg" style={{ flex: 1, height: "4px" }}>
-                        <div className="bar-fill" style={{ height: "100%", width: `${(val / MAX_STAT) * 100}%`, background: isMaxed ? "#7fff7f" : accent, borderRadius: "3px" }} />
+                        <div className="bar-fill" style={{ height: "100%", width: `${(val / MAX_STAT) * 100}%`, background: isMaxed ? "#7fff7f" : accent, borderRadius: "4px" }} />
                       </div>
-                      <span style={{ fontSize: "11px", minWidth: "28px", textAlign: "right", color: isMaxed ? "#7fff7f" : "#aaa", fontWeight: isMaxed ? "bold" : "normal" }}>
+                      <span style={{ fontSize: "12px", minWidth: "28px", textAlign: "right", color: isMaxed ? "#7fff7f" : "#aaa", fontWeight: isMaxed ? "bold" : "normal" }}>
                         {val}
                       </span>
-                      {isMaxed && <span className="badge-max" style={{ fontSize: "7px", padding: "1px 3px" }}>MAX</span>}
+                      {isMaxed && <span className="badge-max" style={{ fontSize: "8px", padding: "1px 4px" }}>MAX</span>}
                     </div>
                   );
                 })}
-                <div style={{ fontSize: "10px", color: "#555", textAlign: "right", marginTop: "4px", borderTop: "1px solid #2a2a4a", paddingTop: "5px" }}>
+                <div style={{ fontSize: "8px", color: "#555", textAlign: "right", marginTop: "4px", borderTop: "1px solid #2a2a4a", paddingTop: "4px" }}>
                   合計 <span style={{ color: gTotal >= MAX_TOTAL ? "#7fff7f" : "#aaa" }}>{gTotal}</span> / {MAX_TOTAL}
                 </div>
               </div>
@@ -638,7 +638,7 @@ export default function EVTracker() {
           })()}
 
           {/* Stats */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "14px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
             {STATS.map(stat => (
               <StatRow key={stat.key} stat={stat} val={evs[stat.key] || 0} color={mon.color} macho={macho} onChange={changeCallbacks[stat.key]} />
             ))}
@@ -657,8 +657,8 @@ export default function EVTracker() {
           <ItemPicker value={mon.item || ""} color={mon.color} onChange={updateItem} />
 
           {/* メモ */}
-          <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: mon.color + "22" }}>
-            <div style={{ fontSize: "10px", color: "#555", marginBottom: "6px", letterSpacing: "1px" }}>メモ</div>
+          <div className="card" style={{ padding: "8px 12px", marginBottom: "8px", borderColor: mon.color + "22" }}>
+            <div style={{ fontSize: "8px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>メモ</div>
             <AutoTextarea value={mon.memo || ""} onChange={updateMemo} placeholder="自由メモ…" />
           </div>
 
@@ -667,53 +667,53 @@ export default function EVTracker() {
                    onTrainerBattle={changeTrainerCount}
                    onResetTrainerCounts={resetTrainerCounts} />
 
-          <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
-            <button onClick={reset} style={{ flex: 1, background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+            <button onClick={reset} style={{ flex: 1, background: "transparent", border: "1px solid #2a2a4a", borderRadius: "8px", color: "#555", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
               EV リセット
             </button>
             {party.length > 1 && (<>
-              <button onClick={() => archiveMon(selected)} style={{ flex: 1, background: "transparent", border: "1px solid #f5d02044", borderRadius: "7px", color: "#f5d020", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
+              <button onClick={() => archiveMon(selected)} style={{ flex: 1, background: "transparent", border: "1px solid #f5d02044", borderRadius: "8px", color: "#f5d020", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
                 アーカイブ
               </button>
-              <button onClick={() => removeMon(selected)} style={{ flex: 1, background: "transparent", border: "1px solid #ff444444", borderRadius: "7px", color: "#ff6666", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
+              <button onClick={() => removeMon(selected)} style={{ flex: 1, background: "transparent", border: "1px solid #ff444444", borderRadius: "8px", color: "#ff6666", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "2px" }}>
                 削除
               </button>
             </>)}
           </div>
 
           {renaming ? (
-            <div style={{ display: "flex", gap: "6px", marginBottom: "10px" }}>
+            <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
               <input
                 autoFocus
                 value={renameValue}
                 onChange={e => setRenameValue(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.isComposing) renameMon(selected, renameValue); if (e.key === "Escape") setRenaming(false); }}
-                style={{ flex: 1, minWidth: 0, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "13px", padding: "8px 10px", fontFamily: "inherit", outline: "none" }}
+                style={{ flex: 1, minWidth: 0, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "8px", color: "#e8e8e8", fontSize: "12px", padding: "8px", fontFamily: "inherit", outline: "none" }}
               />
-              <button onClick={() => renameMon(selected, renameValue)} style={{ flexShrink: 0, background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: mon.color, fontSize: "11px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
-              <button onClick={() => setRenaming(false)} style={{ flexShrink: 0, background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "8px 10px", cursor: "pointer", fontFamily: "inherit" }}>×</button>
+              <button onClick={() => renameMon(selected, renameValue)} style={{ flexShrink: 0, background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "8px", color: mon.color, fontSize: "12px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
+              <button onClick={() => setRenaming(false)} style={{ flexShrink: 0, background: "transparent", border: "1px solid #2a2a4a", borderRadius: "8px", color: "#555", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit" }}>×</button>
             </div>
           ) : (
-            <button onClick={() => { setRenameValue(selected); setRenaming(true); }} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px", marginBottom: "10px" }}>
+            <button onClick={() => { setRenameValue(selected); setRenaming(true); }} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "8px", color: "#555", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px", marginBottom: "8px" }}>
               ✏️ 名前を変更
             </button>
           )}
 
           {iconEditing ? (
-            <div style={{ display: "flex", gap: "6px", marginBottom: "10px", alignItems: "center" }}>
+            <div style={{ display: "flex", gap: "8px", marginBottom: "8px", alignItems: "center" }}>
               <input
                 autoFocus
                 value={iconValue}
                 onChange={e => setIconValue(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.isComposing) updateIcon(iconValue); if (e.key === "Escape") setIconEditing(false); }}
                 placeholder="絵文字を入力"
-                style={{ flex: 1, minWidth: 0, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: "#e8e8e8", fontSize: "20px", padding: "6px 10px", fontFamily: "inherit", outline: "none", textAlign: "center" }}
+                style={{ flex: 1, minWidth: 0, background: "#16213e", border: `1px solid ${mon.color}88`, borderRadius: "8px", color: "#e8e8e8", fontSize: "20px", padding: "8px", fontFamily: "inherit", outline: "none", textAlign: "center" }}
               />
-              <button onClick={() => updateIcon(iconValue)} style={{ flexShrink: 0, background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "7px", color: mon.color, fontSize: "11px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
-              <button onClick={() => setIconEditing(false)} style={{ flexShrink: 0, background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "8px 10px", cursor: "pointer", fontFamily: "inherit" }}>×</button>
+              <button onClick={() => updateIcon(iconValue)} style={{ flexShrink: 0, background: mon.color + "22", border: `1px solid ${mon.color}88`, borderRadius: "8px", color: mon.color, fontSize: "12px", padding: "8px 12px", cursor: "pointer", fontFamily: "inherit" }}>確定</button>
+              <button onClick={() => setIconEditing(false)} style={{ flexShrink: 0, background: "transparent", border: "1px solid #2a2a4a", borderRadius: "8px", color: "#555", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit" }}>×</button>
             </div>
           ) : (
-            <button onClick={() => { setIconValue(mon.icon || ""); setIconEditing(true); }} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "7px", color: "#555", fontSize: "11px", padding: "9px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px", marginBottom: "10px" }}>
+            <button onClick={() => { setIconValue(mon.icon || ""); setIconEditing(true); }} style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "8px", color: "#555", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px", marginBottom: "8px" }}>
               {mon.icon} アイコンを変更
             </button>
           )}
@@ -771,7 +771,7 @@ export default function EVTracker() {
       </div>
 
       {isDev && (
-        <div style={{ position: "fixed", bottom: "56px", left: "8px", fontSize: "9px", color: "#444", background: "#111", border: "1px solid #333", borderRadius: "3px", padding: "2px 5px", letterSpacing: "1px", fontFamily: "monospace", zIndex: 101 }}>DEV</div>
+        <div style={{ position: "fixed", bottom: "56px", left: "8px", fontSize: "8px", color: "#444", background: "#111", border: "1px solid #333", borderRadius: "4px", padding: "2px 4px", letterSpacing: "1px", fontFamily: "monospace", zIndex: 101 }}>DEV</div>
       )}
 
       {/* Bottom nav（モバイルのみ） */}
@@ -785,7 +785,7 @@ export default function EVTracker() {
         <button onClick={() => navigateTab("chosa")} style={{ color: activeTab === "chosa" ? mon.color : "#555", borderTopColor: activeTab === "chosa" ? mon.color : "transparent" }}>
           📊 データ
         </button>
-        <button onClick={() => { location.reload(true); }} title="全ファイルをキャッシュなしで再取得" style={{ flex: "0 0 auto", padding: "16px 14px", color: "#2a2a4a", fontSize: "16px", borderTopColor: "transparent" }}>
+        <button onClick={() => { location.reload(true); }} title="全ファイルをキャッシュなしで再取得" style={{ flex: "0 0 auto", padding: "16px", color: "#2a2a4a", fontSize: "16px", borderTopColor: "transparent" }}>
           ↺
         </button>
       </nav>

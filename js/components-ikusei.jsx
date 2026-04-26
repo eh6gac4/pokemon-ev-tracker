@@ -7,11 +7,11 @@ import { Panel, PokemonSearch, AutoTextarea, tmItemName } from './components-bas
 export const AddMonModal = React.memo(function AddMonModal({ newName, newIcon, newColor, newDexId, setNewName, setNewIcon, setNewColor, setNewDexId, onAdd, onCancel, borderColor }) {
 
   return (
-    <div className="card" style={{ padding: "14px", marginBottom: "14px", borderColor: borderColor + "55", borderRadius: "12px" }}>
-      <div style={{ fontSize: "11px", color: "#888", marginBottom: "10px", letterSpacing: "2px" }}>ポケモンを追加</div>
+    <div className="card" style={{ padding: "16px", marginBottom: "16px", borderColor: borderColor + "55", borderRadius: "12px" }}>
+      <div style={{ fontSize: "12px", color: "#888", marginBottom: "8px", letterSpacing: "2px" }}>ポケモンを追加</div>
 
       {/* 図鑑検索 */}
-      <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px" }}>図鑑から選択</div>
+      <div style={{ fontSize: "8px", color: "#666", marginBottom: "4px" }}>図鑑から選択</div>
       <div style={{ marginBottom: "8px" }}>
         <PokemonSearch
           value={newDexId}
@@ -23,30 +23,30 @@ export const AddMonModal = React.memo(function AddMonModal({ newName, newIcon, n
       </div>
 
       {/* 表示名（図鑑選択後に自動入力、変更可） */}
-      <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px" }}>表示名</div>
+      <div style={{ fontSize: "8px", color: "#666", marginBottom: "4px" }}>表示名</div>
       <input
         value={newName}
         onChange={e => setNewName(e.target.value)}
         onKeyDown={e => e.key === "Enter" && !e.isComposing && onAdd()}
         placeholder="なまえ（例：ゲンガー）"
         className="input-dark"
-        style={{ width: "100%", fontSize: "13px", padding: "8px 10px", marginBottom: "8px" }}
+        style={{ width: "100%", fontSize: "12px", padding: "8px", marginBottom: "8px" }}
       />
-      <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px" }}>アイコン</div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "10px" }}>
+      <div style={{ fontSize: "8px", color: "#666", marginBottom: "4px" }}>アイコン</div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
         {ICONS.map(ic => (
-          <button key={ic} onClick={() => setNewIcon(ic)} style={{ background: newIcon === ic ? "#2a2a4a" : "transparent", border: newIcon === ic ? "1px solid #888" : "1px solid transparent", borderRadius: "6px", padding: "3px 5px", cursor: "pointer", fontSize: "16px" }}>{ic}</button>
+          <button key={ic} onClick={() => setNewIcon(ic)} style={{ background: newIcon === ic ? "#2a2a4a" : "transparent", border: newIcon === ic ? "1px solid #888" : "1px solid transparent", borderRadius: "8px", padding: "4px", cursor: "pointer", fontSize: "16px" }}>{ic}</button>
         ))}
       </div>
-      <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px" }}>カラー</div>
-      <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
+      <div style={{ fontSize: "8px", color: "#666", marginBottom: "4px" }}>カラー</div>
+      <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
         {COLORS.map(c => (
           <button key={c} onClick={() => setNewColor(c)} style={{ width: "24px", height: "24px", background: c, border: newColor === c ? "2px solid #fff" : "2px solid transparent", borderRadius: "50%", cursor: "pointer" }} />
         ))}
       </div>
       <div style={{ display: "flex", gap: "8px" }}>
-        <button onClick={onAdd} style={{ flex: 1, background: `${newColor}33`, border: `1px solid ${newColor}88`, borderRadius: "7px", color: newColor, fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit" }}>追加する</button>
-        <button onClick={onCancel} style={{ flex: 1, background: "transparent", border: "1px solid #3a3a5a", borderRadius: "7px", color: "#666", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit" }}>キャンセル</button>
+        <button onClick={onAdd} style={{ flex: 1, background: `${newColor}33`, border: `1px solid ${newColor}88`, borderRadius: "8px", color: newColor, fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit" }}>追加する</button>
+        <button onClick={onCancel} style={{ flex: 1, background: "transparent", border: "1px solid #3a3a5a", borderRadius: "8px", color: "#666", fontSize: "12px", padding: "8px", cursor: "pointer", fontFamily: "inherit" }}>キャンセル</button>
       </div>
     </div>
   );
@@ -74,40 +74,40 @@ export const NaturePicker = React.memo(function NaturePicker({ value, color, onC
   const current = NATURES.find(n => n.name === value) || null;
 
   return (
-    <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: color + "22" }}>
-      <div style={{ fontSize: "10px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>性格</div>
+    <div className="card" style={{ padding: "8px 12px", marginBottom: "8px", borderColor: color + "22" }}>
+      <div style={{ fontSize: "8px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>性格</div>
       <button
         onClick={() => { setOpen(v => !v); if (!open) setTimeout(() => inputRef.current?.focus(), 30); setQuery(""); }}
         style={{
           width: "100%", textAlign: "left", fontFamily: "inherit",
           background: open ? color + "22" : "#16213e",
           border: `1px solid ${open ? color : "#2a2a4a"}`,
-          borderRadius: open ? "6px 6px 0 0" : "6px",
-          padding: "7px 10px", cursor: "pointer",
+          borderRadius: open ? "8px 8px 0 0" : "8px",
+          padding: "8px", cursor: "pointer",
           color: current ? "#e8e8e8" : "#444", fontSize: "12px",
         }}
       >
         {current ? (
           <>
-            <span style={{ color: color, marginRight: "6px" }}>{current.name}</span>
+            <span style={{ color: color, marginRight: "8px" }}>{current.name}</span>
             {current.up
-              ? <span style={{ fontSize: "10px", color: "#888" }}>↑{STAT_JP[current.up]} / ↓{STAT_JP[current.dn]}</span>
-              : <span style={{ fontSize: "10px", color: "#888" }}>補正なし</span>}
+              ? <span style={{ fontSize: "8px", color: "#888" }}>↑{STAT_JP[current.up]} / ↓{STAT_JP[current.dn]}</span>
+              : <span style={{ fontSize: "8px", color: "#888" }}>補正なし</span>}
           </>
         ) : "── 未設定 ──"}
       </button>
       {open && (
-        <div style={{ background: "#0d1b2a", border: `1px solid ${color}44`, borderTop: "none", borderRadius: "0 0 6px 6px", padding: "6px" }}>
+        <div style={{ background: "#0d1b2a", border: `1px solid ${color}44`, borderTop: "none", borderRadius: "0 0 8px 8px", padding: "8px" }}>
           <div style={{ display: "flex", gap: "4px", marginBottom: "4px" }}>
             <input
               ref={inputRef}
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="性格名で検索…"
-              style={{ flex: 1, background: "#16213e", border: `1px solid ${color}44`, borderRadius: "4px", padding: "5px 8px", color: "#e8e8e8", fontFamily: "inherit", fontSize: "11px", outline: "none" }}
+              style={{ flex: 1, background: "#16213e", border: `1px solid ${color}44`, borderRadius: "4px", padding: "4px 8px", color: "#e8e8e8", fontFamily: "inherit", fontSize: "12px", outline: "none" }}
             />
             {value && (
-              <button onClick={() => select("")} style={{ background: "transparent", border: "1px solid #ff444466", borderRadius: "4px", color: "#ff6666", fontSize: "10px", padding: "5px 8px", cursor: "pointer", fontFamily: "inherit" }}>
+              <button onClick={() => select("")} style={{ background: "transparent", border: "1px solid #ff444466", borderRadius: "4px", color: "#ff6666", fontSize: "8px", padding: "4px 8px", cursor: "pointer", fontFamily: "inherit" }}>
                 クリア
               </button>
             )}
@@ -117,18 +117,18 @@ export const NaturePicker = React.memo(function NaturePicker({ value, color, onC
               <button key={n.name} onClick={() => select(n.name)}
                 style={{
                   textAlign: "left", background: n.name === value ? color + "33" : "transparent",
-                  border: "none", borderRadius: "3px", padding: "4px 8px",
-                  color: n.name === value ? color : "#aaa", fontSize: "11px", cursor: "pointer", fontFamily: "inherit",
+                  border: "none", borderRadius: "4px", padding: "4px 8px",
+                  color: n.name === value ? color : "#aaa", fontSize: "12px", cursor: "pointer", fontFamily: "inherit",
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                 }}
               >
                 <span>{n.name}</span>
                 {n.up
-                  ? <span style={{ fontSize: "10px", color: "#555" }}>↑{STAT_JP[n.up]} / ↓{STAT_JP[n.dn]}</span>
-                  : <span style={{ fontSize: "10px", color: "#555" }}>補正なし</span>}
+                  ? <span style={{ fontSize: "8px", color: "#555" }}>↑{STAT_JP[n.up]} / ↓{STAT_JP[n.dn]}</span>
+                  : <span style={{ fontSize: "8px", color: "#555" }}>補正なし</span>}
               </button>
             ))}
-            {filtered.length === 0 && <div style={{ color: "#444", fontSize: "11px", padding: "4px 8px" }}>該当なし</div>}
+            {filtered.length === 0 && <div style={{ color: "#444", fontSize: "12px", padding: "4px 8px" }}>該当なし</div>}
           </div>
         </div>
       )}
@@ -156,38 +156,38 @@ export const ItemPicker = React.memo(function ItemPicker({ value, color, onChang
   const current = HOLD_ITEMS.find(it => it.name === value) || null;
 
   return (
-    <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: color + "22" }}>
-      <div style={{ fontSize: "10px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>持ち物</div>
+    <div className="card" style={{ padding: "8px 12px", marginBottom: "8px", borderColor: color + "22" }}>
+      <div style={{ fontSize: "8px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>持ち物</div>
       <button
         onClick={() => { setOpen(v => !v); if (!open) setTimeout(() => inputRef.current?.focus(), 30); setQuery(""); }}
         style={{
           width: "100%", textAlign: "left", fontFamily: "inherit",
           background: open ? color + "22" : "#16213e",
           border: `1px solid ${open ? color : "#2a2a4a"}`,
-          borderRadius: open ? "6px 6px 0 0" : "6px",
-          padding: "7px 10px", cursor: "pointer",
+          borderRadius: open ? "8px 8px 0 0" : "8px",
+          padding: "8px", cursor: "pointer",
           color: current ? "#e8e8e8" : "#444", fontSize: "12px",
         }}
       >
         {current ? (
           <>
-            <span style={{ color: color, marginRight: "6px" }}>{current.name}</span>
-            <span style={{ fontSize: "10px", color: "#888" }}>{current.note}</span>
+            <span style={{ color: color, marginRight: "8px" }}>{current.name}</span>
+            <span style={{ fontSize: "8px", color: "#888" }}>{current.note}</span>
           </>
         ) : "── 未設定 ──"}
       </button>
       {open && (
-        <div style={{ background: "#0d1b2a", border: `1px solid ${color}44`, borderTop: "none", borderRadius: "0 0 6px 6px", padding: "6px" }}>
+        <div style={{ background: "#0d1b2a", border: `1px solid ${color}44`, borderTop: "none", borderRadius: "0 0 8px 8px", padding: "8px" }}>
           <div style={{ display: "flex", gap: "4px", marginBottom: "4px" }}>
             <input
               ref={inputRef}
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="アイテム名・カテゴリで検索…"
-              style={{ flex: 1, background: "#16213e", border: `1px solid ${color}44`, borderRadius: "4px", padding: "5px 8px", color: "#e8e8e8", fontFamily: "inherit", fontSize: "11px", outline: "none" }}
+              style={{ flex: 1, background: "#16213e", border: `1px solid ${color}44`, borderRadius: "4px", padding: "4px 8px", color: "#e8e8e8", fontFamily: "inherit", fontSize: "12px", outline: "none" }}
             />
             {value && (
-              <button onClick={() => select("")} style={{ background: "transparent", border: "1px solid #ff444466", borderRadius: "4px", color: "#ff6666", fontSize: "10px", padding: "5px 8px", cursor: "pointer", fontFamily: "inherit" }}>
+              <button onClick={() => select("")} style={{ background: "transparent", border: "1px solid #ff444466", borderRadius: "4px", color: "#ff6666", fontSize: "8px", padding: "4px 8px", cursor: "pointer", fontFamily: "inherit" }}>
                 クリア
               </button>
             )}
@@ -197,16 +197,16 @@ export const ItemPicker = React.memo(function ItemPicker({ value, color, onChang
               <button key={it.name} onClick={() => select(it.name)}
                 style={{
                   textAlign: "left", background: it.name === value ? color + "33" : "transparent",
-                  border: "none", borderRadius: "3px", padding: "4px 8px",
-                  color: it.name === value ? color : "#aaa", fontSize: "11px", cursor: "pointer", fontFamily: "inherit",
+                  border: "none", borderRadius: "4px", padding: "4px 8px",
+                  color: it.name === value ? color : "#aaa", fontSize: "12px", cursor: "pointer", fontFamily: "inherit",
                   display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px",
                 }}
               >
                 <span style={{ whiteSpace: "nowrap" }}>{it.name}</span>
-                <span style={{ fontSize: "10px", color: "#555", textAlign: "right" }}>{it.note}</span>
+                <span style={{ fontSize: "8px", color: "#555", textAlign: "right" }}>{it.note}</span>
               </button>
             ))}
-            {filtered.length === 0 && <div style={{ color: "#444", fontSize: "11px", padding: "4px 8px" }}>該当なし</div>}
+            {filtered.length === 0 && <div style={{ color: "#444", fontSize: "12px", padding: "4px 8px" }}>該当なし</div>}
           </div>
         </div>
       )}
@@ -245,18 +245,18 @@ export const MovePicker = React.memo(function MovePicker({ moves, color, onChang
       <button key={badge ? `${m}__${badge}` : m} onClick={() => select(m)}
         style={{
           textAlign: "left", background: m === currentMove ? color + "33" : "transparent",
-          border: "none", borderRadius: "3px", padding: "3px 8px",
-          color: m === currentMove ? color : "#aaa", fontSize: "11px", cursor: "pointer", fontFamily: "inherit",
+          border: "none", borderRadius: "4px", padding: "4px 8px",
+          color: m === currentMove ? color : "#aaa", fontSize: "12px", cursor: "pointer", fontFamily: "inherit",
           display: "flex", alignItems: "center", gap: "4px",
         }}
       >
-        {badge && <span style={{ fontSize: "8px", color: "#778", background: "#0e1828", borderRadius: "3px", padding: "1px 4px", flexShrink: 0, minWidth: "34px", textAlign: "center" }}>{badge}</span>}
+        {badge && <span style={{ fontSize: "8px", color: "#778", background: "#0e1828", borderRadius: "4px", padding: "1px 4px", flexShrink: 0, minWidth: "32px", textAlign: "center" }}>{badge}</span>}
         {mtc
-          ? <span style={{ fontSize: "8px", color: "#fff", background: mtc + "cc", borderRadius: "3px", padding: "1px 3px", whiteSpace: "nowrap", flexShrink: 0 }}>{mmd[0]}</span>
-          : <span style={{ fontSize: "8px", color: "#333", background: "#1a1a2e", borderRadius: "3px", padding: "1px 3px", flexShrink: 0 }}>?</span>
+          ? <span style={{ fontSize: "8px", color: "#fff", background: mtc + "cc", borderRadius: "4px", padding: "1px 4px", whiteSpace: "nowrap", flexShrink: 0 }}>{mmd[0]}</span>
+          : <span style={{ fontSize: "8px", color: "#333", background: "#1a1a2e", borderRadius: "4px", padding: "1px 4px", flexShrink: 0 }}>?</span>
         }
         <span style={{ flex: 1 }}>{m}</span>
-        {mmd && <span style={{ fontSize: "8px", color: "#555", display: "flex", gap: "3px", flexShrink: 0 }}>
+        {mmd && <span style={{ fontSize: "8px", color: "#555", display: "flex", gap: "4px", flexShrink: 0 }}>
           <span style={{ color: mmd[1] !== null ? "#b0a0d8" : "#383848" }}>P:{mmd[1] !== null ? mmd[1] : "---"}</span>
           <span style={{ color: mmd[2] !== null ? "#6898b8" : "#383848" }}>A:{mmd[2] !== null ? mmd[2] : "---"}</span>
           <span style={{ color: "#484858" }}>PP:{mmd[3]}</span>
@@ -302,15 +302,15 @@ export const MovePicker = React.memo(function MovePicker({ moves, color, onChang
     ].filter(s => s.items.length > 0);
 
     return sections.flatMap((s, si) => [
-      <div key={`hdr-${s.key}`} style={{ fontSize: "9px", color: "#556", padding: "4px 8px 2px", letterSpacing: "1px", background: "#0a1220", marginTop: si > 0 ? "3px" : 0 }}>{s.label}</div>,
+      <div key={`hdr-${s.key}`} style={{ fontSize: "8px", color: "#556", padding: "4px 8px", letterSpacing: "1px", background: "#0a1220", marginTop: si > 0 ? "4px" : 0 }}>{s.label}</div>,
       ...s.items.map(({ name, badge }) => renderMoveBtn(name, badge, currentMove)),
     ]);
   };
 
   return (
-    <div className="card" style={{ padding: "10px 12px", marginBottom: "10px", borderColor: color + "22" }}>
-      <div style={{ fontSize: "10px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>技セット</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+    <div className="card" style={{ padding: "8px 12px", marginBottom: "8px", borderColor: color + "22" }}>
+      <div style={{ fontSize: "8px", color: "#555", marginBottom: "8px", letterSpacing: "1px" }}>技セット</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
         {moves.map((move, i) => {
           const md = move ? MOVE_DATA[move] : null;
           const tc = md ? (TYPE_COLORS[md[0]] || "#555") : null;
@@ -322,33 +322,33 @@ export const MovePicker = React.memo(function MovePicker({ moves, color, onChang
                 width: "100%", textAlign: "left", fontFamily: "inherit",
                 background: activeSlot === i ? color + "22" : "#16213e",
                 border: `1px solid ${activeSlot === i ? color : "#2a2a4a"}`,
-                borderRadius: activeSlot === i ? "6px 6px 0 0" : "6px",
-                padding: "7px 10px", cursor: "pointer",
+                borderRadius: activeSlot === i ? "8px 8px 0 0" : "8px",
+                padding: "8px", cursor: "pointer",
                 color: move ? "#e8e8e8" : "#444", fontSize: "12px",
-                display: "flex", alignItems: "center", gap: "6px",
+                display: "flex", alignItems: "center", gap: "8px",
               }}
             >
-              <span style={{ color: color, fontSize: "10px", flexShrink: 0 }}>わざ{i + 1}</span>
-              {tc && <span style={{ fontSize: "8px", color: "#fff", background: tc + "cc", borderRadius: "3px", padding: "1px 3px", flexShrink: 0 }}>{md[0]}</span>}
+              <span style={{ color: color, fontSize: "8px", flexShrink: 0 }}>わざ{i + 1}</span>
+              {tc && <span style={{ fontSize: "8px", color: "#fff", background: tc + "cc", borderRadius: "4px", padding: "1px 4px", flexShrink: 0 }}>{md[0]}</span>}
               <span style={{ flex: 1 }}>{move || "── 未設定 ──"}</span>
-              {md && <span style={{ fontSize: "8px", color: "#555", display: "flex", gap: "3px", flexShrink: 0 }}>
+              {md && <span style={{ fontSize: "8px", color: "#555", display: "flex", gap: "4px", flexShrink: 0 }}>
                 <span style={{ color: md[1] !== null ? "#b0a0d8" : "#383848" }}>P:{md[1] !== null ? md[1] : "---"}</span>
                 <span style={{ color: md[2] !== null ? "#6898b8" : "#383848" }}>A:{md[2] !== null ? md[2] : "---"}</span>
                 <span style={{ color: "#484858" }}>PP:{md[3]}</span>
               </span>}
             </button>
             {activeSlot === i && (
-              <div style={{ background: "#0d1b2a", border: `1px solid ${color}44`, borderTop: "none", borderRadius: "0 0 6px 6px", padding: "6px" }}>
+              <div style={{ background: "#0d1b2a", border: `1px solid ${color}44`, borderTop: "none", borderRadius: "0 0 8px 8px", padding: "8px" }}>
                 <div style={{ display: "flex", gap: "4px", marginBottom: "4px" }}>
                   <input
                     ref={inputRef}
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     placeholder="技名で検索…"
-                    style={{ flex: 1, background: "#16213e", border: `1px solid ${color}44`, borderRadius: "4px", padding: "5px 8px", color: "#e8e8e8", fontFamily: "inherit", fontSize: "11px", outline: "none" }}
+                    style={{ flex: 1, background: "#16213e", border: `1px solid ${color}44`, borderRadius: "4px", padding: "4px 8px", color: "#e8e8e8", fontFamily: "inherit", fontSize: "12px", outline: "none" }}
                   />
                   {move && (
-                    <button onClick={() => select("")} style={{ background: "transparent", border: "1px solid #ff444466", borderRadius: "4px", color: "#ff6666", fontSize: "10px", padding: "5px 8px", cursor: "pointer", fontFamily: "inherit" }}>
+                    <button onClick={() => select("")} style={{ background: "transparent", border: "1px solid #ff444466", borderRadius: "4px", color: "#ff6666", fontSize: "8px", padding: "4px 8px", cursor: "pointer", fontFamily: "inherit" }}>
                       クリア
                     </button>
                   )}
@@ -358,7 +358,7 @@ export const MovePicker = React.memo(function MovePicker({ moves, color, onChang
                     ? renderGroupedList(move)
                     : filtered.slice(0, 100).map(m => renderMoveBtn(m, null, move))
                   }
-                  {query.trim() && filtered.length === 0 && <div style={{ color: "#444", fontSize: "11px", padding: "4px 8px" }}>該当なし</div>}
+                  {query.trim() && filtered.length === 0 && <div style={{ color: "#444", fontSize: "12px", padding: "4px 8px" }}>該当なし</div>}
                 </div>
               </div>
             )}
@@ -373,12 +373,12 @@ export const MovePicker = React.memo(function MovePicker({ moves, color, onChang
 export const PartySlots = React.memo(function PartySlots({ slots, roster, color, onSlotSelect, onSlotClear, onEmptySlotClick }) {
   const filled = slots.filter(Boolean).length;
   return (
-    <div className="card" style={{ padding: "10px 12px", marginBottom: "16px", borderColor: color + "44" }}>
+    <div className="card" style={{ padding: "8px 12px", marginBottom: "16px", borderColor: color + "44" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-        <span style={{ fontSize: "10px", color: "#555", letterSpacing: "1px" }}>現在のパーティ</span>
-        <span style={{ fontSize: "9px", color: filled === 6 ? color : "#444" }}>{filled}/6</span>
+        <span style={{ fontSize: "8px", color: "#555", letterSpacing: "1px" }}>現在のパーティ</span>
+        <span style={{ fontSize: "8px", color: filled === 6 ? color : "#444" }}>{filled}/6</span>
       </div>
-      <div style={{ display: "flex", gap: "5px" }}>
+      <div style={{ display: "flex", gap: "4px" }}>
         {[0,1,2,3,4,5].map(i => {
           const name = slots[i] || null;
           const mon = name ? roster.find(p => p.name === name) : null;
@@ -389,15 +389,15 @@ export const PartySlots = React.memo(function PartySlots({ slots, roster, color,
                 style={{
                   width: "100%", background: mon ? `${mon.color}22` : "#0d0d1a",
                   border: `1px solid ${mon ? mon.color + "66" : "#2a2a4a"}`,
-                  borderRadius: "8px", padding: "6px 2px 5px", cursor: "pointer",
+                  borderRadius: "8px", padding: "8px 2px 4px", cursor: "pointer",
                   textAlign: "center", minHeight: "52px", display: "flex",
                   flexDirection: "column", alignItems: "center", justifyContent: "center",
                 }}
               >
                 {mon ? (
                   <>
-                    <div style={{ fontSize: "18px", lineHeight: 1 }}>{mon.icon}</div>
-                    <div style={{ fontSize: "7px", color: mon.color, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", width: "100%", padding: "0 2px", marginTop: "3px" }}>{mon.name}</div>
+                    <div style={{ fontSize: "16px", lineHeight: 1 }}>{mon.icon}</div>
+                    <div style={{ fontSize: "8px", color: mon.color, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", width: "100%", padding: "0 2px", marginTop: "4px" }}>{mon.name}</div>
                   </>
                 ) : (
                   <div style={{ fontSize: "16px", color: "#2a2a4a", lineHeight: 1 }}>＋</div>
@@ -407,10 +407,10 @@ export const PartySlots = React.memo(function PartySlots({ slots, roster, color,
                 <button
                   onClick={e => { e.stopPropagation(); onSlotClear(i); }}
                   style={{
-                    position: "absolute", top: "-5px", right: "-5px",
+                    position: "absolute", top: "-4px", right: "-4px",
                     width: "16px", height: "16px", background: "#1a1a2e",
                     border: "1px solid #3a3a5a", borderRadius: "50%",
-                    color: "#888", fontSize: "9px", cursor: "pointer",
+                    color: "#888", fontSize: "8px", cursor: "pointer",
                     padding: 0, lineHeight: 1, fontFamily: "inherit",
                   }}
                 >×</button>
@@ -434,8 +434,8 @@ export const PartyPickerModal = React.memo(function PartyPickerModal({ roster, a
       style={{
         flex: 1, background: tab === id ? color + "22" : "transparent",
         border: `1px solid ${tab === id ? color + "66" : "#2a2a4a"}`,
-        borderRadius: "6px", padding: "7px", cursor: "pointer",
-        color: tab === id ? color : "#555", fontSize: "10px",
+        borderRadius: "8px", padding: "8px", cursor: "pointer",
+        color: tab === id ? color : "#555", fontSize: "8px",
         fontFamily: "inherit", letterSpacing: "1px",
       }}
     >{label}{tab !== id && id === "archived" && archivedParty.length > 0 && ` (${archivedParty.length})`}</button>
@@ -447,14 +447,14 @@ export const PartyPickerModal = React.memo(function PartyPickerModal({ roster, a
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div style={{ width: "100%", background: "#1a1a2e", borderRadius: "16px 16px 0 0", padding: "16px 16px 24px", maxHeight: "65vh", overflowY: "auto" }}>
-        <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
+        <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
           {tabBtn("active", "育成中")}
           {tabBtn("archived", "アーカイブ済み")}
         </div>
 
         {tab === "active" && (
           available.length === 0 ? (
-            <div style={{ textAlign: "center", color: "#555", fontSize: "11px", padding: "20px" }}>育成中のポケモンは全員パーティに入っています</div>
+            <div style={{ textAlign: "center", color: "#555", fontSize: "12px", padding: "20px" }}>育成中のポケモンは全員パーティに入っています</div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "12px" }}>
               {available.map(p => (
@@ -463,11 +463,11 @@ export const PartyPickerModal = React.memo(function PartyPickerModal({ roster, a
                   onClick={() => onSelect(p.name)}
                   style={{
                     background: `${p.color}22`, border: `1px solid ${p.color}55`,
-                    borderRadius: "10px", padding: "10px 6px", cursor: "pointer", textAlign: "center",
+                    borderRadius: "8px", padding: "8px", cursor: "pointer", textAlign: "center",
                   }}
                 >
-                  <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
-                  <div style={{ fontSize: "10px", color: p.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                  <div style={{ fontSize: "20px", marginBottom: "4px" }}>{p.icon}</div>
+                  <div style={{ fontSize: "8px", color: p.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
                 </button>
               ))}
             </div>
@@ -476,7 +476,7 @@ export const PartyPickerModal = React.memo(function PartyPickerModal({ roster, a
 
         {tab === "archived" && (
           archivedParty.length === 0 ? (
-            <div style={{ textAlign: "center", color: "#555", fontSize: "11px", padding: "20px" }}>アーカイブ済みのポケモンはいません</div>
+            <div style={{ textAlign: "center", color: "#555", fontSize: "12px", padding: "20px" }}>アーカイブ済みのポケモンはいません</div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "12px" }}>
               {archivedParty.map(p => (
@@ -485,13 +485,13 @@ export const PartyPickerModal = React.memo(function PartyPickerModal({ roster, a
                   onClick={() => { onUnarchive(p.name); onSelect(p.name); onClose(); }}
                   style={{
                     background: `${p.color}11`, border: `1px solid ${p.color}33`,
-                    borderRadius: "10px", padding: "10px 6px", cursor: "pointer", textAlign: "center",
+                    borderRadius: "8px", padding: "8px", cursor: "pointer", textAlign: "center",
                     opacity: 0.8,
                   }}
                 >
-                  <div style={{ fontSize: "20px", marginBottom: "3px" }}>{p.icon}</div>
-                  <div style={{ fontSize: "10px", color: p.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
-                  <div style={{ fontSize: "8px", color: "#555", marginTop: "2px" }}>復元して追加</div>
+                  <div style={{ fontSize: "20px", marginBottom: "4px" }}>{p.icon}</div>
+                  <div style={{ fontSize: "8px", color: p.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+                  <div style={{ fontSize: "8px", color: "#555", marginTop: "4px" }}>復元して追加</div>
                 </button>
               ))}
             </div>
@@ -500,7 +500,7 @@ export const PartyPickerModal = React.memo(function PartyPickerModal({ roster, a
 
         <button
           onClick={onClose}
-          style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "8px", color: "#555", padding: "11px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px" }}
+          style={{ width: "100%", background: "transparent", border: "1px solid #2a2a4a", borderRadius: "8px", color: "#555", padding: "12px", cursor: "pointer", fontFamily: "inherit", letterSpacing: "1px" }}
         >キャンセル</button>
       </div>
     </div>
@@ -513,10 +513,10 @@ export const EVGuide = React.memo(function EVGuide({ color, trainerBattleCounts,
   return (
     <Panel title="📖 EV稼ぎガイド（FR/LG）" open={open} onToggle={() => setOpen(v => !v)} color={color}>
       {EV_GUIDE.map(({ stat, jp, spots, trainers }) => (
-        <div key={stat} style={{ marginBottom: "10px" }}>
-          <div style={{ fontSize: "10px", color: "#666", marginBottom: "4px", letterSpacing: "1px" }}>{jp}</div>
+        <div key={stat} style={{ marginBottom: "8px" }}>
+          <div style={{ fontSize: "8px", color: "#666", marginBottom: "4px", letterSpacing: "1px" }}>{jp}</div>
           {spots.map(s => (
-            <div key={s.name} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "10px", marginBottom: "3px", paddingLeft: "4px" }}>
+            <div key={s.name} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "8px", marginBottom: "4px", paddingLeft: "4px" }}>
               <span style={{ color: "#ccc", minWidth: "72px" }}>{s.name}</span>
               <span style={{ color: "#7fff7f", minWidth: "24px", textAlign: "right" }}>+{s.ev}</span>
               <span style={{ color: "#8888cc", minWidth: "52px" }}>{s.level}</span>
@@ -525,32 +525,32 @@ export const EVGuide = React.memo(function EVGuide({ color, trainerBattleCounts,
           ))}
           {trainers && trainers.length > 0 && (
             <div style={{ marginTop: "4px", paddingLeft: "4px", borderLeft: "2px solid #554400" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
-                <div style={{ fontSize: "9px", color: "#887700" }}>🎮 トレーナーバトル</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                <div style={{ fontSize: "8px", color: "#887700" }}>🎮 トレーナーバトル</div>
                 {onResetTrainerCounts && trainers.some((_, i) => (trainerBattleCounts?.[`${stat}_t${i}`] || 0) > 0) && (
                   <button onClick={() => onResetTrainerCounts(trainers.map((_, i) => `${stat}_t${i}`))}
-                          style={{ fontSize: "9px", color: "#aa6655", background: "none", border: "1px solid #553322", borderRadius: "3px", padding: "0 4px", cursor: "pointer" }}>リセット</button>
+                          style={{ fontSize: "8px", color: "#aa6655", background: "none", border: "1px solid #553322", borderRadius: "4px", padding: "0 4px", cursor: "pointer" }}>リセット</button>
                 )}
               </div>
               {trainers.map((t, i) => {
                 const key   = `${stat}_t${i}`;
                 const count = trainerBattleCounts?.[key] || 0;
                 return (
-                  <div key={i} style={{ marginBottom: "5px", paddingLeft: "4px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "10px" }}>
+                  <div key={i} style={{ marginBottom: "4px", paddingLeft: "4px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "8px" }}>
                       <span style={{ color: "#bbaa44", minWidth: "100px" }}>{t.location} {t.trainer}</span>
                       <span style={{ color: "#7fff7f", minWidth: "24px", textAlign: "right" }}>+{t.ev}</span>
                       <span style={{ color: "#555" }}>{t.note}</span>
                     </div>
                     {onTrainerBattle && (
-                      <div style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "2px", paddingLeft: "4px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "4px", paddingLeft: "4px" }}>
                         <button onClick={() => onTrainerBattle(key, stat, t.ev, -1)} disabled={count === 0}
-                                style={{ fontSize: "14px", lineHeight: 1, padding: "5px 12px", background: "#222", border: "1px solid #444", borderRadius: "5px", color: count === 0 ? "#444" : "#ccc", cursor: count === 0 ? "default" : "pointer" }}>－</button>
-                        <span style={{ fontSize: "10px", minWidth: "30px", textAlign: "center", color: "#ccaa55" }}>{count}回</span>
+                                style={{ fontSize: "16px", lineHeight: 1, padding: "4px 12px", background: "#222", border: "1px solid #444", borderRadius: "4px", color: count === 0 ? "#444" : "#ccc", cursor: count === 0 ? "default" : "pointer" }}>－</button>
+                        <span style={{ fontSize: "8px", minWidth: "32px", textAlign: "center", color: "#ccaa55" }}>{count}回</span>
                         <button onClick={() => onTrainerBattle(key, stat, t.ev, 1)}
-                                style={{ fontSize: "14px", lineHeight: 1, padding: "5px 12px", background: "#222", border: "1px solid #444", borderRadius: "5px", color: "#ccc", cursor: "pointer" }}>＋</button>
+                                style={{ fontSize: "16px", lineHeight: 1, padding: "4px 12px", background: "#222", border: "1px solid #444", borderRadius: "4px", color: "#ccc", cursor: "pointer" }}>＋</button>
                         {count > 0 && (
-                          <span style={{ fontSize: "9px", color: "#7fff7f" }}>+{count * t.ev} EV</span>
+                          <span style={{ fontSize: "8px", color: "#7fff7f" }}>+{count * t.ev} EV</span>
                         )}
                       </div>
                     )}
@@ -578,12 +578,12 @@ export const IVPanel = React.memo(function IVPanel({ ivs, color, onChange }) {
 
   return (
     <Panel title="🧬 個体値" open={open} onToggle={() => setOpen(v => !v)} color={color}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 14px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
         {STATS.map(stat => {
           const val = ivs?.[stat.key];
           return (
-            <div key={stat.key} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <div style={{ fontSize: "11px", color: "#666", width: "38px", flexShrink: 0 }}>{stat.jp}</div>
+            <div key={stat.key} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ fontSize: "12px", color: "#666", width: "40px", flexShrink: 0 }}>{stat.jp}</div>
               <input
                 type="number" min="0" max="31"
                 value={val !== null && val !== undefined ? val : ""}
@@ -595,7 +595,7 @@ export const IVPanel = React.memo(function IVPanel({ ivs, color, onChange }) {
                 placeholder="—"
                 className="input-dark"
                 style={{
-                  flex: 1, fontSize: "13px", padding: "5px 6px", textAlign: "center",
+                  flex: 1, fontSize: "12px", padding: "4px 8px", textAlign: "center",
                   color: ivColor(val),
                 }}
               />

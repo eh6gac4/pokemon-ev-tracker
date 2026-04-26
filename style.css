@@ -10,7 +10,7 @@ body { margin: 0; overscroll-behavior-y: none; }
   background: #0d0d1a;
   color: #7ec8e3;
   font-family: 'DotGothic16', monospace;
-  font-size: 13px;
+  font-size: 12px;
   opacity: 0;
   transition: opacity 0.15s, transform 0.15s;
   pointer-events: none;
@@ -19,7 +19,7 @@ body { margin: 0; overscroll-behavior-y: none; }
 #ptr-indicator.ptr-ready { color: #7fff7f; }
 #ptr-icon {
   display: block; flex-shrink: 0;
-  width: 22px; height: 22px;
+  width: 24px; height: 24px;
   transition: transform 0.2s;
   transform-origin: center center;
   transform-box: fill-box;
@@ -49,7 +49,7 @@ body { margin: 0; overscroll-behavior-y: none; }
 .bottom-nav button {
   flex: 1; padding: 16px 8px;
   background: transparent; border: none; border-top: 2px solid transparent;
-  color: #555; font-size: 13px; cursor: pointer;
+  color: #555; font-size: 12px; cursor: pointer;
   font-family: inherit; letter-spacing: 1px;
   transition: color 0.15s;
 }
@@ -61,16 +61,16 @@ body { margin: 0; overscroll-behavior-y: none; }
 
 /* EV step buttons */
 .step-btn {
-  border-radius: 6px; font-size: 13px;
-  padding: 6px 10px; cursor: pointer;
-  min-width: 38px; font-family: inherit;
+  border-radius: 8px; font-size: 12px;
+  padding: 8px; cursor: pointer;
+  min-width: 40px; font-family: inherit;
   transition: all 0.1s;
 }
 .step-btn:hover { filter: brightness(1.3); transform: scale(1.08); }
 .step-btn:active { transform: scale(0.95); }
 
 /* Progress bar */
-.bar-bg { background: #0d0d1a; border-radius: 3px; overflow: hidden; }
+.bar-bg { background: #0d0d1a; border-radius: 4px; overflow: hidden; }
 .bar-fill { transition: width 0.3s cubic-bezier(.4,0,.2,1); }
 
 /* Cards */
@@ -83,14 +83,14 @@ body { margin: 0; overscroll-behavior-y: none; }
   font-size: 8px;
   background: #7fff7f22; color: #7fff7f;
   border: 1px solid #7fff7f44;
-  border-radius: 3px; padding: 1px 4px;
+  border-radius: 4px; padding: 1px 4px;
 }
 
 /* Collapsible panel */
 .panel-toggle {
   width: 100%; background: #16213e;
   border: 1px solid #2a2a4a; border-radius: 8px;
-  color: #555; font-size: 11px; padding: 8px;
+  color: #555; font-size: 12px; padding: 8px;
   cursor: pointer; font-family: inherit;
   letter-spacing: 1px; text-align: center;
 }
@@ -106,10 +106,10 @@ input, textarea, select { outline: none; font-family: inherit; }
 .input-dark {
   background: #16213e;
   border: 1px solid #3a3a5a;
-  border-radius: 6px;
+  border-radius: 8px;
   color: #e8e8e8;
   font-size: 12px;
-  padding: 6px 8px;
+  padding: 8px;
 }
 textarea.input-dark { resize: none; overflow: hidden; }
 .search-item:hover { background: #2a2a4a !important; color: #e8e8e8 !important; }
@@ -128,7 +128,7 @@ textarea.input-dark { resize: none; overflow: hidden; }
   .col-hidden { display: block !important; }
   .bottom-nav { display: none !important; }
 }
-.toggle-row { display: flex; flex-direction: column; gap: 6px; }
+.toggle-row { display: flex; flex-direction: column; gap: 8px; }
 @media (min-width: 1024px) {
   .app-layout {
     grid-template-columns: 300px 1fr 320px;
