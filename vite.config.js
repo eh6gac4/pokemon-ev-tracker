@@ -43,6 +43,10 @@ function apiMockPlugin() {
 }
 
 export default defineConfig({
+  test: {
+    environment: 'jsdom',
+    include: ['js/**/*.test.js'],
+  },
   plugins: [react(), apiMockPlugin()],
   build: {
     outDir: "dist",

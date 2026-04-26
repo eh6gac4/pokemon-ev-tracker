@@ -1,4 +1,4 @@
-import { batchFetch, persistCache } from './pokeapi.js';
+import { batchFetch, saveProcessed, loadProcessed } from './pokeapi.js';
 
 export const DEFAULT_PARTY = [
   { name: "リザードン", icon: "🔥", color: "#FF6B35", memo: "", nature: "", dexId: 5   },
@@ -578,6 +578,15 @@ export let ABILITY_DATA = [
 ];
 
 export async function loadPokemonFromAPI() {
+  const cached = loadProcessed('pokemon');
+  if (cached) {
+    POKEMON_DATA   = cached.pokemonData;
+    EV_YIELD       = cached.evYield;
+    ABILITY_DATA   = cached.abilityData;
+    EVOLUTION_DATA = cached.evolutionData;
+    return;
+  }
+
   const STAT_KEY_MAP = {
     'hp': 'hp', 'attack': 'atk', 'defense': 'def',
     'special-attack': 'spa', 'special-defense': 'spd', 'speed': 'spe',
@@ -711,7 +720,12 @@ export async function loadPokemonFromAPI() {
     ABILITY_DATA    = newAbilityData;
     EVOLUTION_DATA  = newEvoData;
 
-    persistCache();
+    saveProcessed('pokemon', {
+      pokemonData:   POKEMON_DATA,
+      evYield:       EV_YIELD,
+      abilityData:   ABILITY_DATA,
+      evolutionData: EVOLUTION_DATA,
+    });
   } catch (e) {
     console.warn('loadPokemonFromAPI failed:', e);
   }
