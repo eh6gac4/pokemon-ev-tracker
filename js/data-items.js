@@ -1,61 +1,63 @@
+import { batchFetch, saveProcessed, loadProcessed } from './pokeapi.js';
+
 export const ITEM_DATA = [
   { area: "マサラタウン", items: [
-    { id: "ma01", name: "タウンマップ",        type: "gift",   note: "自宅2F・姉デイジーからもらう" },
+    { id: "ma01", name: "タウンマップ",        type: "gift",   note: "自宅2F・姉デイジーからもらう",                             slug: "town-map" },
   ]},
   { area: "2番道路ゲート", items: [
     { id: "r002", tmId: "HM05",               type: "hm",     note: "2番道路東ゲート内・オーキドの助手（ポケモンを10種類以上捕まえた後）" },
   ]},
   { area: "ニビシティ・ニビのはくぶつかん", items: [
-    { id: "ni01", name: "ランニングシューズ",  type: "gift",   note: "タケシ撃破後・ニビシティ右出口でオーキドの助手から" },
+    { id: "ni01", name: "ランニングシューズ",  type: "gift",   note: "タケシ撃破後・ニビシティ右出口でオーキドの助手から",        slug: "running-shoes" },
     { id: "ni02", tmId: "TM39",               type: "gym",    note: "ニビジム・タケシを倒す" },
-    { id: "ni04", name: "ひみつのコハク",      type: "gift",   note: "ニビのはくぶつかん・制限区域の科学者（いあいぎり必要）→ グレンじま研究所でプテラに復元" },
-    { id: "ni03", name: "ふしぎなアメ",        type: "hidden", note: "ニビのはくぶつかん裏・ダウジングマシンを使用して発見" },
+    { id: "ni04", name: "ひみつのコハク",      type: "gift",   note: "ニビのはくぶつかん・制限区域の科学者（いあいぎり必要）→ グレンじま研究所でプテラに復元", slug: "old-amber" },
+    { id: "ni03", name: "ふしぎなアメ",        type: "hidden", note: "ニビのはくぶつかん裏・ダウジングマシンを使用して発見",       slug: "rare-candy" },
   ]},
   { area: "おつきみやま", items: [
     { id: "ot01", tmId: "TM09",               type: "field",  note: "おつきみやま1F・アイテムボール" },
-    { id: "oz04", name: "ふしぎなアメ",        type: "field",  note: "おつきみやま1F・アイテムボール",                           img: "https://appmedia.jp/wp-content/uploads/2026/03/143032_4efry.webp" },
-    { id: "ot02", name: "ほしのかけら",        type: "field",  note: "おつきみやまB2F・アイテムボール（ロケット団員エリア東の高台）" },
+    { id: "oz04", name: "ふしぎなアメ",        type: "field",  note: "おつきみやま1F・アイテムボール",                           img: "https://appmedia.jp/wp-content/uploads/2026/03/143032_4efry.webp", slug: "rare-candy" },
+    { id: "ot02", name: "ほしのかけら",        type: "field",  note: "おつきみやまB2F・アイテムボール（ロケット団員エリア東の高台）", slug: "stardust" },
     { id: "oz03", tmId: "TM46",               type: "field",  note: "おつきみやまB2F・アイテムボール" },
     { id: "oz02", name: "かいのカセキ または こうらのカセキ", type: "gift", note: "おつきみやまB2F・スーパーオタクを倒した後どちらか1つ選択（かいのカセキ→オムナイト、こうらのカセキ→カブト）→ グレンじま研究所で復元" },
-    { id: "oz01", name: "つきのいし",          type: "hidden", note: "おつきみやまB2F・ダウジングマシンを使用して発見" },
+    { id: "oz01", name: "つきのいし",          type: "hidden", note: "おつきみやまB2F・ダウジングマシンを使用して発見",            slug: "moon-stone" },
   ]},
   { area: "ハナダシティ周辺・25番道路", items: [
-    { id: "ha02", name: "ふしぎなアメ",        type: "hidden", note: "ハナダシティ・ダウジングマシンで発見",                      img: "https://appmedia.jp/wp-content/uploads/2026/03/135513_4nhoj.webp" },
+    { id: "ha02", name: "ふしぎなアメ",        type: "hidden", note: "ハナダシティ・ダウジングマシンで発見",                      img: "https://appmedia.jp/wp-content/uploads/2026/03/135513_4nhoj.webp", slug: "rare-candy" },
     { id: "hd01", tmId: "TM28",               type: "gift",   note: "ハナダシティ・ロケット団員を倒した後にもらう" },
-    { id: "hd02", name: "ふねのチケット",      type: "gift",   note: "25番道路・ビルの家でビルから（ポケモン変身解除の手伝い後）" },
+    { id: "hd02", name: "ふねのチケット",      type: "gift",   note: "25番道路・ビルの家でビルから（ポケモン変身解除の手伝い後）", slug: "ss-ticket" },
     { id: "ha01", tmId: "TM03",               type: "gym",    note: "ハナダジム・カスミを倒す" },
   ]},
   { area: "5・6番道路", items: [
-    { id: "r06a", name: "ふしぎなアメ",        type: "hidden", note: "6番道路・ダウジングマシンで発見",                           img: "https://appmedia.jp/wp-content/uploads/2026/03/140021_6d8kl.webp" },
+    { id: "r06a", name: "ふしぎなアメ",        type: "hidden", note: "6番道路・ダウジングマシンで発見",                           img: "https://appmedia.jp/wp-content/uploads/2026/03/140021_6d8kl.webp", slug: "rare-candy" },
   ]},
   { area: "クチバシティ・サント・アンヌごう", items: [
     { id: "ss01", tmId: "HM01",               type: "hm",     note: "サント・アンヌごう・船長の部屋で背中をなでてあげる" },
     { id: "ss02", tmId: "TM44",               type: "field",  note: "サント・アンヌごうB1F・アイテムボール" },
     { id: "ss03", tmId: "TM31",               type: "field",  note: "サント・アンヌごう1F客室・アイテムボール" },
     { id: "ku01", tmId: "TM34",               type: "gym",    note: "クチバジム・マチスを倒す" },
-    { id: "ku03", name: "バトルサーチャー",    type: "gift",   note: "クチバポケモンセンター・女性エーストレーナーから（サント・アンヌごう乗船後）" },
-    { id: "kb03", name: "ボロのつりざお",      type: "gift",   note: "クチバシティ・北西の釣り人の家" },
-    { id: "ku02", name: "じてんしゃ",          type: "gift",   note: "クチバシティ・ポケモンだいすきクラブの会長から「ひきかえけん」をもらう → ハナダシティの自転車屋で交換" },
+    { id: "ku03", name: "バトルサーチャー",    type: "gift",   note: "クチバポケモンセンター・女性エーストレーナーから（サント・アンヌごう乗船後）", slug: "vs-seeker" },
+    { id: "kb03", name: "ボロのつりざお",      type: "gift",   note: "クチバシティ・北西の釣り人の家",                            slug: "old-rod" },
+    { id: "ku02", name: "じてんしゃ",          type: "gift",   note: "クチバシティ・ポケモンだいすきクラブの会長から「ひきかえけん」をもらう → ハナダシティの自転車屋で交換", slug: "bicycle" },
   ]},
   { area: "9〜11番道路", items: [
-    { id: "r09a", name: "ふしぎなアメ",        type: "hidden", note: "9番道路・ダウジングマシンで発見",                           img: "https://appmedia.jp/wp-content/uploads/2026/03/140028_r8qxy.webp" },
+    { id: "r09a", name: "ふしぎなアメ",        type: "hidden", note: "9番道路・ダウジングマシンで発見",                           img: "https://appmedia.jp/wp-content/uploads/2026/03/140028_r8qxy.webp", slug: "rare-candy" },
     { id: "r9_01", tmId: "TM40",              type: "field",  note: "9番道路南西・アイテムボール" },
-    { id: "r10a", name: "かわらずのいし",      type: "gift",   note: "10番道路ポケモンセンター・オーキドの助手（ポケモンを20種類以上捕まえた後）" },
-    { id: "r11a", name: "ダウジングマシン",    type: "gift",   note: "11番道路ゲート2F・オーキドの助手（ポケモンを30種類以上捕まえた後）" },
+    { id: "r10a", name: "かわらずのいし",      type: "gift",   note: "10番道路ポケモンセンター・オーキドの助手（ポケモンを20種類以上捕まえた後）", slug: "everstone" },
+    { id: "r11a", name: "ダウジングマシン",    type: "gift",   note: "11番道路ゲート2F・オーキドの助手（ポケモンを30種類以上捕まえた後）", slug: "itemfinder" },
   ]},
   { area: "12〜15番道路", items: [
-    { id: "r12a", name: "ちいさなキノコ",      type: "hidden", note: "12番道路・ダウジングマシンで発見" },
-    { id: "rv07", name: "すごいキズぐすり",    type: "hidden", note: "12番道路・フィッシャーマンのそばでダウジングマシンを使用" },
-    { id: "rv08", name: "たべのこし",          type: "hidden", note: "12番道路・カビゴンがいた場所でダウジングマシン使用（カビゴン撃破/捕獲後）" },
+    { id: "r12a", name: "ちいさなキノコ",      type: "hidden", note: "12番道路・ダウジングマシンで発見",                          slug: "tiny-mushroom" },
+    { id: "rv07", name: "すごいキズぐすり",    type: "hidden", note: "12番道路・フィッシャーマンのそばでダウジングマシンを使用",  slug: "hyper-potion" },
+    { id: "rv08", name: "たべのこし",          type: "hidden", note: "12番道路・カビゴンがいた場所でダウジングマシン使用（カビゴン撃破/捕獲後）", slug: "leftovers" },
     { id: "r12b", tmId: "TM48",               type: "field",  note: "12番道路・アイテムボール" },
-    { id: "r12c", name: "ふしぎなアメ",        type: "hidden", note: "12番道路・ダウジングマシンで発見",                          img: "https://appmedia.jp/wp-content/uploads/2026/03/140044_jxf32.webp" },
-    { id: "r15a", name: "がくしゅうそうち",    type: "gift",   note: "15番道路東ゲート2F・オーキドの助手（ポケモンを50種類以上捕まえた後）" },
+    { id: "r12c", name: "ふしぎなアメ",        type: "hidden", note: "12番道路・ダウジングマシンで発見",                          img: "https://appmedia.jp/wp-content/uploads/2026/03/140044_jxf32.webp", slug: "rare-candy" },
+    { id: "r15a", name: "がくしゅうそうち",    type: "gift",   note: "15番道路東ゲート2F・オーキドの助手（ポケモンを50種類以上捕まえた後）", slug: "exp-share" },
   ]},
   { area: "16〜17番道路（サイクリングロード）", items: [
     { id: "r16a", tmId: "HM02",               type: "hm",     note: "16番道路西・自転車専用道路の女の子（いあいぎり必要）" },
-    { id: "r16b", name: "たべのこし",          type: "hidden", note: "16番道路・カビゴンがいた場所でダウジングマシン使用（カビゴン撃破/捕獲後）" },
-    { id: "r16c", name: "おまもりこばん",      type: "gift",   note: "16番道路ゲート2F・オーキドの助手（ポケモンを40種類以上捕まえた後）" },
-    { id: "r17a", name: "ふしぎなアメ",        type: "hidden", note: "17番道路・サイクリングロード・ダウジングマシンで発見",       img: "https://appmedia.jp/wp-content/uploads/2026/03/140035_58qiv.webp" },
+    { id: "r16b", name: "たべのこし",          type: "hidden", note: "16番道路・カビゴンがいた場所でダウジングマシン使用（カビゴン撃破/捕獲後）", slug: "leftovers" },
+    { id: "r16c", name: "おまもりこばん",      type: "gift",   note: "16番道路ゲート2F・オーキドの助手（ポケモンを40種類以上捕まえた後）", slug: "amulet-coin" },
+    { id: "r17a", name: "ふしぎなアメ",        type: "hidden", note: "17番道路・サイクリングロード・ダウジングマシンで発見",       img: "https://appmedia.jp/wp-content/uploads/2026/03/140035_58qiv.webp", slug: "rare-candy" },
   ]},
   { area: "タマムシシティ・ロケット団アジト", items: [
     { id: "ta01", tmId: "TM19",               type: "gym",    note: "タマムシジム・エリカを倒す" },
@@ -69,47 +71,47 @@ export const ITEM_DATA = [
     { id: "ta07", tmId: "TM35",               type: "tm",     note: "ゲームコーナー・4000コイン" },
     { id: "ta08", tmId: "TM30",               type: "tm",     note: "ゲームコーナー・4500コイン" },
     { id: "ta09", tmId: "TM15",               type: "field",  note: "タマムシデパート4F・7500円" },
-    { id: "ta02", name: "シルフスコープ",      type: "gift",   note: "ゲームコーナー地下ロケット団アジトB4F・ジョバンニを倒す（ポケモンタワー進行に必須）" },
-    { id: "ta10", name: "ふしぎなアメ",        type: "field",  note: "ゲームコーナー地下ロケット団アジトB3F・アイテムボール",     img: "https://appmedia.jp/wp-content/uploads/2026/03/143043_kcho1.webp" },
+    { id: "ta02", name: "シルフスコープ",      type: "gift",   note: "ゲームコーナー地下ロケット団アジトB4F・ジョバンニを倒す（ポケモンタワー進行に必須）", slug: "silph-scope" },
+    { id: "ta10", name: "ふしぎなアメ",        type: "field",  note: "ゲームコーナー地下ロケット団アジトB3F・アイテムボール",     img: "https://appmedia.jp/wp-content/uploads/2026/03/143043_kcho1.webp", slug: "rare-candy" },
   ]},
   { area: "シオンタウン・ポケモンタワー・12番道路", items: [
-    { id: "la01", name: "ポケモンのふえ",      type: "gift",   note: "ポケモンタワー7F・フジ老人を救出後にもらう（カビゴン起こしに必須）" },
+    { id: "la01", name: "ポケモンのふえ",      type: "gift",   note: "ポケモンタワー7F・フジ老人を救出後にもらう（カビゴン起こしに必須）", slug: "poke-flute" },
     { id: "rv02", tmId: "TM27",               type: "gift",   note: "シオンタウン〜12番道路のゲート2F・女性からもらう" },
-    { id: "rv03", name: "すごいつりざお",      type: "gift",   note: "12番道路・釣り師の家の老釣り人からもらう" },
-    { id: "rv04", name: "おおきなキノコ",      type: "hidden", note: "ポケモンタワー5F・チャネラーのそばでダウジングマシンを使用" },
-    { id: "rv05", name: "やすらぎのすず",      type: "hidden", note: "ポケモンタワー7F・フジ老人がいた場所でダウジングマシン使用（救出後・シルフスコープ必要）" },
-    { id: "la02", name: "ふしぎなアメ",        type: "field",  note: "ポケモンタワー6F・アイテムボール",                          img: "https://appmedia.jp/wp-content/uploads/2026/03/143057_aodly.webp" },
+    { id: "rv03", name: "すごいつりざお",      type: "gift",   note: "12番道路・釣り師の家の老釣り人からもらう",                  slug: "super-rod" },
+    { id: "rv04", name: "おおきなキノコ",      type: "hidden", note: "ポケモンタワー5F・チャネラーのそばでダウジングマシンを使用", slug: "big-mushroom" },
+    { id: "rv05", name: "やすらぎのすず",      type: "hidden", note: "ポケモンタワー7F・フジ老人がいた場所でダウジングマシン使用（救出後・シルフスコープ必要）", slug: "soothe-bell" },
+    { id: "la02", name: "ふしぎなアメ",        type: "field",  note: "ポケモンタワー6F・アイテムボール",                          img: "https://appmedia.jp/wp-content/uploads/2026/03/143057_aodly.webp", slug: "rare-candy" },
   ]},
   { area: "ヤマブキシティ・シルフカンパニー", items: [
     { id: "yk01", tmId: "TM29",               type: "gift",   note: "ヤマブキシティ・サイキッカーのおじいさんの家" },
     { id: "ya03", tmId: "TM04",               type: "gym",    note: "ヤマブキジム・ナツメを倒す" },
     { id: "ya02", name: "ラプラス",            type: "gift",   note: "シルフカンパニー7F・社員からもらう" },
-    { id: "ya01", name: "マスターボール",      type: "gift",   note: "シルフカンパニー11F・社長からもらう（ジョバンニ撃破後）" },
+    { id: "ya01", name: "マスターボール",      type: "gift",   note: "シルフカンパニー11F・社長からもらう（ジョバンニ撃破後）",   slug: "master-ball" },
     { id: "ya04", tmId: "TM01",               type: "field",  note: "ヤマブキシルフカンパニー・アイテムボール" },
-    { id: "ya05", name: "ふしぎなアメ",        type: "field",  note: "シルフカンパニー10F・アイテムボール",                       img: "https://appmedia.jp/wp-content/uploads/2026/03/143114_3kf5j.webp" },
+    { id: "ya05", name: "ふしぎなアメ",        type: "field",  note: "シルフカンパニー10F・アイテムボール",                       img: "https://appmedia.jp/wp-content/uploads/2026/03/143114_3kf5j.webp", slug: "rare-candy" },
     { id: "yk05", name: "サワムラー または エビワラー", type: "gift", note: "ヤマブキ格闘道場・ルイを倒した後どちらかを選択" },
   ]},
   { area: "セキチクシティ・サファリゾーン", items: [
     { id: "se01", tmId: "TM06",               type: "gym",    note: "セキチクジム・キョウを倒す" },
     { id: "se02", tmId: "HM03",               type: "hm",     note: "サファリゾーン奥・秘密の家（サファリゾーン最奥まで到達）" },
-    { id: "se03", name: "きんのいれば",        type: "field",  note: "サファリゾーン奥エリア・アイテムボール" },
+    { id: "se03", name: "きんのいれば",        type: "field",  note: "サファリゾーン奥エリア・アイテムボール",                    slug: "gold-teeth" },
     { id: "se04", tmId: "HM04",               type: "hm",     note: "セキチクシティ・サファリゾーンの管理人（きんのいれば返却後）" },
-    { id: "sc05", name: "いいつりざお",        type: "gift",   note: "セキチクシティ・南東の家の釣り人からもらう" },
-    { id: "se05", name: "ふしぎなアメ",        type: "field",  note: "セキチクシティ・動物園の園長の家（かいりき必要）",           img: "https://appmedia.jp/wp-content/uploads/2026/03/143105_szgyi.webp" },
+    { id: "sc05", name: "いいつりざお",        type: "gift",   note: "セキチクシティ・南東の家の釣り人からもらう",                slug: "good-rod" },
+    { id: "se05", name: "ふしぎなアメ",        type: "field",  note: "セキチクシティ・動物園の園長の家（かいりき必要）",           img: "https://appmedia.jp/wp-content/uploads/2026/03/143105_szgyi.webp", slug: "rare-candy" },
   ]},
   { area: "ふたごじま", items: [
-    { id: "ft01", name: "げんきのかけら",      type: "field",  note: "ふたごじま B1F・アイテムボール" },
-    { id: "ft02", name: "みずのいし",          type: "field",  note: "ふたごじま B2F・アイテムボール" },
-    { id: "ft03", name: "おおきなしんじゅ",    type: "field",  note: "ふたごじま B2F・アイテムボール" },
-    { id: "ft04", name: "みずのいし",          type: "hidden", note: "ふたごじま B2F・ダウジングマシンで発見" },
-    { id: "ft05", name: "ハイパーボール",      type: "field",  note: "ふたごじま B4F・アイテムボール" },
-    { id: "ft06", name: "みずのいし",          type: "hidden", note: "ふたごじま B4F・ダウジングマシンで発見" },
+    { id: "ft01", name: "げんきのかけら",      type: "field",  note: "ふたごじま B1F・アイテムボール",                            slug: "revive" },
+    { id: "ft02", name: "みずのいし",          type: "field",  note: "ふたごじま B2F・アイテムボール",                            slug: "water-stone" },
+    { id: "ft03", name: "おおきなしんじゅ",    type: "field",  note: "ふたごじま B2F・アイテムボール",                            slug: "big-pearl" },
+    { id: "ft04", name: "みずのいし",          type: "hidden", note: "ふたごじま B2F・ダウジングマシンで発見",                    slug: "water-stone" },
+    { id: "ft05", name: "ハイパーボール",      type: "field",  note: "ふたごじま B4F・アイテムボール",                            slug: "ultra-ball" },
+    { id: "ft06", name: "みずのいし",          type: "hidden", note: "ふたごじま B4F・ダウジングマシンで発見",                    slug: "water-stone" },
     { id: "ft07", name: "フリーザー",          type: "field",  note: "ふたごじま B4F（1匹のみ）" },
   ]},
   { area: "グレンじま・グレンタウン・ポケモン屋敷", items: [
-    { id: "gl02", name: "ひみつのカギ",        type: "field",  note: "ポケモン屋敷B1F・アイテムボール（グレンジム入場に必須）" },
+    { id: "gl02", name: "ひみつのカギ",        type: "field",  note: "ポケモン屋敷B1F・アイテムボール（グレンジム入場に必須）",   slug: "secret-key" },
     { id: "gr01", tmId: "TM38",               type: "gym",    note: "グレンジム・カツラを倒す" },
-    { id: "gr05", name: "ふしぎなアメ",        type: "hidden", note: "ポケモン屋敷3F・ダウジングマシンで発見",                    img: "https://appmedia.jp/wp-content/uploads/2026/03/140053_dy9g3.webp" },
+    { id: "gr05", name: "ふしぎなアメ",        type: "hidden", note: "ポケモン屋敷3F・ダウジングマシンで発見",                    img: "https://appmedia.jp/wp-content/uploads/2026/03/140053_dy9g3.webp", slug: "rare-candy" },
     { id: "gr02", name: "ファイヤー",          type: "field",  note: "グレンじま 洞窟奥（1匹のみ）" },
     { id: "gr03", name: "プテラ（ひみつのコハク復元）",  type: "gift", note: "グレンじま研究所（ひみつのコハク持参）" },
     { id: "gr04", name: "オムスター または カブトプス（化石復元）", type: "gift", note: "グレンじま研究所（かいのカセキ または こうらのカセキを持参）" },
@@ -120,11 +122,11 @@ export const ITEM_DATA = [
   ]},
   { area: "トキワシティ（ジム）", items: [
     { id: "to01", tmId: "TM26",               type: "gym",    note: "トキワジム・サカキを倒す（8つ目のバッジ）" },
-    { id: "to02", name: "きょうせいギプス",    type: "hidden", note: "トキワジム内・サカキがいた場所でダウジングマシン使用" },
+    { id: "to02", name: "きょうせいギプス",    type: "hidden", note: "トキワジム内・サカキがいた場所でダウジングマシン使用",       slug: "macho-brace" },
   ]},
   { area: "チャンピオンロード", items: [
     { id: "cr01", tmId: "TM02",               type: "field",  note: "チャンピオンロード1F・アイテムボール" },
-    { id: "ch02", name: "ふしぎなアメ",        type: "field",  note: "チャンピオンロード1F・アイテムボール",                      img: "https://appmedia.jp/wp-content/uploads/2026/03/143122_gc2q4.webp" },
+    { id: "ch02", name: "ふしぎなアメ",        type: "field",  note: "チャンピオンロード1F・アイテムボール",                      img: "https://appmedia.jp/wp-content/uploads/2026/03/143122_gc2q4.webp", slug: "rare-candy" },
   ]},
   { area: "22〜23番道路・はつでんしょ（クリア後）", items: [
     { id: "r23a", name: "サンダー",            type: "field",  note: "はつでんしょ B1F（1匹のみ）" },
@@ -139,61 +141,61 @@ export const ITEM_DATA = [
     { id: "i4_01", tmId: "HM07",              type: "hm",     note: "こおりのぬけみちB1F・アイテムボール" },
   ]},
   { area: "7の島（クリア後）", items: [
-    { id: "sv02", name: "ふしぎなアメ",        type: "field",  note: "かえらずのあな・アイテムボール",                            img: "https://appmedia.jp/wp-content/uploads/2026/03/143130_0jao4.webp" },
+    { id: "sv02", name: "ふしぎなアメ",        type: "field",  note: "かえらずのあな・アイテムボール",                            img: "https://appmedia.jp/wp-content/uploads/2026/03/143130_0jao4.webp", slug: "rare-candy" },
   ]},
   { area: "2の島（クリア後）", items: [
-    { id: "si01", name: "ふしぎなアメ",        type: "hidden", note: "きわのみさき・わざおしえの家の裏でダウジングマシンを使用",   img: "https://appmedia.jp/wp-content/uploads/2026/03/140110_o4sfg.webp" },
-    { id: "i2_02", name: "ポイントマックス",   type: "hidden", note: "きわのみさき・たきのぼり南東の陸地でダウジングマシン使用（なみのり+たきのぼり必要）" },
+    { id: "si01", name: "ふしぎなアメ",        type: "hidden", note: "きわのみさき・わざおしえの家の裏でダウジングマシンを使用",   img: "https://appmedia.jp/wp-content/uploads/2026/03/140110_o4sfg.webp", slug: "rare-candy" },
+    { id: "i2_02", name: "ポイントマックス",   type: "hidden", note: "きわのみさき・たきのぼり南東の陸地でダウジングマシン使用（なみのり+たきのぼり必要）", slug: "pp-max" },
   ]},
 ];
 
 // ─── 持ち物リスト（FR/LG Gen III） ───────────────────────────────────────────
 export const HOLD_ITEMS = [
   // バトル
-  { name: "こだわりハチマキ", cat: "バトル",     note: "物理攻撃×1.5（技固定）" },
-  { name: "たべのこし",       cat: "バトル",     note: "毎ターンHP 1/16回復" },
-  { name: "きあいのハチマキ", cat: "バトル",     note: "一撃耐えることがある" },
-  { name: "せんせいのツメ",   cat: "バトル",     note: "先制して動くことがある" },
-  { name: "ひかりのこな",     cat: "バトル",     note: "相手の命中率ダウン" },
-  { name: "のんきのおこう",   cat: "バトル",     note: "相手の命中率ダウン（ひかりのこなと同効果）" },
-  { name: "おうじゃのしるし", cat: "バトル",     note: "わざにひるみ追加" },
-  { name: "かいがらのすず",   cat: "バトル",     note: "与ダメの1/8回復" },
-  { name: "ピントレンズ",     cat: "バトル",     note: "急所率アップ" },
-  { name: "しろいハーブ",     cat: "バトル",     note: "下がったステータスを一度回復" },
+  { name: "こだわりハチマキ", cat: "バトル",     note: "物理攻撃×1.5（技固定）",                  slug: "choice-band" },
+  { name: "たべのこし",       cat: "バトル",     note: "毎ターンHP 1/16回復",                     slug: "leftovers" },
+  { name: "きあいのハチマキ", cat: "バトル",     note: "一撃耐えることがある",                     slug: "focus-band" },
+  { name: "せんせいのツメ",   cat: "バトル",     note: "先制して動くことがある",                   slug: "quick-claw" },
+  { name: "ひかりのこな",     cat: "バトル",     note: "相手の命中率ダウン",                       slug: "bright-powder" },
+  { name: "のんきのおこう",   cat: "バトル",     note: "相手の命中率ダウン（ひかりのこなと同効果）", slug: "lax-incense" },
+  { name: "おうじゃのしるし", cat: "バトル",     note: "わざにひるみ追加",                         slug: "kings-rock" },
+  { name: "かいがらのすず",   cat: "バトル",     note: "与ダメの1/8回復",                         slug: "shell-bell" },
+  { name: "ピントレンズ",     cat: "バトル",     note: "急所率アップ",                             slug: "scope-lens" },
+  { name: "しろいハーブ",     cat: "バトル",     note: "下がったステータスを一度回復",              slug: "white-herb" },
   // タイプ強化
-  { name: "もくたん",         cat: "タイプ強化", note: "ほのお×1.1" },
-  { name: "しんぴのしずく",   cat: "タイプ強化", note: "みず×1.1" },
-  { name: "きせきのタネ",     cat: "タイプ強化", note: "くさ×1.1" },
-  { name: "じしゃく",         cat: "タイプ強化", note: "でんき×1.1" },
-  { name: "とけないこおり",   cat: "タイプ強化", note: "こおり×1.1" },
-  { name: "するどいくちばし", cat: "タイプ強化", note: "ひこう×1.1" },
-  { name: "かたいいし",       cat: "タイプ強化", note: "いわ×1.1" },
-  { name: "くろいメガネ",     cat: "タイプ強化", note: "あく×1.1" },
-  { name: "くろおび",         cat: "タイプ強化", note: "かくとう×1.1" },
-  { name: "どくバリ",         cat: "タイプ強化", note: "どく×1.1" },
-  { name: "ぎんのこな",       cat: "タイプ強化", note: "むし×1.1" },
-  { name: "まがったスプーン", cat: "タイプ強化", note: "エスパー×1.1" },
-  { name: "りゅうのキバ",     cat: "タイプ強化", note: "ドラゴン×1.1" },
-  { name: "やわらかいすな",   cat: "タイプ強化", note: "じめん×1.1" },
-  { name: "メタルコート",     cat: "タイプ強化", note: "はがね×1.1" },
+  { name: "もくたん",         cat: "タイプ強化", note: "ほのお×1.1",                              slug: "charcoal" },
+  { name: "しんぴのしずく",   cat: "タイプ強化", note: "みず×1.1",                                slug: "mystic-water" },
+  { name: "きせきのタネ",     cat: "タイプ強化", note: "くさ×1.1",                                slug: "miracle-seed" },
+  { name: "じしゃく",         cat: "タイプ強化", note: "でんき×1.1",                              slug: "magnet" },
+  { name: "とけないこおり",   cat: "タイプ強化", note: "こおり×1.1",                              slug: "never-melt-ice" },
+  { name: "するどいくちばし", cat: "タイプ強化", note: "ひこう×1.1",                              slug: "sharp-beak" },
+  { name: "かたいいし",       cat: "タイプ強化", note: "いわ×1.1",                                slug: "hard-stone" },
+  { name: "くろいメガネ",     cat: "タイプ強化", note: "あく×1.1",                                slug: "black-glasses" },
+  { name: "くろおび",         cat: "タイプ強化", note: "かくとう×1.1",                            slug: "black-belt" },
+  { name: "どくバリ",         cat: "タイプ強化", note: "どく×1.1",                                slug: "poison-barb" },
+  { name: "ぎんのこな",       cat: "タイプ強化", note: "むし×1.1",                                slug: "silver-powder" },
+  { name: "まがったスプーン", cat: "タイプ強化", note: "エスパー×1.1",                            slug: "twisted-spoon" },
+  { name: "りゅうのキバ",     cat: "タイプ強化", note: "ドラゴン×1.1",                            slug: "dragon-fang" },
+  { name: "やわらかいすな",   cat: "タイプ強化", note: "じめん×1.1",                              slug: "soft-sand" },
+  { name: "メタルコート",     cat: "タイプ強化", note: "はがね×1.1",                              slug: "metal-coat" },
   // きのみ
-  { name: "きのみジュース",   cat: "きのみ",     note: "HP20回復（HP半分以下）" },
-  { name: "オレンのみ",       cat: "きのみ",     note: "HP10回復（HP半分以下）" },
-  { name: "オボンのみ",       cat: "きのみ",     note: "HP30回復（HP半分以下）" },
-  { name: "カゴのみ",         cat: "きのみ",     note: "ねむりを回復" },
-  { name: "ラムのみ",         cat: "きのみ",     note: "状態異常すべてを回復" },
+  { name: "きのみジュース",   cat: "きのみ",     note: "HP20回復（HP半分以下）",                  slug: "berry-juice" },
+  { name: "オレンのみ",       cat: "きのみ",     note: "HP10回復（HP半分以下）",                  slug: "oran-berry" },
+  { name: "オボンのみ",       cat: "きのみ",     note: "HP30回復（HP半分以下）",                  slug: "sitrus-berry" },
+  { name: "カゴのみ",         cat: "きのみ",     note: "ねむりを回復",                             slug: "chesto-berry" },
+  { name: "ラムのみ",         cat: "きのみ",     note: "状態異常すべてを回復",                     slug: "lum-berry" },
   // 特殊（ポケモン固有）
-  { name: "ふといホネ",       cat: "特殊",       note: "カラカラ/ガラガラの攻撃×2" },
-  { name: "でんきだま",       cat: "特殊",       note: "ピカチュウのとくこう×2" },
-  { name: "メタルパウダー",   cat: "特殊",       note: "メタモンの防御×2" },
-  { name: "しんかいのキバ",   cat: "特殊",       note: "パールルのとくこう×2" },
-  { name: "しんかいのウロコ", cat: "特殊",       note: "パールルのとくぼう×2" },
-  { name: "ラッキーパンチ",   cat: "特殊",       note: "ラッキーの急所率アップ" },
-  { name: "ながねぎ",         cat: "特殊",       note: "カモネギの急所率アップ" },
-  { name: "こころのしずく",   cat: "特殊",       note: "ラティアス/ラティオス とくこう・とくぼう×1.5" },
+  { name: "ふといホネ",       cat: "特殊",       note: "カラカラ/ガラガラの攻撃×2",               slug: "thick-club" },
+  { name: "でんきだま",       cat: "特殊",       note: "ピカチュウのとくこう×2",                  slug: "light-ball" },
+  { name: "メタルパウダー",   cat: "特殊",       note: "メタモンの防御×2",                        slug: "metal-powder" },
+  { name: "しんかいのキバ",   cat: "特殊",       note: "パールルのとくこう×2",                    slug: "deep-sea-tooth" },
+  { name: "しんかいのウロコ", cat: "特殊",       note: "パールルのとくぼう×2",                    slug: "deep-sea-scale" },
+  { name: "ラッキーパンチ",   cat: "特殊",       note: "ラッキーの急所率アップ",                   slug: "lucky-punch" },
+  { name: "ながねぎ",         cat: "特殊",       note: "カモネギの急所率アップ",                   slug: "stick" },
+  { name: "こころのしずく",   cat: "特殊",       note: "ラティアス/ラティオス とくこう・とくぼう×1.5", slug: "soul-dew" },
   // その他
-  { name: "しあわせタマゴ",   cat: "その他",     note: "経験値×1.5" },
-  { name: "やすらぎのすず",   cat: "その他",     note: "なつき度が上がりやすい" },
+  { name: "しあわせタマゴ",   cat: "その他",     note: "経験値×1.5",                              slug: "lucky-egg" },
+  { name: "やすらぎのすず",   cat: "その他",     note: "なつき度が上がりやすい",                   slug: "soothe-bell" },
 ];
 
 export const LOCATION_DATA = [
@@ -584,3 +586,43 @@ export const OBTAIN_DATA = {
   "ミュウツー": "ハナダのどうくつ（クリア後・1匹のみ）",
   "ミュウ":     "イベント配布のみ",
 };
+
+// ─── PokeAPI アイテムデータ（キャッシュ） ────────────────────────────────────
+export let ITEM_API_DATA = {};
+
+export async function loadItemsFromAPI() {
+  const CACHE_KEY = 'items_v1';
+  const cached = loadProcessed(CACHE_KEY);
+  if (cached) { ITEM_API_DATA = cached; return; }
+
+  const slugSet = new Set();
+  ITEM_DATA.forEach(area => area.items.forEach(item => {
+    const s = item.slug ?? (item.tmId ? item.tmId.toLowerCase() : null);
+    if (s) slugSet.add(s);
+  }));
+  HOLD_ITEMS.forEach(item => { if (item.slug) slugSet.add(item.slug); });
+
+  const slugs = [...slugSet];
+  const results = await batchFetch(slugs.map(s => `/item/${s}`));
+
+  const processed = {};
+  slugs.forEach((slug, i) => {
+    const r = results[i];
+    if (r.status !== 'fulfilled') return;
+    const d = r.value;
+
+    const jaName = d.names?.find(n => n.language.name === 'ja')?.name
+                || d.names?.find(n => n.language.name === 'ja-hrkt')?.name;
+
+    const ftes = d.flavor_text_entries?.filter(e =>
+      e.language.name === 'ja' || e.language.name === 'ja-hrkt'
+    ) ?? [];
+    const desc = (ftes.find(e => e.version_group?.name === 'firered-leafgreen') ?? ftes[0])
+      ?.text?.replace(/\n/g, ' ');
+
+    processed[slug] = { jaName, desc, category: d.category?.name };
+  });
+
+  saveProcessed(CACHE_KEY, processed);
+  ITEM_API_DATA = processed;
+}
