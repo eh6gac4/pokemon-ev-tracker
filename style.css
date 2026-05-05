@@ -129,6 +129,47 @@ textarea.input-dark { resize: none; overflow: hidden; }
   .bottom-nav { display: none !important; }
 }
 .toggle-row { display: flex; flex-direction: column; gap: 8px; }
+
+/* SW update banner */
+#sw-update-banner {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 80px);
+  transform: translateX(-50%);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 16px;
+  background: #16213e;
+  border: 1px solid #3a3a5a;
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  color: #e8e8e8;
+  font-family: 'DotGothic16', 'Courier New', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  max-width: calc(100vw - 32px);
+}
+#sw-update-banner button {
+  background: #2a2a4a;
+  border: 1px solid #3a3a5a;
+  border-radius: 999px;
+  color: #7ec8e3;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+#sw-update-banner button:active { background: #3a3a5a; }
+#sw-update-banner button[data-action="dismiss"] {
+  padding: 4px 10px;
+  color: #888;
+}
+@media (min-width: 768px) {
+  #sw-update-banner { bottom: 24px; }
+}
 @media (min-width: 1024px) {
   .app-layout {
     grid-template-columns: 300px 1fr 320px;
