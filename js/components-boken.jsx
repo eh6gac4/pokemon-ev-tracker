@@ -220,6 +220,26 @@ export const AdventurePanel = React.memo(function AdventurePanel({ color, checke
   const [filter,    setFilter]    = useState("all");
   const [openAreas, setOpenAreas] = useState({});
   const [openImgs,  setOpenImgs]  = useState({});
+  const prevAllDoneRef = useRef({});
+
+  // すべてチェック済みになったエリアは自動で閉じる（手動で再度開けば開いたまま維持）
+  useEffect(() => {
+    setOpenAreas(prev => {
+      const next = { ...prev };
+      let changed = false;
+      ITEM_DATA.forEach(areaData => {
+        const allDone = areaData.items.length > 0 &&
+                        areaData.items.every(i => checkedItems[i.id]);
+        const prevAllDone = prevAllDoneRef.current[areaData.area];
+        if (allDone && !prevAllDone) {
+          next[areaData.area] = false;
+          changed = true;
+        }
+        prevAllDoneRef.current[areaData.area] = allDone;
+      });
+      return changed ? next : prev;
+    });
+  }, [checkedItems]);
 
   const TYPE_ICON  = { gift: "🎁", tm: "💿", hm: "🔑", field: "📦", hidden: "🔍", gym: "🏆" };
   const FILTERS = [
